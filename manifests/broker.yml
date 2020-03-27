@@ -1,0 +1,104 @@
+---
+# ===========================================================
+# This file configures the RabbitMQ Multitenant Broker node.
+# ===========================================================
+
+meta:
+  cf:
+    exodus_path: (( concat "secret/exodus/" params.env "/cf" ))
+    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
+    api_url:    (( vault meta.cf.exodus_path ":api_url" ))
+    username:   (( vault meta.cf.exodus_path ":admin_username" ))
+    password:   (( vault meta.cf.exodus_path ":admin_password" ))
+  broker:
+    username: (( grab params.broker_username ))
+    password: (( vault meta.vault "/broker/auth:password" ))
+    protocol: http
+
+params:
+  product_name: p-rabbitmq
+  broker_username: broker
+  broker_domain: (( param "Please specify a broker domain" ))
+  rabbitmq_username: admin
+
+instance_groups:
+- name:      rmq-broker
+  instances: 1
+  azs:       (( grab params.availability_zones || meta.default.azs ))
+  stemcell:  default
+  networks:
+  - name: (( grab params.network || "rabbitmq" ))
+    static_ips: (( static_ips 0 ))
+  vm_type:   (( grab params.broker_vm_type || "small" ))
+  jobs:
+  - name: rabbitmq-service-broker
+    release: cf-rabbitmq-multitenant-broker
+    properties:
+      cf:
+        domain: (( grab meta.cf.system_domain ))
+      rabbitmq-service-broker:
+        route: 
+        cc_endpoint: (( grab meta.cf.api_url ))
+        service:
+          username:  (( grab meta.broker.username ))
+          password:  (( grab meta.broker.password ))
+          # Generate these
+          uuid:      54766614-4530-41e6-b5df-8ccb2dc3fd3f
+          plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
+          product_name: (( grab params.product_name ))
+          shareable: true
+        logging:
+          level: debug
+          print_stack_traces: false
+        rabbitmq:
+          hosts: actually uses bosh links
+          operator_set_policy:
+            enabled: true
+            policy_name: "operator_set_policy"
+            policy_definition: '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+            policy_priority: 50
+          management_domain: (( grab params.broker_domain ))
+          management:
+            username: management
+          administrator:
+            username: admin
+            password: (( vault meta.vault "/rabbitmq/admin:password" ))
+
+  - name:    bpm
+    release: bpm
+
+  - name: broker-registrar
+    release: cf-rabbitmq-multitenant-broker
+    properties:
+      .: (( inject instance_groups.rmq_broker.jobs.broker-deregistar.properties ))
+      broker:
+        protocol: (( grab meta.broker.protocol ))
+        host:     (( grab params.broker_domain ))
+        username: (( grab meta.broker.username ))
+        password: (( grab meta.broker.password ))
+
+  - name: broker-deregistrar
+    release: cf-rabbitmq-multitenant-broker
+    properties:
+      cf:
+        api_url: (( grab meta.cf.api_url ))
+        admin_username: (( grab meta.cf.username ))
+        admin_password: (( grab meta.cf.password ))
+      broker:
+        service:
+          name: (( grab params.product_name ))
+        name: (( grab params.product_name ))
+
+  - name: smoke-tests
+    release: cf-rabbitmq-smoke-tests
+    properties:
+      cf:
+        api_url: (( grab meta.cf.api_url ))
+        domain:  (( grab meta.cf.system_domain ))
+        admin_username: (( grab meta.cf.username ))
+        admin_password: (( grab meta.cf.password ))
+      broker:
+        name: (( grab params.product_name ))
+      smoke_tests:
+        org: system
+

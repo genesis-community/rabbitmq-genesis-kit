@@ -1,0 +1,22 @@
+
+releases:
+- name:    cf-rabbitmq
+  version: 284.0.0
+  url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=284.0.0
+  sha1:    2b06714f9d901b7adcbc5f7d64509ce74d8cf02f
+
+- name:    cf-rabbitmq-multitenant-broker
+  version: 63.0.0
+  url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=63.0.0
+  sha1:    e09875eff8512ebcc78f91d2371c9df13e78e978
+
+- name:    cf-rabbitmq-smoke-tests
+  version: 40.0.0
+  url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=40.0.0
+  sha1:    128e1d1f0348e7c5444a654768d7d9d16f5f1a73
+
+- name:    bpm
+  version: 1.1.6 
+  url:     https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.6
+  sha1:    5bad6161dbbcf068830a100b6a76056fe3b99bc8
+

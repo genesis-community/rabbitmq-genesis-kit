@@ -1,0 +1,51 @@
+instance_groups:
+- name: rmq
+  instances: (( grab params.rmq_instances || 1 ))
+  jobs:
+  - name: rabbitmq-server
+    release: cf-rabbitmq
+    properties:
+      rabbitmq-server:
+        version: "3.7"
+        plugins:
+        - rabbitmq_management
+        - rabbitmq_mqtt
+        - rabbitmq_stomp
+        ports:
+        - 5672
+        - 5671
+        - 1883
+        - 8883
+        - 61613
+        - 61614
+        - 15672
+        - 15674
+        administrators:
+          management:
+            username: management
+            password: (( vault meta.vault "/rabbitmq/management:password" ))
+          broker:
+            username: (( grab params.broker_username ))
+            password: (( vault meta.vault "/broker/auth:password" ))
+        cookie: (( vault meta.vault "/rabbitmq/erlang-cookie:cookie" ))
+        cluster_partition_handling: pause_minority
+  vm_type: (( grab params.server_vm_type || "rabbitmq" ))
+  stemcell: default
+  persistent_disk_type: rabbitmq
+  networks:
+  - name: (( grab params.network || "rabbitmq" ))
+  azs: (( grab params.availability_zones || meta.default.azs ))
+
+- name: haproxy
+  instances: 1
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  vm_type: (( grab params.proxy_vm_type || "small" ))
+  stemcell: default
+  networks:
+  - name: (( grab params.network || "rabbitmq" ))
+  azs: (( grab params.availability_zones || meta.default.azs ))
+

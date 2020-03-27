@@ -1,0 +1,21 @@
+meta:
+  default:
+    azs: [z1]
+
+instance_groups:
+- name: rmq-server
+- name: rmq-broker
+
+update:
+  serial:            false
+  canaries:          1
+  max_in_flight:     1
+  max_errors:        1
+  canary_watch_time: 5000-600000
+  update_watch_time: 5000-600000
+
+stemcells:
+- alias:   default
+  os:      (( grab params.stemcell_os      || "ubuntu-xenial" ))
+  version: (( grab params.stemcell_version || "latest" ))
+
