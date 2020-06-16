@@ -42,7 +42,7 @@ instance_groups:
         service:
           username:  (( grab meta.broker.username ))
           password:  (( grab meta.broker.password ))
-          # Generate these
+          #FIXME: Generate these
           uuid:      54766614-4530-41e6-b5df-8ccb2dc3fd3f
           plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
           product_name: (( grab params.product_name ))
