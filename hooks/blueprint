@@ -13,12 +13,17 @@ set -eu
 # zero exit code otherwise).
 
 
-validate_features 
+validate_features multitenant-broker
 
 declare -a manifests
 manifests+=( manifests/base.yml
-             manifests/broker.yml 
              manifests/releases.yml
              manifests/server.yml )
+
+if want_feature "multitenant-broker" ; then
+  manifests+=(
+    manifests/broker.yml
+  )
+fi
 
 echo ${manifests[@]}

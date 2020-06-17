@@ -6,15 +6,43 @@ set -eu
 # Genesis Kit `new' Hook
 #
 
-cat <<EOF >$GENESIS_ROOT/$GENESIS_ENVIRONMENT.yml
+prompt_for use_broker boolean \
+  'Would you like to deploy the multitenant service broker in front of this RabbitMQ?'
+
+if $use_broker; then
+  prompt_for broker_domain line \
+    'What hostname will the broker be reachable at (e.g. rmq.mydomain.com)?'
+fi
+
+env_file="${GENESIS_ROOT}/${GENESIS_ENVIRONMENT}.yml"
+
+cat <<EOF >>$env_file
 kit:
   name:    $GENESIS_KIT_NAME
   version: $GENESIS_KIT_VERSION
   features:
     - (( replace ))
+EOF
 
-params:
+if $use_broker; then
+cat <<EOF >>$env_file
+    - multitenant_broker
+EOF
+fi
+
+cat <<EOF >>$env_file
+genesis:
   env:   $GENESIS_ENVIRONMENT
   vault: $GENESIS_VAULT_PREFIX
 EOF
+
+if $use_broker; then
+  cat <<EOF >>$env_file
+params:
+  broker_domain: $broker_domain
+
+EOF
+
+fi
+
 exit 0

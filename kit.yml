@@ -9,9 +9,13 @@ genesis_version_min: 2.6.0
 
 credentials:
   base:
-    broker/auth:
+    rabbitmq/admin/broker:
       password: random 64
-    rabbitmq/admin:
+    rabbitmq/admin/management:
       password: random 64
     rabbitmq/erlang-cookie:
       cookie: random 64
+
+  multitenant-broker:
+    broker/auth:
+      password: random 64

@@ -4,7 +4,6 @@ meta:
 
 instance_groups:
 - name: rmq-server
-- name: rmq-broker
 
 update:
   serial:            false

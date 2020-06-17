@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#Cloud Config checks
+if [[ -z "$GENESIS_CLOUD_CONFIG" ]]; then exit 0; fi
+
+cloud_config_needs network   "$(lookup params.rabbitmq_network rabbitmq)"
+cloud_config_needs vm_type   "$(lookup params.server_vm_type   rabbitmq)"
+cloud_config_needs vm_type   "$(lookup params.proxy_vm_type    small)"
+cloud_config_needs disk_type "$(lookup params.server_disk_type rabbitmq)"
+
+if want_feature "multitenant-broker"; then
+  cloud_config_needs vm_type "$(lookup params.broker_vm_type small)"
+fi
+
+if check_cloud_config; then
+  describe "  cloud-config [#G{OK}]"
+else
+  describe "  cloud-config [#R{FAILED}]"
+  exit 1
+fi

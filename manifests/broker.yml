@@ -17,17 +17,20 @@ meta:
 
 params:
   product_name: p-rabbitmq
-  broker_username: broker
   broker_domain: (( param "Please specify a broker domain" ))
-  rabbitmq_username: admin
 
 instance_groups:
+- name:      rmq-server
+  networks:
+  - (( replace ))
+  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
+
 - name:      rmq-broker
   instances: 1
   azs:       (( grab params.availability_zones || meta.default.azs ))
   stemcell:  default
   networks:
-  - name: (( grab params.network || "rabbitmq" ))
+  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
     static_ips: (( static_ips 0 ))
   vm_type:   (( grab params.broker_vm_type || "small" ))
   jobs:
@@ -61,8 +64,8 @@ instance_groups:
           management:
             username: management
           administrator:
-            username: admin
-            password: (( vault meta.vault "/rabbitmq/admin:password" ))
+            username: broker
+            password: (( vault meta.vault "/rabbitmq/admin/broker:password" ))
 
   - name:    bpm
     release: bpm
@@ -102,3 +105,8 @@ instance_groups:
       smoke_tests:
         org: system
 
+releases:
+  - name: cf-rabbitmq-multitenant-broker
+    .:    (( inject meta.releases.cf-rabbitmq-multitenant-broker ))
+  - name: cf-rabbitmq-smoke-tests
+    .:    (( inject meta.releases.cf-rabbitmq-multitenant-broker ))

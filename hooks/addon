@@ -1,0 +1,5 @@
+#!/bin/bash
+
+list() {
+  echo "This kit does not currently define any addon hooks"
+}

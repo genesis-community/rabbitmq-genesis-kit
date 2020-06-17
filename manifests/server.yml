@@ -1,12 +1,16 @@
+params:
+  # the username used by the Cloud Controller to auth to the broker
+  broker_username: broker
+
 instance_groups:
-- name: rmq
+- name: rmq-server
   instances: (( grab params.rmq_instances || 1 ))
   jobs:
   - name: rabbitmq-server
     release: cf-rabbitmq
     properties:
       rabbitmq-server:
-        version: "3.7"
+        version: "3.8"
         plugins:
         - rabbitmq_management
         - rabbitmq_mqtt
@@ -23,17 +27,17 @@ instance_groups:
         administrators:
           management:
             username: management
-            password: (( vault meta.vault "/rabbitmq/management:password" ))
+            password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
           broker:
-            username: (( grab params.broker_username ))
-            password: (( vault meta.vault "/broker/auth:password" ))
+            username: broker
+            password: (( vault meta.vault "/rabbitmq/admin/broker:password" ))
         cookie: (( vault meta.vault "/rabbitmq/erlang-cookie:cookie" ))
         cluster_partition_handling: pause_minority
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default
-  persistent_disk_type: rabbitmq
+  persistent_disk_type: (( grab params.server_disk_type || "rabbitmq" ))
   networks:
-  - name: (( grab params.network || "rabbitmq" ))
+  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
 - name: haproxy
@@ -46,6 +50,12 @@ instance_groups:
   vm_type: (( grab params.proxy_vm_type || "small" ))
   stemcell: default
   networks:
-  - name: (( grab params.network || "rabbitmq" ))
+  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
+    static_ips: (( static_ips 0 ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
+releases:
+- name: cf-rabbitmq
+  .:    (( inject meta.releases.cf-rabbitmq ))
+- name: bpm
+  .:    (( inject meta.releases.bpm ))
