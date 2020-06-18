@@ -11,8 +11,11 @@ prompt_for use_broker boolean \
 
 if $use_broker; then
   prompt_for broker_domain line \
-    'What hostname will the broker be reachable at (e.g. rmq.mydomain.com)?'
+    'What hostname will the broker be reachable at (e.g. rmq-broker.mydomain.com)?'
 fi
+
+prompt_for rmq_domain line \
+  'What hostname will the RabbitMQ and RMQ Management Plugin be reachable at (e.g. rmq.mydomain.com)?'
 
 env_file="${GENESIS_ROOT}/${GENESIS_ENVIRONMENT}.yml"
 
@@ -36,9 +39,13 @@ genesis:
   vault: $GENESIS_VAULT_PREFIX
 EOF
 
+cat <<EOF >>$env_file
+params:
+  rmq_external_url: $rmq_domain
+EOF
+
 if $use_broker; then
   cat <<EOF >>$env_file
-params:
   broker_domain: $broker_domain
 
 EOF
