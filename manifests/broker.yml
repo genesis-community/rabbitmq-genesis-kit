@@ -37,11 +37,11 @@ instance_groups:
   - name: rabbitmq-service-broker
     release: cf-rabbitmq-multitenant-broker
     properties:
-      cf:
-        domain: (( grab meta.cf.system_domain ))
+      #cf:
+      #  domain: (( grab meta.cf.system_domain ))
       rabbitmq-service-broker:
-        route: 
-        cc_endpoint: (( grab meta.cf.api_url ))
+        #route: 
+        #cc_endpoint: (( grab meta.cf.api_url ))
         service:
           username:  (( grab meta.broker.username ))
           password:  (( grab meta.broker.password ))
@@ -54,7 +54,8 @@ instance_groups:
           level: debug
           print_stack_traces: false
         rabbitmq:
-          hosts: actually uses bosh links
+          #hosts: actually uses bosh links
+          ssl: true
           operator_set_policy:
             enabled: true
             policy_name: "operator_set_policy"
@@ -95,13 +96,9 @@ instance_groups:
   - name: smoke-tests
     release: cf-rabbitmq-smoke-tests
     properties:
+      .: (( inject instance_groups.rmq_broker.jobs.broker-deregistar.properties ))
       cf:
-        api_url: (( grab meta.cf.api_url ))
         domain:  (( grab meta.cf.system_domain ))
-        admin_username: (( grab meta.cf.username ))
-        admin_password: (( grab meta.cf.password ))
-      broker:
-        name: (( grab params.product_name ))
       smoke_tests:
         org: system
 

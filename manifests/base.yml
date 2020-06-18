@@ -6,7 +6,7 @@ instance_groups:
 - name: rmq-server
 
 update:
-  serial:            false
+  serial:            true
   canaries:          1
   max_in_flight:     1
   max_errors:        1

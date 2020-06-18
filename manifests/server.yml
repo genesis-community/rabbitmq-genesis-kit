@@ -33,6 +33,20 @@ instance_groups:
             password: (( vault meta.vault "/rabbitmq/admin/broker:password" ))
         cookie: (( vault meta.vault "/rabbitmq/erlang-cookie:cookie" ))
         cluster_partition_handling: pause_minority
+        ssl:
+          enabled: true
+          key:    (( vault meta.vault "/rabbitmq/certs/server:key" ))
+          cert:   (( vault meta.vault "/rabbitmq/certs/server:certificate" ))
+          cacert: (( vault meta.vault "/rabbitmq/certs/ca:certificate" ))
+          versions:
+          - tlsv1.2
+          # Verification is off because we don't currently have a way to
+          # automagically sign the certificate for the IPs that the servers
+          # will dynamically assigned.
+          verify:                    false
+          verification_depth:        5
+          fail_if_no_peer_cert:      true
+
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default
   persistent_disk_type: (( grab params.server_disk_type || "rabbitmq" ))
