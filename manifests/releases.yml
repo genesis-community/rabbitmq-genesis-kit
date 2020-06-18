@@ -20,3 +20,7 @@ meta:
     url:     https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.8
     sha1:    c956394fce7e74f741e4ae8c256b480904ad5942
 
+  - name:    cf-cli
+    version: 1.26.0
+    url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.26.0
+    sha1:    ed3aef6b2b25cb7cec1b0eaff3b7c736374a2f47

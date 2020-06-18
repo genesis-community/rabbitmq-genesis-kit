@@ -41,7 +41,7 @@ EOF
 
 cat <<EOF >>$env_file
 params:
-  rmq_external_url: $rmq_domain
+  rmq_domain: $rmq_domain
 EOF
 
 if $use_broker; then

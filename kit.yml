@@ -16,6 +16,10 @@ credentials:
     rabbitmq/erlang-cookie:
       cookie: random 64
 
+  multitenant-broker:
+    broker/auth:
+      password: random 64
+
 certificates:
   base:
     rabbitmq/certs:
@@ -24,8 +28,4 @@ certificates:
         names:     ["rabbitmqCA"]
       server:
         valid_for: 1y
-        names:     ["${params.rmq_external_url}"]
-
-  multitenant-broker:
-    broker/auth:
-      password: random 64
+        names:     ["${params.rmq_domain}"]

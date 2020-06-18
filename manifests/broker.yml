@@ -7,7 +7,7 @@ meta:
   cf:
     exodus_path: (( concat "secret/exodus/" params.env "/cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
-    api_url:    (( vault meta.cf.exodus_path ":api_url" ))
+    api_url:    (( concat "https://api." meta.cf.system_domain ))
     username:   (( vault meta.cf.exodus_path ":admin_username" ))
     password:   (( vault meta.cf.exodus_path ":admin_password" ))
   broker:
@@ -20,18 +20,13 @@ params:
   broker_domain: (( param "Please specify a broker domain" ))
 
 instance_groups:
-- name:      rmq-server
-  networks:
-  - (( replace ))
-  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
-
 - name:      rmq-broker
   instances: 1
   azs:       (( grab params.availability_zones || meta.default.azs ))
   stemcell:  default
   networks:
   - name: (( grab params.rabbitmq_network || "rabbitmq" ))
-    static_ips: (( static_ips 0 ))
+    static_ips: (( static_ips 1 ))
   vm_type:   (( grab params.broker_vm_type || "small" ))
   jobs:
   - name: rabbitmq-service-broker
@@ -61,7 +56,7 @@ instance_groups:
             policy_name: "operator_set_policy"
             policy_definition: '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
             policy_priority: 50
-          management_domain: (( grab params.broker_domain ))
+          management_domain: (( grab params.rmq_domain ))
           management:
             username: management
           administrator:
@@ -71,13 +66,16 @@ instance_groups:
   - name:    bpm
     release: bpm
 
+  - name: cf-cli-6-linux
+    release: cf-cli
+
   - name: broker-registrar
     release: cf-rabbitmq-multitenant-broker
     properties:
-      .: (( inject instance_groups.rmq_broker.jobs.broker-deregistar.properties ))
+      .: (( inject instance_groups.rmq-broker.jobs.broker-deregistrar.properties ))
       broker:
         protocol: (( grab meta.broker.protocol ))
-        host:     (( grab params.broker_domain ))
+        host:     (( concat params.broker_domain ":4567" ))
         username: (( grab meta.broker.username ))
         password: (( grab meta.broker.password ))
 
@@ -96,7 +94,7 @@ instance_groups:
   - name: smoke-tests
     release: cf-rabbitmq-smoke-tests
     properties:
-      .: (( inject instance_groups.rmq_broker.jobs.broker-deregistar.properties ))
+      .: (( inject instance_groups.rmq-broker.jobs.broker-deregistrar.properties ))
       cf:
         domain:  (( grab meta.cf.system_domain ))
       smoke_tests:
@@ -106,4 +104,6 @@ releases:
   - name: cf-rabbitmq-multitenant-broker
     .:    (( inject meta.releases.cf-rabbitmq-multitenant-broker ))
   - name: cf-rabbitmq-smoke-tests
-    .:    (( inject meta.releases.cf-rabbitmq-multitenant-broker ))
+    .:    (( inject meta.releases.cf-rabbitmq-smoke-tests ))
+  - name: cf-cli
+    .:    (( inject meta.releases.cf-cli ))
