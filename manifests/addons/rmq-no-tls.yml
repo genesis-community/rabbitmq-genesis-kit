@@ -1,0 +1,10 @@
+---
+- type: remove
+  path: /instance_groups/name=rmq-broker?/jobs/name=rabbitmq-service-broker/properties/rabbittmq-service-broker/rabbitmq/ssl
+
+- type: remove
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ssl
+
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ssl?/enabled
+  value: false

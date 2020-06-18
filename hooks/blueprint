@@ -13,7 +13,7 @@ set -eu
 # zero exit code otherwise).
 
 
-validate_features multitenant-broker
+validate_features multitenant-broker rmq-no-tls
 
 declare -a manifests
 manifests+=( manifests/base.yml
@@ -23,6 +23,12 @@ manifests+=( manifests/base.yml
 if want_feature "multitenant-broker" ; then
   manifests+=(
     manifests/broker.yml
+  )
+fi
+
+if want_feature "rmq-no-tls" ; then
+  manifests+=(
+    manifests/addons/rmq-no-tls.yml
   )
 fi
 
