@@ -1,5 +1,52 @@
 #!/bin/bash
 
+set -u
+
+#Version check
+min_version="2.7.6"
+genesis_version="$(genesis -v 2>&1 | grep '^Genesis v' | sed -e 's/Genesis v\(.*\) (.*$/\1/')"
+if ! [[ "$genesis_version" =~ -dev$ ]] && ! new_enough "$genesis_version" "$min_version" ; then
+  describe >&2 "" "#R{[ERROR]} This kit needs Genesis $min_version.  Please upgrade before continuing" ""
+  exit 1
+fi
+set -e
+
 list() {
-  echo "This kit does not currently define any addon hooks"
+  describe "" "$(cat <<EOF
+The following addons are defined:
+  #G{register-broker}    Register this broker with the Cloud Foundry in
+                     this environment.
+
+  #G{deregister-broker}  Deregister this broker from the Cloud Foundry in
+                     this environment.
+
+  #G{smoketest}          Run the smoke test errand for this deployment.
+
+EOF
+)" ""
 }
+
+case $GENESIS_ADDON_SCRIPT in
+list)
+  list
+  exit 0
+  ;;
+
+register-broker)
+  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-registrar
+  ;;
+
+deregister-broker)
+  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-deregistrar
+  ;;
+
+smoketest)
+  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand smoke-tests
+  ;;
+
+*)
+  echo "Unrecognized RabbitMQ Genesis Kit addon."
+  list
+  exit 1
+  ;;
+esac
