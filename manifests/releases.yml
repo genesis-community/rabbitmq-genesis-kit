@@ -1,9 +1,9 @@
 meta:
   releases:
   - name:    cf-rabbitmq
-    version: 304.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=304.0.0
-    sha1:    ea97604b56aa9c8807e9cbe07f2f9ad6f78a72aa
+    version: 298.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=298.0.0
+    sha1:    af49f66f70cd5d6ca50e21e9e3c755aaa965ae84
 
   - name:    cf-rabbitmq-multitenant-broker
     version: 72.0.0
