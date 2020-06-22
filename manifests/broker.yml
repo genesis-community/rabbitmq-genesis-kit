@@ -16,7 +16,8 @@ meta:
     protocol: http
 
 params:
-  product_name: p-rabbitmq
+  broker_name:  p-rabbitmq
+  service_name: p-rabbitmq
   broker_domain: (( param "Please specify a broker domain" ))
 
 instance_groups:
@@ -43,7 +44,7 @@ instance_groups:
           #FIXME: Generate these
           uuid:      54766614-4530-41e6-b5df-8ccb2dc3fd3f
           plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
-          product_name: (( grab params.product_name ))
+          name:      (( grab params.service_name ))
           shareable: true
         logging:
           level: debug
@@ -88,8 +89,8 @@ instance_groups:
         admin_password: (( grab meta.cf.password ))
       broker:
         service:
-          name: (( grab params.product_name ))
-        name: (( grab params.product_name ))
+          name: (( grab params.service_name ))
+        name: (( grab params.broker_name ))
 
   - name: smoke-tests
     release: cf-rabbitmq-smoke-tests
