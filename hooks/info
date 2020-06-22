@@ -1,0 +1,21 @@
+#!/bin/bash
+set -eu
+
+host_data="$(safe get "$GENESIS_EXODUS_BASE" | spruce json)"
+missing="$(describe "#RI{missing}")"
+
+describe "#u{RabbitMQ Management UI}" \
+        "  URL:      #C{$(echo "$host_data" | jq -Mr '.management_url // "'"$missing"'"')}" \
+        "  Username: #C{$(echo "$host_data" | jq -Mr '.management_username // "'"$missing"'"')}" \
+        "  Password: #C{$(echo "$host_data" | jq -Mr '.management_password // "'"$missing"'"')}"
+
+echo
+
+if want_feature "multitenant-broker"; then
+  describe "#u{Service Broker}" \
+          "  URL:          #C{$(echo "$host_data" | jq -Mr '.broker_url // "'"$missing"'"')}" \
+          "  Username:     #C{$(echo "$host_data" | jq -Mr '.broker_username // "'"$missing"'"')}" \
+          "  Password:     #C{$(echo "$host_data" | jq -Mr '.broker_password // "'"$missing"'"')}" \
+          "  Broker Name:  #C{$(echo "$host_data" | jq -Mr '.broker_name // "'"$missing"'"')}" \
+          "  Service Name: #C{$(echo "$host_data" | jq -Mr '.service_name // "'"$missing"'"')}"
+fi
