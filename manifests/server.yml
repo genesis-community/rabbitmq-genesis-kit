@@ -1,6 +1,7 @@
-params:
-  # the username used by the Cloud Controller to auth to the broker
-  broker_username: broker
+#==================================================
+# This file configures the RabbitMQ server cluster
+#  and inbound traffic HAProxy
+#==================================================
 
 instance_groups:
 - name: rmq-server
@@ -42,7 +43,7 @@ instance_groups:
           - tlsv1.2
           # Verification is off because we don't currently have a way to
           # automagically sign the certificate for the IPs that the servers
-          # will dynamically assigned.
+          # will be dynamically assigned.
           verify:                    false
           verification_depth:        5
           fail_if_no_peer_cert:      true
@@ -73,3 +74,8 @@ releases:
   .:    (( inject meta.releases.cf-rabbitmq ))
 - name: bpm
   .:    (( inject meta.releases.bpm ))
+
+exodus:
+  management_url: (( concat "https://" instance_groups.haproxy.networks.0.static_ips.0 ":15672" ))
+  management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))
+  management_password: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.password ))

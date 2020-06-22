@@ -19,6 +19,8 @@ params:
   broker_name:  p-rabbitmq
   service_name: p-rabbitmq
   broker_domain: (( param "Please specify a broker domain" ))
+  # the username used by the Cloud Controller to auth to the broker
+  broker_username: broker
 
 instance_groups:
 - name:      rmq-broker
@@ -108,3 +110,10 @@ releases:
     .:    (( inject meta.releases.cf-rabbitmq-smoke-tests ))
   - name: cf-cli
     .:    (( inject meta.releases.cf-cli ))
+
+exodus:
+  broker_url: (( concat meta.broker.protocol "://" params.broker_domain ":4567" ))
+  broker_username: (( grab meta.broker.username ))
+  broker_password: (( grab meta.broker.password ))
+  broker_name: (( grab params.broker_name ))
+  service_name: (( grab params.service_name ))
