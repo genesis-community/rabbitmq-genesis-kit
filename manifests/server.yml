@@ -23,6 +23,7 @@ instance_groups:
         - 8883
         - 61613
         - 61614
+        - 15671
         - 15672
         - 15674
         administrators:
@@ -47,6 +48,11 @@ instance_groups:
           verify:                    false
           verification_depth:        5
           fail_if_no_peer_cert:      true
+        management_tls:
+          enabled: true
+          cacert:  (( vault meta.vault "/rabbitmq/certs/ca:certificate" ))
+          cert:  (( vault meta.vault "/rabbitmq/certs/management:certificate" ))
+          key:  (( vault meta.vault "/rabbitmq/certs/management:key" ))
 
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default
