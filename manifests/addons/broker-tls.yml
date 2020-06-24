@@ -1,0 +1,26 @@
+instance_groups:
+- name: rmq-broker
+  jobs:
+  - name:    haproxy
+    release: haproxy
+    properties:
+      ha_proxy:
+        disable_tls_10: true
+        disable_tls_11: true
+        ssl_pem:        (( vault meta.vault "/broker/certs/server:combined" ))
+        tcp:
+        - name: broker_https
+          port: 443
+          backend_port: 4567
+          backend_servers: [127.0.0.1]
+          ssl: true
+          backend_ssl: none
+
+  - name: broker-registrar
+    properties:
+      broker:
+        host: (( concat params.broker_domain ":" instance_groups.rmq-broker.jobs.haproxy.properties.ha_proxy.tcp.0.port ))
+
+meta:
+  broker:
+    protocol: https

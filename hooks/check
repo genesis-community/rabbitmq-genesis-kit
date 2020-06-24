@@ -8,7 +8,7 @@ cloud_config_needs vm_type   "$(lookup params.server_vm_type   rabbitmq)"
 cloud_config_needs vm_type   "$(lookup params.proxy_vm_type    small)"
 cloud_config_needs disk_type "$(lookup params.server_disk_type rabbitmq)"
 
-if want_feature "multitenant-broker"; then
+if want_feature "broker"; then
   cloud_config_needs vm_type "$(lookup params.broker_vm_type small)"
 fi
 

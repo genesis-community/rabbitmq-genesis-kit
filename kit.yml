@@ -4,8 +4,7 @@ author:  Thomas Mitchell <tmitchell@starkandwayne.com>
 docs:    https://github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release 
 code:    https://github.com/genesis-community/rabbitmq-genesis-kit
 
-# 2.6.0 was our last big feature bump
-genesis_version_min: 2.6.0
+genesis_version_min: 2.7.9
 
 credentials:
   base:
@@ -16,7 +15,7 @@ credentials:
     rabbitmq/erlang-cookie:
       cookie: random 64
 
-  multitenant-broker:
+  broker:
     broker/auth:
       password: random 64
 
@@ -29,3 +28,12 @@ certificates:
       server:
         valid_for: 1y
         names:     ["${params.rmq_domain}"]
+    
+  +broker-tls:
+    broker/certs:
+      ca:
+        valid_for: 10y
+        names:     ["rmqbrokerCA"]
+      server:
+        valid_for: 1y
+        names:     ["${params.broker_domain}"]

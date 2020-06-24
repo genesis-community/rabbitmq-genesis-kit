@@ -24,3 +24,8 @@ meta:
     version: 1.26.0
     url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.26.0
     sha1:    ed3aef6b2b25cb7cec1b0eaff3b7c736374a2f47
+
+  - name:    haproxy
+    version: 10.1.0
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.1.0
+    sha1:    97fbb573fc04d36c548915d8daef12a547e722d6
