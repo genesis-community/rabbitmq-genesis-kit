@@ -20,7 +20,7 @@ credentials:
       password: random 64
 
 certificates:
-  base:
+  +rmq-tls:
     rabbitmq/certs:
       ca:
         valid_for: 10y
