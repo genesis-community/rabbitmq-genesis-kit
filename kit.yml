@@ -13,7 +13,7 @@ credentials:
     rabbitmq/admin/management:
       password: random 64
     rabbitmq/erlang-cookie:
-      cookie: random 64
+      cookie: random 64 fixed
 
   broker:
     broker/auth:
