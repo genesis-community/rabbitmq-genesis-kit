@@ -5,21 +5,54 @@ instance_groups:
     release: haproxy
     properties:
       ha_proxy:
-        disable_tls_10: true
-        disable_tls_11: true
-        ssl_pem:        (( vault meta.vault "/broker/certs/server:combined" ))
-        tcp:
-        - name: broker_https
-          port: 443
-          backend_port: 4567
-          backend_servers: [127.0.0.1]
-          ssl: true
-          backend_ssl: none
+        ssl_pem: (( vault meta.vault "/broker/certs/server:combined" ))
+        raw_config: |
+          global
+              log stdout len 1024 format raw syslog info
+              daemon
+              user vcap
+              group vcap
+              maxconn 64000
+              spread-checks 4
+              tune.ssl.default-dh-param 2048
+              tune.bufsize 16384
+              stats socket /var/vcap/sys/run/haproxy/stats.sock mode 600 expose-fd listeners level admin
+              stats timeout 2m
+              ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+              ssl-default-bind-ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+              ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+              ssl-default-server-ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+
+          defaults
+              log global
+              option log-health-checks
+              option log-separate-errors
+              maxconn 64000
+              option http-server-close
+              option httplog
+              option forwardfor
+              option contstats
+              timeout connect         5000ms
+              timeout client          30000ms
+              timeout server          30000ms
+              timeout tunnel          3600000ms
+              timeout http-keep-alive 6000ms
+              timeout http-request    5000ms
+              timeout queue           30000ms
+
+          frontend tcp-frontend-broker-https
+              mode tcp
+              bind :443  ssl crt /var/vcap/jobs/haproxy/config/ssl
+              default_backend tcp-broker-https
+
+          backend tcp-broker-https
+              mode tcp
+              server node0 127.0.0.1:4567 check inter 1000
 
   - name: broker-registrar
     properties:
       broker:
-        host: (( concat params.broker_domain ":" instance_groups.rmq-broker.jobs.haproxy.properties.ha_proxy.tcp.0.port ))
+        host: (( concat params.broker_domain ":443" ))
 
 meta:
   broker:
