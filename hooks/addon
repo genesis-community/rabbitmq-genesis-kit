@@ -32,15 +32,15 @@ list)
   exit 0
   ;;
 
-register-broker)
+register-broker|broker-registrar)
   $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-registrar
   ;;
 
-deregister-broker)
+deregister-broker|broker-deregistrar)
   $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-deregistrar
   ;;
 
-smoketest)
+smoketest|smoke-tests)
   $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand smoke-tests
   ;;
 
