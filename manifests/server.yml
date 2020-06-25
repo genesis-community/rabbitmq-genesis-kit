@@ -3,6 +3,9 @@
 #  and inbound traffic HAProxy
 #==================================================
 
+params:
+  rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
+
 instance_groups:
 - name: rmq-server
   instances: (( grab params.rmq_instances || 1 ))
@@ -17,14 +20,14 @@ instance_groups:
         - rabbitmq_mqtt
         - rabbitmq_stomp
         ports:
-        - 5672
-        - 5671
-        - 1883
-        - 8883
-        - 61613
-        - 61614
-        - 15672
-        - 15674
+        - 5672 #AMQP
+        - 5671 #AMQPS
+        - 1883 #MQTT
+        - 8883 #MQTT over TLS
+        - 61613 #STOMP
+        - 61614 #STOMP over TLS
+        - 15672 #RMQ Management
+        - 15674 #STOMP WebSocket
         administrators:
           management:
             username: management
@@ -76,6 +79,6 @@ releases:
   .:    (( inject meta.releases.bpm ))
 
 exodus:
-  management_url: (( concat "https://" instance_groups.haproxy.networks.0.static_ips.0 ":15672" ))
+  management_url: (( concat "https://" params.rmq_domain ":15672" ))
   management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))
   management_password: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.password ))

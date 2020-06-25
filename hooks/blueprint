@@ -13,7 +13,7 @@ set -eu
 # zero exit code otherwise).
 
 
-validate_features broker no-rmq-tls no-broker-tls
+validate_features broker no-rmq-tls no-broker-tls external-rmq-lb
 
 declare -a manifests
 manifests+=( manifests/base.yml
@@ -36,6 +36,17 @@ if want_feature "no-rmq-tls" ; then
   manifests+=(
     manifests/addons/no-rmq-tls.yml
   )
+fi
+
+if want_feature "external-rmq-lb" ; then
+  manifests+=(
+    manifests/addons/external-rmq-lb.yml
+  )
+  if want_feature "broker" ; then
+    manifests+=(
+      manifests/addons/external-rmq-lb-with-broker.yml
+    )
+  fi
 fi
 
 echo ${manifests[@]}

@@ -1,0 +1,4 @@
+---
+- type: replace
+  path: /instance_groups/name=rmq-broker/jobs/name=rabbitmq-service-broker/properties/rabbitmq-service-broker/rabbitmq/dns_host?
+  value: (( grab params.rmq_domain ))
