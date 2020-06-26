@@ -1,0 +1,34 @@
+---
+meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
+
+params:
+  cf_deployment: (( concat meta.environment "-cf" ))
+  broker_route_subdomain: rabbitmq-broker
+  cf_system_domain: (( vault "secret/exodus/" meta.bosh_exodus_path "/cf:system_domain" ))
+
+instance_groups:
+- name: rmq-broker
+  jobs:
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats:
+        from:       nats
+        deployment: (( grab params.cf_deployment ))
+      nats-tls: nil
+    properties:
+      route_registrar:
+        routes:
+        - name: (( grab params.broker_route_subdomain ))
+          tls_port: 443
+          registration_interval: 20s
+          uris:
+          - (( concat params.broker_route_subdomain "." params.cf_system_domain ))
+      host: (( grab params.broker_domain ))
+
+
+releases:
+- name: routing
+  .:    (( inject meta.releases.routing ))

@@ -29,3 +29,8 @@ meta:
     version: 10.1.0
     url:     https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.1.0
     sha1:    97fbb573fc04d36c548915d8daef12a547e722d6
+
+  - name:    routing
+    version: 0.201.0
+    url:     https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.201.0
+    sha1:    1048b130d823e62269ee692b244ad13067662a3c

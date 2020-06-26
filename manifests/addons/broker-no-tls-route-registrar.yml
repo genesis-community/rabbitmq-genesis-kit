@@ -1,0 +1,6 @@
+---
+- type: replace
+  path: /instance_groups/name=rmq-broker/jobs/name=route_registrar/properties/route_registrar/routes/0/port?
+  value: 4567
+- type: remove
+  path: /instance_groups/name=rmq-broker/jobs/name=route_registrar/properties/route_registrar/routes/0/tls_port
