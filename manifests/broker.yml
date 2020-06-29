@@ -2,10 +2,12 @@
 # ===========================================================
 # This file configures the RabbitMQ Multitenant Broker node.
 # ===========================================================
-
 meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
+
   cf:
-    exodus_path: (( concat "secret/exodus/" params.env "/cf" ))
+    exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:    (( concat "https://api." meta.cf.system_domain ))
     username:   (( vault meta.cf.exodus_path ":admin_username" ))
