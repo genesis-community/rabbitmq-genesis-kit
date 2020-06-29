@@ -8,7 +8,7 @@ params:
 
 instance_groups:
 - name: rmq-server
-  instances: (( grab params.rmq_instances || 1 ))
+  instances: (( grab params.rmq_instances || 3 ))
   jobs:
   - name: rabbitmq-server
     release: cf-rabbitmq
