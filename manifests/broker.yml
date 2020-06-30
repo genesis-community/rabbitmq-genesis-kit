@@ -30,7 +30,7 @@ instance_groups:
   azs:       (( grab params.availability_zones || meta.default.azs ))
   stemcell:  default
   networks:
-  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
+  - name: (( grab params.broker_network || "rabbitmq" ))
     static_ips: (( static_ips 1 ))
   vm_type:   (( grab params.broker_vm_type || "small" ))
   jobs:

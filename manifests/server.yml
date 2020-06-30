@@ -55,7 +55,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: (( grab params.server_disk_type || "rabbitmq" ))
   networks:
-  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
+  - name: (( grab params.server_network || "rabbitmq" ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
 - name: haproxy
@@ -68,7 +68,7 @@ instance_groups:
   vm_type: (( grab params.proxy_vm_type || "small" ))
   stemcell: default
   networks:
-  - name: (( grab params.rabbitmq_network || "rabbitmq" ))
+  - name: (( grab params.proxy_network || "rabbitmq" ))
     static_ips: (( static_ips 0 ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
