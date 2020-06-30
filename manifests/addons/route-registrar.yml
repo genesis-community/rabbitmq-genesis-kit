@@ -1,0 +1,68 @@
+---
+params:
+  cf_deployment: (( concat meta.environment "-cf" ))
+  registered_broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
+  registered_mgmt_domain: (( concat "rabbitmq-management." meta.cf_system_domain ))
+
+meta:
+  broker:
+    protocol: https
+  cf_system_domain: (( vault "secret/exodus/" meta.bosh_exodus_path "/cf:system_domain" ))
+
+instance_groups:
+- name: haproxy
+  jobs:
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats:
+        from:       nats
+        deployment: (( grab params.cf_deployment ))
+      nats-tls: nil
+    properties:
+      route_registrar:
+        routes:
+        - name: (( concat meta.environment "-rabbitmq-mgmt" ))
+          port: 15672
+          registration_interval: 20s
+          uris:
+          - (( grab params.registered_mgmt_domain ))
+      host: (( grab params.rmq_domain ))
+
+- name: rmq-broker
+  jobs:
+  - name: rabbitmq-service-broker
+    properties:
+      rabbitmq-service-broker:
+        rabbitmq:
+          management_domain: (( grab params.registered_mgmt_domain ))
+
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats:
+        from:       nats
+        deployment: (( grab params.cf_deployment ))
+      nats-tls: nil
+    properties:
+      route_registrar:
+        routes:
+        - name: (( concat params.broker_name "-broker" ))
+          tls_port: 443
+          registration_interval: 20s
+          uris:
+          - (( grab params.registered_broker_domain ))
+      host: (( grab params.broker_domain ))
+
+  - name: broker-registrar
+    properties:
+      broker:
+        host: (( concat params.registered_broker_domain ":443" ))
+
+exodus:
+  broker_url: (( concat "https://" params.registered_broker_domain ))
+  management_url: (( concat "https://" params.registered_mgmt_domain ))
+
+releases:
+- name: routing
+  .:    (( inject meta.releases.routing ))
