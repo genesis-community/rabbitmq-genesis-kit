@@ -1,4 +1,0 @@
----
-params:
-  ca_validity_period:   5y
-  cert_validity_period: 1y
