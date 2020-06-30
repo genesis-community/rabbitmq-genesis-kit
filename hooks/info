@@ -11,7 +11,7 @@ describe "#u{RabbitMQ Management UI}" \
 
 echo
 
-if want_feature "multitenant-broker"; then
+if want_feature "broker"; then
   describe "#u{Service Broker}" \
           "  URL:          #C{$(echo "$host_data" | jq -Mr '.broker_url // "'"$missing"'"')}" \
           "  Username:     #C{$(echo "$host_data" | jq -Mr '.broker_username // "'"$missing"'"')}" \
