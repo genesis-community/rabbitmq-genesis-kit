@@ -25,19 +25,16 @@ header "Checking previous deployments on ${BOSH_ENVIRONMENT}..."
 $BOSH deployments
 
 header "Cleaning up from any previous deployments (if necessary)..."
-cleanup ci-baseline-bosh
-safe rm -rf secret/ci/baseline/bosh
-safe rm -rf secret/ci/proto/bosh
-safe cp -rf secret/static/bosh secret/ci/baseline/bosh
-safe cp -rf secret/static/bosh secret/ci/proto/bosh
+cleanup ci-baseline-rabbitmq
+safe rm -rf secret/ci/baseline/rabbitmq
 safe_target_orig="$(safe target --json | jq -r .name)"
 
 header "Deploying BASELINE environment to verify functionality..."
 cd dev
-genesis compile-kit --name bosh -v 9.9.9 --force # make sure hooks are executable before screaming at shipit for failing.
+genesis compile-kit --name rabbitmq -v 9.9.9 --force # make sure hooks are executable before screaming at shipit for failing.
 cd ..
 genesis do ci-baseline -- list
 genesis add-secrets ci-baseline
 genesis deploy -y ci-baseline
 
-cleanup ci-baseline-bosh
+cleanup ci-baseline-rabbitmq
