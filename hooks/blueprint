@@ -14,7 +14,7 @@ set -eu
 
 
 validate_features broker no-rmq-tls no-broker-tls external-rmq-lb \
-                  broker-route-registrar manual-nats nats-tls
+                  route-registrar nats-tls
 
 declare -a manifests
 manifests+=( manifests/base.yml
@@ -43,18 +43,9 @@ if want_feature "broker" ; then
       )
     fi
 
-    want_feature "manual-nats" && want_feature "nats-tls" && bail "" \
-      "Routing Release does not support NATS mutual TLS without BOSH links"
-
     if want_feature "nats-tls" ; then
       manifests+=(
         manifests/addons/nats-tls.yml
-      )
-    fi
-
-    if want_feature "manual-nats" ; then
-      manifests+=(
-        manifests/addons/manual-nats.yml
       )
     fi
   fi
