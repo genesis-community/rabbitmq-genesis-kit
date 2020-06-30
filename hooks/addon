@@ -20,7 +20,9 @@ The following addons are defined:
   #G{deregister-broker}  Deregister this broker from the Cloud Foundry in
                      this environment.
 
-  #G{smoketest}          Run the smoke test errand for this deployment.
+  #G{smoketest}          Run the smoke test errand for this deployment. This
+                     errand will not pass unless you have route registrar
+                     enabled.
 
 EOF
 )" ""
