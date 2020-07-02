@@ -153,6 +153,16 @@ forward are as follows:
 * `rmq_loadbalancer` - Applies to each of the rmq_server nodes. Should be used
 to attach the VMs to the backend pool of a load balancer.
 
+## `provided-rmq-cert`
+
+This will cause the kit to not generate certificates for the RabbitMQ cluster,
+and to instead require that you populate the server certificate and trusted
+CA certificate at:
+
+* `secret/<your/env>/rabbitmq/rabbitmq/certs/server:certificate`
+* `secret/<your/env>/rabbitmq/rabbitmq/certs/server:key`
+* `secret/<your/env>/rabbitmq/rabbitmq/certs/ca:certificate`
+
 # Available Addons
 
 * `register-broker` - Register this broker with the Cloud Foundry in

@@ -1,5 +1,11 @@
 #!/bin/bash
 
 echo "$GENESIS_REQUESTED_FEATURES"
-want_feature "no-rmq-tls"    || echo "+rmq-tls"
-want_feature "no-broker-tls" || echo "+broker-tls"
+
+if ! want_feature "no-rmq-tls" && ! want_feature "provided-rmq-cert" ; then
+  echo "+rmq-tls"
+fi
+
+if ! want_feature "no-broker-tls" ; then
+  echo "+broker-tls"
+fi

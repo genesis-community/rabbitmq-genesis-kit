@@ -37,3 +37,18 @@ certificates:
       server:
         valid_for: 1y
         names:     ["${params.broker_domain}"]
+
+provided:
+  provided-rmq-cert:
+    rabbitmq/certs/server:
+      keys:
+        certificate:
+          multiline: true
+
+        key:
+          multiline: true
+
+    rabbitmq/certs/ca:
+      keys:
+        certificate:
+          multiline: true
