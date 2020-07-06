@@ -13,7 +13,7 @@ set -eu
 # zero exit code otherwise).
 
 
-validate_features broker no-rmq-tls no-mgmt-tls no-broker-tls \
+validate_features metrics-emitter broker no-rmq-tls no-mgmt-tls no-broker-tls \
                   external-rmq-lb route-registrar nats-tls \
                   provided-rmq-cert provided-mgmt-cert provided-broker-cert
 
@@ -51,6 +51,12 @@ if want_feature "broker" ; then
         manifests/addons/nats-tls.yml
       )
     fi
+  fi
+
+  if want_feature "metrics-emitter" ; then
+      manifests+=(
+        manifests/addons/metrics-emitter.yml
+      )
   fi
 fi
 

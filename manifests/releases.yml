@@ -16,7 +16,7 @@ meta:
     sha1:    add77ac51dba0c7cbda195d138bb80765d2a948a
 
   - name:    bpm
-    version: 1.1.9 
+    version: 1.1.9
     url:     https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
     sha1:    dcf0582d838a73de29da273552ae79ac3098ee8b
 
@@ -34,3 +34,12 @@ meta:
     version: 0.207.0
     url:     https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.207.0
     sha1:    9e703259a07f032e7ca96dca2730d0e0c2b61685
+
+  - name: rabbitmq-metrics-emitter
+    version: "0.4.0"
+    url: https://github.com/starkandwayne/rabbitmq-metrics-emitter-release/releases/download/0.4.0/rabbitmq-metrics-emitter-0.4.0.tgz
+
+  - name: loggregator-agent
+    url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=3.9
+    version: "3.9"
+    sha1: bf723af956a61c7b51db0ba535c871bad24dd289

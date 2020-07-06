@@ -1,0 +1,40 @@
+instance_groups:
+- name:      rmq-broker
+  jobs:
+  - name: loggregator_agent
+    release: loggregator-agent
+    consumes:
+      doppler:
+        from: doppler
+        deployment: (( grab meta.cf.deployment_name ))
+    properties:
+      loggregator:
+        tls:
+          ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+          agent:
+            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+  - name: rabbitmq-metrics-emitter
+    release: rabbitmq-metrics-emitter
+    properties:
+      rabbitmq_metrics_emitter:
+        cloud_foundry:
+          api:    (( grab meta.cf.api_url ))
+          skip_ssl_validation: true
+          username:   (( vault meta.cf.exodus_path ":admin_username" ))
+          password:   (( vault meta.cf.exodus_path ":admin_password" ))
+        rmq_management:
+          endpoint: (( concat "http://" params.rmq_domain ":15672/api" ))
+          user: management
+          password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
+        loggregator:
+          tls:
+            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+            ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+
+releases:
+- name: rabbitmq-metrics-emitter
+  .:    (( inject meta.releases.rabbitmq-metrics-emitter ))
+- name: loggregator-agent
+  .:    (( inject meta.releases.loggregator-agent ))
