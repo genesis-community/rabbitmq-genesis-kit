@@ -1,0 +1,44 @@
+instance_groups:
+- name:      rmq-broker
+  jobs:
+  - name: loggregator_agent
+    release: loggregator-agent
+    consumes:
+      doppler:
+        from: doppler
+        deployment: (( grab meta.cf.deployment_name ))
+    properties:
+      loggregator:
+        tls:
+          ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+          agent:
+            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+  - name: rabbitmq-metrics-emitter
+    release: rabbitmq-metrics-emitter
+    properties:
+      rabbitmq_metrics_emitter:
+        cloud_foundry:
+          api:    (( concat "https://api." meta.cf.system_domain ))
+          skip_ssl_validation: true
+          username:   (( vault meta.cf.exodus_path ":admin_username" ))
+          password:   (( vault meta.cf.exodus_path ":admin_password" ))
+        rmq_management:
+          endpoint: (( concat "http://" params.rmq_domain ":15672/api" ))
+          user: management
+          password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
+        loggregator:
+          tls:
+            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+            ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+
+##### Add new releases here
+releases:
+- name: rabbitmq-metrics-emitter
+  version: "0.3.2"
+  url: git+https://github.com/starkandwayne/rabbitmq-metrics-emitter-release
+- name: loggregator-agent
+  url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=3.9
+  version: "3.9"
+  sha1: bf723af956a61c7b51db0ba535c871bad24dd289
