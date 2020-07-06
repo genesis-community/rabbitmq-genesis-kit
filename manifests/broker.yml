@@ -42,7 +42,7 @@ instance_groups:
       #cf:
       #  domain: (( grab meta.cf.system_domain ))
       rabbitmq-service-broker:
-        #route: 
+        #route:
         #cc_endpoint: (( grab meta.cf.api_url ))
         service:
           username:  (( grab meta.broker.username ))
