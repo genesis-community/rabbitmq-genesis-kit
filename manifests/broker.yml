@@ -72,8 +72,8 @@ instance_groups:
           management:
             username: management
           administrator:
-            username: broker
-            password: (( vault meta.vault "/rabbitmq/admin/broker:password" ))
+            username: (( grab meta.broker.username ))
+            password: (( grab meta.broker.password ))
 
   - name:    bpm
     release: bpm
