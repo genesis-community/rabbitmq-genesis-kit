@@ -11,6 +11,7 @@ meta:
 
 params:
   rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
+  check_queue_sync: false
 
 instance_groups:
 - name: rmq-server
@@ -56,6 +57,7 @@ instance_groups:
           verify:                    false
           verification_depth:        5
           fail_if_no_peer_cert:      true
+        check_queue_sync: (( grab params.check_queue_sync ))
 
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default

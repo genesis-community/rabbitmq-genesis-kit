@@ -43,6 +43,8 @@ data.
 
 * `stemcell_version` - (_Default_: `latest`) The version of the stemcell to use.
 
+* `check_queue_sync` - (_Default_: `false`) If true, the pre-stop script of the rabbitmq-server will wait until mirrored and quorum queues are synced before shutting down.
+
 # Features
 
 ## `broker`
@@ -78,6 +80,9 @@ be registered with Cloud Foundry by the broker-registrar errand.
 
 * `service_name` - (_Default_: `p-rabbitmq`) The name of the service that will
 be exposed in the catalog to Cloud Foundry.
+
+* `ha_sync_mode` - (_Default_: `manual`) The ha-sync-mode to be configured for
+vhosts created by this broker.
 
 ## `no-broker-tls`
 

@@ -23,6 +23,7 @@ params:
   broker_domain: (( param "Please specify a broker domain" ))
   # the username used by the Cloud Controller to auth to the broker
   broker_username: broker
+  ha_sync_mode: manual
 
 instance_groups:
 - name:      rmq-broker
@@ -59,7 +60,7 @@ instance_groups:
           operator_set_policy:
             enabled: true
             policy_name: "operator_set_policy"
-            policy_definition: '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+            policy_definition: (( concat '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode": "' meta.ha_sync_mode '"}' ))
             policy_priority: 50
           management_domain: (( concat params.rmq_domain ":15672" ))
           management:
