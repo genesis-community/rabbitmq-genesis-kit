@@ -56,7 +56,7 @@ instance_groups:
           # will be dynamically assigned.
           verify:                    false
           verification_depth:        5
-          fail_if_no_peer_cert:      true
+          fail_if_no_peer_cert:      false
         check_queue_sync: (( grab params.check_queue_sync ))
 
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
