@@ -60,7 +60,12 @@ instance_groups:
           operator_set_policy:
             enabled: true
             policy_name: "operator_set_policy"
-            policy_definition: (( concat '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode": "' meta.ha_sync_mode '"}' ))
+            policy_definition: >-
+              (( concat "{
+                \"ha-mode\": \"exactly\",
+                \"ha-params\": 2,
+                \"ha-sync-mode\": \"" meta.ha_sync_mode "\" }" 
+              ))
             policy_priority: 50
           management_domain: (( concat params.rmq_domain ":15672" ))
           management:
