@@ -1,8 +1,8 @@
 ---
 params:
   cf_deployment: (( concat meta.environment "-cf" ))
-  registered_broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
-  mgmt_domain: (( concat "rabbitmq-management." meta.cf_system_domain ))
+  broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
+  mgmt_domain:   (( concat "rabbitmq-management." meta.cf_system_domain ))
 
 meta:
   broker:
@@ -35,14 +35,6 @@ instance_groups:
   jobs:
   - (( grab meta.mgmt_route_registrar_job ))
 
-- name: rmq-broker
-  jobs:
-  - name: rabbitmq-service-broker
-    properties:
-      rabbitmq-service-broker:
-        rabbitmq:
-          management_domain: (( grab params.registered_mgmt_domain ))
-
   - name: route_registrar
     release: routing
     consumes:
@@ -54,7 +46,7 @@ instance_groups:
       route_registrar:
         routes:
         - name: (( concat params.broker_name "-broker" ))
-          tls_port: 4566
+          tls_port: (( grab meta.broker.port ))
           registration_interval: 20s
           uris:
           - (( grab params.broker_domain ))
@@ -64,7 +56,7 @@ instance_groups:
   - name: broker-registrar
     properties:
       broker:
-        host: (( concat params.registered_broker_domain ":443" ))
+        host: (( concat params.broker_domain ":443" ))
 
 exodus:
   broker_url: (( concat "https://" params.broker_domain ))

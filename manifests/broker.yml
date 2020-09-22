@@ -16,6 +16,7 @@ meta:
     username: (( grab params.broker_username ))
     password: (( vault meta.vault "/broker/auth:password" ))
     protocol: http
+    port:     4567
 
 params:
   broker_name:  p-rabbitmq
@@ -86,7 +87,7 @@ instance_groups:
       .: (( inject instance_groups.rmq-broker.jobs.broker-deregistrar.properties ))
       broker:
         protocol: (( grab meta.broker.protocol ))
-        host:     (( concat params.broker_domain ":4567" ))
+        host:     (( concat params.broker_domain ":" meta.broker.port ))
         username: (( grab meta.broker.username ))
         password: (( grab meta.broker.password ))
 
