@@ -45,7 +45,7 @@ certificates:
         names:     ["RMQManagementAPICA"]
       server:
         valid_for: 1y
-        names:     ["${params.rmq_domain}"]
+        names:     ["${params.mgmt_domain}"]
 
 provided:
   provided-rmq-cert:

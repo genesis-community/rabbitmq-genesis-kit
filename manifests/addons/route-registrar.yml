@@ -2,7 +2,7 @@
 params:
   cf_deployment: (( concat meta.environment "-cf" ))
   registered_broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
-  registered_mgmt_domain: (( concat "rabbitmq-management." meta.cf_system_domain ))
+  mgmt_domain: (( concat "rabbitmq-management." meta.cf_system_domain ))
 
 meta:
   broker:
@@ -26,8 +26,9 @@ meta:
       - name: (( concat meta.environment "-rabbitmq-mgmt" ))
         tls_port: 15671
         registration_interval: 20s
+        server_cert_domain_san: (( grab params.mgmt_domain ))
         uris:
-        - (( grab params.registered_mgmt_domain ))
+        - (( grab params.mgmt_domain ))
 
 instance_groups:
 - name: haproxy
@@ -56,7 +57,8 @@ instance_groups:
           tls_port: 4566
           registration_interval: 20s
           uris:
-          - (( grab params.registered_broker_domain ))
+          - (( grab params.broker_domain ))
+          server_cert_domain_san: (( grab params.broker_domain ))
       host: (( grab params.broker_domain ))
 
   - name: broker-registrar
@@ -65,8 +67,8 @@ instance_groups:
         host: (( concat params.registered_broker_domain ":443" ))
 
 exodus:
-  broker_url: (( concat "https://" params.registered_broker_domain ))
-  management_url: (( concat "https://" params.registered_mgmt_domain ))
+  broker_url: (( concat "https://" params.broker_domain ))
+  management_url: (( concat "https://" params.mgmt_domain ))
 
 releases:
 - name: routing

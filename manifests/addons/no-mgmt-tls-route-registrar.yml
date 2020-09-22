@@ -6,4 +6,4 @@
   value: 15672
 - type: replace
   path: /instance_groups/name=rmq-broker/jobs/name=rabbitmq-service-broker/properties/dns_host?
-  value: (( grab params.rmq_domain ))
+  value: (( grab params.mgmt_domain ))

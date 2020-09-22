@@ -4,12 +4,14 @@ The **RabbitMQ Genesis Kit** deploys a RabbitMQ cluster and, optionally, the CF 
 
 # Base Parameters
 
-* `rmq_domain` - (**REQUIRED**) The domain that the RabbitMQ Management API and
-AMQP/MQTT/Stomp APIs will be located. If you're not utilizing DNS to target
-these nodes, set this to the static IP that the RabbitMQ proxy will be
-deployed to (the first static IP in the network). If you are utilizing DNS,
-use the DNS hostname. This value should _not_ include a scheme or port in the
-value.
+* `rmq_domain` - (**REQUIRED**) The domain that the AMQP/MQTT/Stomp APIs will
+be located. If you're not utilizing DNS to target these nodes, set this to
+the static IP that the RabbitMQ proxy will be deployed to (the first static
+IP in the network). If you are utilizing DNS, use the DNS hostname. This
+value should _not_ include a scheme or port in the value.
+
+* `mgmt_domain` - (_Default_: `<value of rmq_domain>) The domain that the
+RabbitMQ Management API will be located at.
 
 * `rmq_instances` - (_Default_: `3`) The number of RabbitMQ nodes in the 
 cluster.
@@ -108,13 +110,16 @@ deployed by a different BOSH director.
 * `cf_deployment` - (_Default_: `<env-name>-cf`) The name of the BOSH deployment
 containing your Cloud Foundry.
 
-* `registered_broker_domain` - (_Default_: `rabbitmq-broker.<cf-system-domain>`) 
-The domain for which the broker will be registered and routed for with the
+* `broker_domain` - (_Default_: `rabbitmq-broker.<cf-system-domain>`) This
+param already exists at the base of the kit, but specifying this feature
+gives it a default value and thus makes it no longer mandatory. The value of
+this parameter is what the broker will be registered and routed for with the
 GoRouter.
 
-* `registered_mgmt_domain` - (_Default_: `rabbitmq-management.<cf-system-domain>`) 
-The domain for which the RabbitMQ management API will be registered and
-routed for with the GoRouter.
+* `mgmt_domain` - (_Default_: `rabbitmq-management.<cf-system-domain>`) 
+This param already exists at the base of the kit, but specifying this feature
+changes its default value. The value of this parameter is what the RabbitMQ
+management API will be registered and routed for with the GoRouter.
 
 ## `nats-tls`
 

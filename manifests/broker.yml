@@ -63,7 +63,7 @@ instance_groups:
             policy_definition: >-
               (( concat "{\"ha-mode\":\"exactly\",\"ha-params\": 2,\"ha-sync-mode\":\"" params.ha_sync_mode "\"}" ))
             policy_priority: 50
-          management_domain: (( concat params.rmq_domain ":" meta.mgmt_port ))
+          management_domain: (( concat params.mgmt_domain ":" meta.mgmt_port ))
           management_tls:
             enabled: true
             cacert: (( grab meta.mgmt_tls.cacert ))

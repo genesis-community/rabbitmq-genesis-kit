@@ -18,6 +18,7 @@ meta:
 
 params:
   rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
+  mgmt_domain: (( grab params.rmq_domain ))
   check_queue_sync: false
 
 instance_groups:
@@ -93,6 +94,6 @@ releases:
   .:    (( inject meta.releases.bpm ))
 
 exodus:
-  management_url: (( concat "https://" params.rmq_domain ":" meta.mgmt_port ))
+  management_url: (( concat "https://" params.mgmt_domain ":" meta.mgmt_port ))
   management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))
   management_password: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.password ))
