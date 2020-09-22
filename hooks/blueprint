@@ -87,6 +87,12 @@ if want_feature "external-rmq-lb" ; then
       manifests/addons/external-rmq-lb-with-broker.yml
     )
   fi
+
+  if want_feature "route-registrar" ; then
+    manifests+=(
+      manifests/addons/external-rmq-lb-route-registrar.yml
+    )
+  fi
 fi
 
 echo ${manifests[@]}

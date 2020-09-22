@@ -9,6 +9,18 @@ meta:
     protocol: https
   cf_system_domain: (( vault "secret/exodus/" meta.bosh_exodus_path "/cf:system_domain" ))
 
+  mgmt_route_registrar_job:
+    name: route_registrar
+    release: routing
+    consumes:
+      nats:
+        from:       nats
+        deployment: (( grab params.cf_deployment ))
+      nats-tls: nil
+    properties:
+      host:            (( grab params.rmq_domain ))
+      route_registrar: (( grab meta.mgmt_domain_route ))
+
   mgmt_domain_route:
     routes: 
       - name: (( concat meta.environment "-rabbitmq-mgmt" ))
@@ -20,16 +32,7 @@ meta:
 instance_groups:
 - name: haproxy
   jobs:
-  - name: route_registrar
-    release: routing
-    consumes:
-      nats:
-        from:       nats
-        deployment: (( grab params.cf_deployment ))
-      nats-tls: nil
-    properties:
-      host:            (( grab params.rmq_domain ))
-      route_registrar: (( grab meta.mgmt_domain_route ))
+  - (( grab meta.mgmt_route_registrar_job ))
 
 - name: rmq-broker
   jobs:
