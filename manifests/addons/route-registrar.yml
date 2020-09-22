@@ -9,6 +9,14 @@ meta:
     protocol: https
   cf_system_domain: (( vault "secret/exodus/" meta.bosh_exodus_path "/cf:system_domain" ))
 
+  mgmt_domain_route:
+    routes: 
+      - name: (( concat meta.environment "-rabbitmq-mgmt" ))
+        tls_port: 15671
+        registration_interval: 20s
+        uris:
+        - (( grab params.registered_mgmt_domain ))
+
 instance_groups:
 - name: haproxy
   jobs:
@@ -20,14 +28,8 @@ instance_groups:
         deployment: (( grab params.cf_deployment ))
       nats-tls: nil
     properties:
-      route_registrar:
-        routes:
-        - name: (( concat meta.environment "-rabbitmq-mgmt" ))
-          port: 15672
-          registration_interval: 20s
-          uris:
-          - (( grab params.registered_mgmt_domain ))
-      host: (( grab params.rmq_domain ))
+      host:            (( grab params.rmq_domain ))
+      route_registrar: (( grab meta.mgmt_domain_route ))
 
 - name: rmq-broker
   jobs:
@@ -48,7 +50,7 @@ instance_groups:
       route_registrar:
         routes:
         - name: (( concat params.broker_name "-broker" ))
-          tls_port: 443
+          tls_port: 4566
           registration_interval: 20s
           uris:
           - (( grab params.registered_broker_domain ))

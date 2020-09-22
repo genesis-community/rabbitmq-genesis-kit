@@ -9,6 +9,13 @@ meta:
     cert:   (( vault meta.vault "/rabbitmq/certs/server:certificate" ))
     cacert: (( vault meta.vault "/rabbitmq/certs/ca:certificate" ))
 
+  mgmt_tls:
+    key:    (( vault meta.vault "/mgmt/certs/server:key" ))
+    cert:   (( vault meta.vault "/mgmt/certs/server:certificate" ))
+    cacert: (( vault meta.vault "/mgmt/certs/ca:certificate" ))
+
+  mgmt_port: 15671
+
 params:
   rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
   check_queue_sync: false
@@ -33,6 +40,7 @@ instance_groups:
         - 8883 #MQTT over TLS
         - 61613 #STOMP
         - 61614 #STOMP over TLS
+        - 15671 #RMQ Management TLS
         - 15672 #RMQ Management
         - 15674 #STOMP WebSocket
         administrators:
@@ -58,6 +66,11 @@ instance_groups:
           verification_depth:        5
           fail_if_no_peer_cert:      false
         check_queue_sync: (( grab params.check_queue_sync ))
+        management_tls:
+          enabled: true
+          cacert: (( grab meta.mgmt_tls.cacert ))
+          cert:   (( grab meta.mgmt_tls.cert ))
+          key:    (( grab meta.mgmt_tls.key ))
 
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default
@@ -87,6 +100,6 @@ releases:
   .:    (( inject meta.releases.bpm ))
 
 exodus:
-  management_url: (( concat "https://" params.rmq_domain ":15672" ))
+  management_url: (( concat "https://" params.rmq_domain ":" meta.mgmt_port ))
   management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))
   management_password: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.password ))

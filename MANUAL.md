@@ -50,7 +50,8 @@ data.
 ## `broker`
 
 Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud
-Foundry to utilize the RabbitMQ cluster.
+Foundry to utilize the RabbitMQ cluster. The broker server listens on TCP 
+port 4566, listening for HTTPS traffic.
 
 ### Parameters
 
@@ -137,6 +138,11 @@ Mutual TLS.
 Disables TLS communications to the RabbitMQ cluster, and also between RabbitMQ
 nodes.
 
+## `no-mgmt-tls`
+
+Disables the TLS listener for the Management API on 15671, and will instead
+listen for plaintext HTTP traffic on 15672.
+
 ## `external-rmq-lb`
 
 Stops the haproxy node which would normally front the RabbitMQ nodes from being
@@ -148,7 +154,8 @@ forward are as follows:
 * `5671` - AMQPS
 * `5672` - AMQP
 * `8883` - MQTT over TLS
-* `15672` - RabbitMQ Management
+* `15671` - RabbitMQ Management over HTTPS
+* `15672` - RabbitMQ Management over HTTP
 * `15674` - WebSTOMP
 * `61613` - STOMP
 * `61614` - STOMP over TLS
@@ -167,6 +174,16 @@ CA certificate at:
 * `secret/<your/env>/rabbitmq/rabbitmq/certs/server:certificate`
 * `secret/<your/env>/rabbitmq/rabbitmq/certs/server:key`
 * `secret/<your/env>/rabbitmq/rabbitmq/certs/ca:certificate`
+
+## `provided-mgmt-cert`
+
+This will cause the kit to not generate certificates for the Management API,
+and to instead require that you populate the server certificate and trusted
+CA certificate at:
+
+* `secret/<your/env>/rabbitmq/mgmt/certs/server:certificate`
+* `secret/<your/env>/rabbitmq/mgmt/certs/server:key`
+* `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate`
 
 # Available Addons
 

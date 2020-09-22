@@ -28,7 +28,7 @@ certificates:
       server:
         valid_for: 1y
         names:     ["${params.rmq_domain}"]
-    
+
   +broker-tls:
     broker/certs:
       ca:
@@ -38,17 +38,30 @@ certificates:
         valid_for: 1y
         names:     ["${params.broker_domain}"]
 
+  +mgmt-tls:
+    mgmt/certs:
+      ca:
+        valid_for: 10y
+        names:     ["RMQManagementAPICA"]
+      server:
+        valid_for: 1y
+        names:     ["${params.rmq_domain}"]
+
 provided:
   provided-rmq-cert:
     rabbitmq/certs/server:
       keys:
-        certificate:
-          multiline: true
-
-        key:
-          multiline: true
-
+        certificate: { multiline: true }
+        key:         { multiline: true }
     rabbitmq/certs/ca:
       keys:
-        certificate:
-          multiline: true
+        certificate: { multiline: true }
+
+  provided-mgmt-cert:
+    mgmt/certs/server:
+      keys:
+        certificate: { multiline: true }
+        key:         { multiline: true }
+    mgmt/certs/ca:
+      keys:
+        certificate: { multiline: true }

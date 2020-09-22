@@ -42,7 +42,7 @@ instance_groups:
 
           frontend tcp-frontend-broker-https
               mode tcp
-              bind :443  ssl crt /var/vcap/jobs/haproxy/config/ssl
+              bind :4566 ssl crt /var/vcap/jobs/haproxy/config/ssl
               default_backend tcp-broker-https
 
           backend tcp-broker-https

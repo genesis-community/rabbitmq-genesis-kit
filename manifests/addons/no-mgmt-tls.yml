@@ -1,0 +1,8 @@
+---
+- type: remove
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/management_tls
+- type: remove
+  path: /instance_groups/name=rmq-broker/jobs/name=rabbitmq-service-broker/properties/rabbitmq-service-broker/rabbitmq/management_tls
+- type: replace
+  path: /meta/mgmt_port
+  value: 16572

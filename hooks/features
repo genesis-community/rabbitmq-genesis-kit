@@ -6,6 +6,10 @@ if ! want_feature "no-rmq-tls" && ! want_feature "provided-rmq-cert" ; then
   echo "+rmq-tls"
 fi
 
+if ! want_feature "no-mgmt-tls" && ! want_feature "provided-mgmt-cert" ; then
+  echo "+mgmt-tls"
+fi
+
 if ! want_feature "no-broker-tls" ; then
   echo "+broker-tls"
 fi

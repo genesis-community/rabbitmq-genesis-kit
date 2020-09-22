@@ -1,19 +1,19 @@
 meta:
   releases:
   - name:    cf-rabbitmq
-    version: 316.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=316.0.0
-    sha1:    fbb51b43b206b3ddff6b194febd68939e4ba7677
+    version: 312.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=312.0.0
+    sha1:    1a90f68f8a0e353397eea2ef4ccc0a0bb50c5596
 
   - name:    cf-rabbitmq-multitenant-broker
-    version: 78.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=78.0.0
-    sha1:    68aeed25aad84a6c8d2ecd283bc2339f3b2dff74
+    version: 80.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=80.0.0
+    sha1:    d256a6ba4d94254284930ebd7f0006315884437d
 
   - name:    cf-rabbitmq-smoke-tests
-    version: 64.0.0
+    version: 65.0.0
     url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=64.0.0
-    sha1:    db84a04af06f611214068c32eae6396f8544e7fd
+    sha1:    add77ac51dba0c7cbda195d138bb80765d2a948a
 
   - name:    bpm
     version: 1.1.9 
@@ -21,9 +21,9 @@ meta:
     sha1:    dcf0582d838a73de29da273552ae79ac3098ee8b
 
   - name:    cf-cli
-    version: 1.29.0
-    url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.29.0
-    sha1:    0dd79b169473a95f1ff39e79f2695edf4c97f38d
+    version: 1.30.0
+    url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.30.0
+    sha1:    7b4910ff8520040f3600f5d50a40aa2173777652
 
   - name:    haproxy
     version: 10.1.0
