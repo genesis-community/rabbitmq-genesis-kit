@@ -1,11 +1,11 @@
 ---
 - type: replace
-  path: /instance_groups/name=rmq-server/jobs/name=bpm?
+  path: /instance_groups/name=rmq-server/jobs/-
   value:
     name:    bpm
     release: bpm
 - type: replace
-  path: /instance_groups/name=rmq-server/jobs/name=route_registrar
+  path: /instance_groups/name=rmq-server/jobs/-
   value: (( grab meta.mgmt_route_registrar_job ))
 - type: remove
   path: /instance_groups/name=haproxy?
