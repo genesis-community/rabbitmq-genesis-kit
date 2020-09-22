@@ -10,6 +10,6 @@ if ! want_feature "no-mgmt-tls" && ! want_feature "provided-mgmt-cert" ; then
   echo "+mgmt-tls"
 fi
 
-if ! want_feature "no-broker-tls" ; then
+if ! want_feature "no-broker-tls" && ! want_feature "provided-broker-cert" ; then
   echo "+broker-tls"
 fi

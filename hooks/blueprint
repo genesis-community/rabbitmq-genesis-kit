@@ -13,8 +13,9 @@ set -eu
 # zero exit code otherwise).
 
 
-validate_features broker no-rmq-tls no-mgmt-tls no-broker-tls external-rmq-lb \
-                  route-registrar nats-tls provided-rmq-cert provided-mgmt-cert
+validate_features broker no-rmq-tls no-mgmt-tls no-broker-tls \
+                  external-rmq-lb route-registrar nats-tls \
+                  provided-rmq-cert provided-mgmt-cert provided-broker-cert
 
 declare -a manifests
 manifests+=( manifests/base.yml
@@ -41,6 +42,8 @@ if want_feature "broker" ; then
       manifests+=(
         manifests/addons/broker-no-tls-route-registrar.yml
       )
+    else if ! want_feature "provided-broker-cert" ; then
+      bail "" "Cannot have no-broker-tls and provided-broker-cert features"
     fi
 
     if want_feature "nats-tls" ; then

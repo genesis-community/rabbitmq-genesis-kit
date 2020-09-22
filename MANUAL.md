@@ -190,6 +190,16 @@ CA certificate at:
 * `secret/<your/env>/rabbitmq/mgmt/certs/server:key`
 * `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate`
 
+## `provided-broker-cert`
+
+This will cause the kit to not generate certificates for the Service Broker,
+and to instead require that you populate the server certificate and trusted
+CA certificate at:
+
+* `secret/<your/env>/rabbitmq/broker/certs/server:certificate`
+* `secret/<your/env>/rabbitmq/broker/certs/server:key`
+* `secret/<your/env>/rabbitmq/broker/certs/ca:certificate`
+
 ## `mqtt`
 
 Enables the RabbitMQ MQTT plugin
