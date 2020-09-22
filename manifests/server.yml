@@ -31,18 +31,11 @@ instance_groups:
         version: "3.8"
         plugins:
         - rabbitmq_management
-        - rabbitmq_mqtt
-        - rabbitmq_stomp
         ports:
         - 5672 #AMQP
         - 5671 #AMQPS
-        - 1883 #MQTT
-        - 8883 #MQTT over TLS
-        - 61613 #STOMP
-        - 61614 #STOMP over TLS
         - 15671 #RMQ Management TLS
         - 15672 #RMQ Management
-        - 15674 #STOMP WebSocket
         administrators:
           management:
             username: management

@@ -185,6 +185,14 @@ CA certificate at:
 * `secret/<your/env>/rabbitmq/mgmt/certs/server:key`
 * `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate`
 
+## `mqtt`
+
+Enables the RabbitMQ MQTT plugin
+
+## `stomp`
+
+Enables the RabbitMQ STOMP plugin
+
 # Available Addons
 
 * `register-broker` - Register this broker with the Cloud Foundry in

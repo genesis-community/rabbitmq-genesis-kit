@@ -51,6 +51,18 @@ if want_feature "broker" ; then
   fi
 fi
 
+if want_feature "mqtt" ; then
+  manifests+=(
+    manifests/addons/mqtt.yml
+  )
+fi
+
+if want_feature "stomp" ; then
+  manifests+=(
+    manifests/addons/stomp.yml
+  )
+fi
+
 if want_feature "no-rmq-tls" ; then
   manifests+=(
     manifests/addons/no-rmq-tls.yml

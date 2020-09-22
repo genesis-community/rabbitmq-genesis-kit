@@ -1,0 +1,13 @@
+---
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/plugins/-
+  value: rabbitmq_stomp
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ports/-
+  value: 61613
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ports/-
+  value: 61614
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ports/-
+  value: 15674
