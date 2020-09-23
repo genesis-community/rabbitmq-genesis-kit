@@ -42,7 +42,7 @@ if want_feature "broker" ; then
       manifests+=(
         manifests/addons/broker-no-tls-route-registrar.yml
       )
-    else if ! want_feature "provided-broker-cert" ; then
+    elif ! want_feature "provided-broker-cert" ; then
       bail "" "Cannot have no-broker-tls and provided-broker-cert features"
     fi
 
