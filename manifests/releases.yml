@@ -11,9 +11,9 @@ meta:
     sha1:    d256a6ba4d94254284930ebd7f0006315884437d
 
   - name:    cf-rabbitmq-smoke-tests
-    version: 65.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=64.0.0
-    sha1:    add77ac51dba0c7cbda195d138bb80765d2a948a
+    version: 66.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=66.0.0
+    sha1:    133dfbefe41152094e92de2935ea7b280e36de74
 
   - name:    bpm
     version: 1.1.9 
