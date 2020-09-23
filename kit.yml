@@ -62,9 +62,6 @@ provided:
       keys:
         certificate: { multiline: true }
         key:         { multiline: true }
-    broker/certs/ca:
-      keys:
-        certificate: { multiline: true }
 
   provided-mgmt-cert:
     mgmt/certs/server:

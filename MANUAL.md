@@ -198,7 +198,6 @@ CA certificate at:
 
 * `secret/<your/env>/rabbitmq/broker/certs/server:certificate`
 * `secret/<your/env>/rabbitmq/broker/certs/server:key`
-* `secret/<your/env>/rabbitmq/broker/certs/ca:certificate`
 
 ## `mqtt`
 
