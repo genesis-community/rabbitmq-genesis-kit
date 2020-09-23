@@ -6,3 +6,6 @@
 - type: replace
   path: /meta/mgmt_port
   value: 16572
+- type: replace
+  path: /meta/mgmt_scheme
+  value: http

@@ -14,7 +14,8 @@ meta:
     cert:   (( vault meta.vault "/mgmt/certs/server:certificate" ))
     cacert: (( vault meta.vault "/mgmt/certs/ca:certificate" ))
 
-  mgmt_port: 15671
+  mgmt_port:   15671
+  mgmt_scheme: https
 
 params:
   rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
