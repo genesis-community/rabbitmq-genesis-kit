@@ -1,5 +1,6 @@
 params:
-  cf.deployment_name: (( param "Please specify the deployment name in bosh for CF" ))
+  cf:
+    skip_ssl_validation: true
 
 instance_groups:
 - name:      rmq-broker
@@ -9,7 +10,7 @@ instance_groups:
     consumes:
       doppler:
         from: doppler
-        deployment: (( grab params.cf.deployment_name ))
+        deployment: (( grab meta.cf.deployment_name ))
     properties:
       loggregator:
         tls:
@@ -23,11 +24,11 @@ instance_groups:
       rabbitmq_metrics_emitter:
         cloud_foundry:
           api:    (( grab meta.cf.api_url ))
-          skip_ssl_validation: (( grab meta.cf.skip_ssl_validation ))
+          skip_ssl_validation: (( grab params.cf.skip_ssl_validation ))
           username:   (( vault meta.cf.exodus_path ":admin_username" ))
           password:   (( vault meta.cf.exodus_path ":admin_password" ))
         rmq_management:
-          endpoint: (( concat meta.mgmt_scheme "://" params.rmq_domain ":" meta.mgmt_port "/api" ))
+          endpoint: (( concat meta.mgmt_scheme "://" params.mgmt_domain ":" meta.mgmt_port "/api" ))
           user: management
           password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
         loggregator:

@@ -43,8 +43,8 @@ instance_groups:
             username: management
             password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
           broker:
-            username: (( grab meta.broker.username ))
-            password: (( grab meta.broker.password ))
+            username: broker
+            password: (( vault meta.vault "/rabbitmq/admin/broker:password" ))
         cookie: (( vault meta.vault "/rabbitmq/erlang-cookie:cookie" ))
         cluster_partition_handling: pause_minority
         ssl:

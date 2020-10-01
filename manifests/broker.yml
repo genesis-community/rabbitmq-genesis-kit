@@ -8,9 +8,9 @@ meta:
 
   cf:
     exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
+    deployment_name: (( concat meta.environment "-cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:    (( concat "https://api." meta.cf.system_domain ))
-    skip_ssl_validation: true
     username:   (( vault meta.cf.exodus_path ":admin_username" ))
     password:   (( vault meta.cf.exodus_path ":admin_password" ))
   broker:

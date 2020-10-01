@@ -1,6 +1,5 @@
 ---
 params:
-  cf_deployment: (( concat meta.environment "-cf" ))
   broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
   mgmt_domain:   (( concat "rabbitmq-management." meta.cf_system_domain ))
 
@@ -15,14 +14,14 @@ meta:
     consumes:
       nats:
         from:       nats
-        deployment: (( grab params.cf_deployment ))
+        deployment: (( grab meta.cf_deployment ))
       nats-tls: nil
     properties:
       host:            (( grab params.rmq_domain ))
       route_registrar: (( grab meta.mgmt_domain_route ))
 
   mgmt_domain_route:
-    routes: 
+    routes:
       - name: (( concat meta.environment "-rabbitmq-mgmt" ))
         tls_port: 15671
         registration_interval: 20s
@@ -40,7 +39,7 @@ instance_groups:
     consumes:
       nats:
         from:       nats
-        deployment: (( grab params.cf_deployment ))
+        deployment: (( grab meta.cf_deployment ))
       nats-tls: nil
     properties:
       route_registrar:
