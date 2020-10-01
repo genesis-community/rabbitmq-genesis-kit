@@ -10,7 +10,7 @@ meta:
     exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:    (( concat "https://api." meta.cf.system_domain ))
-    skip_ssl_validation: false
+    skip_ssl_validation: true
     username:   (( vault meta.cf.exodus_path ":admin_username" ))
     password:   (( vault meta.cf.exodus_path ":admin_password" ))
   broker:
@@ -43,7 +43,7 @@ instance_groups:
       #cf:
       #  domain: (( grab meta.cf.system_domain ))
       rabbitmq-service-broker:
-        #route: 
+        #route:
         #cc_endpoint: (( grab meta.cf.api_url ))
         service:
           username:  (( grab meta.broker.username ))
@@ -124,7 +124,7 @@ releases:
     .:    (( inject meta.releases.haproxy ))
 
 exodus:
-  broker_url: (( concat meta.broker.protocol "://" params.broker_domain ":4567" ))
+  broker_url: (( concat meta.broker.protocol "://" params.broker_domain ":" meta.broker.port ))
   broker_username: (( grab meta.broker.username ))
   broker_password: (( grab meta.broker.password ))
   broker_name: (( grab params.broker_name ))

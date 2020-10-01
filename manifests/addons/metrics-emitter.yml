@@ -1,3 +1,6 @@
+params:
+  cf.deployment_name: (( param "Please specify the deployment name in bosh for CF" ))
+
 instance_groups:
 - name:      rmq-broker
   jobs:
@@ -6,7 +9,7 @@ instance_groups:
     consumes:
       doppler:
         from: doppler
-        deployment: (( grab meta.cf.deployment_name ))
+        deployment: (( grab params.cf.deployment_name ))
     properties:
       loggregator:
         tls:
@@ -36,8 +39,9 @@ instance_groups:
 ##### Add new releases here
 releases:
 - name: rabbitmq-metrics-emitter
-  version: "0.3.2"
-  url: git+https://github.com/starkandwayne/rabbitmq-metrics-emitter-release
+  version: 0.4.1
+  url: https://github.com/starkandwayne/rabbitmq-metrics-emitter-release/releases/download/0.4.1/rabbitmq-metrics-emitter-0.4.1.tgz
+  sha1: 05afc6f3559f45e0696c6a3760242045640e0df8
 - name: loggregator-agent
   url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=3.9
   version: "3.9"
