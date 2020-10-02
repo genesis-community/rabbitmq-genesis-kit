@@ -1,6 +1,5 @@
 params:
-  cf:
-    skip_ssl_validation: true
+  cf_skip_ssl_validation: false
 
 instance_groups:
 - name:      rmq-broker
@@ -24,7 +23,7 @@ instance_groups:
       rabbitmq_metrics_emitter:
         cloud_foundry:
           api:    (( grab meta.cf.api_url ))
-          skip_ssl_validation: (( grab params.cf.skip_ssl_validation ))
+          skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
           username:   (( vault meta.cf.exodus_path ":admin_username" ))
           password:   (( vault meta.cf.exodus_path ":admin_password" ))
         rmq_management:

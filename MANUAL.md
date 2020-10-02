@@ -199,6 +199,16 @@ CA certificate at:
 * `secret/<your/env>/rabbitmq/broker/certs/server:certificate`
 * `secret/<your/env>/rabbitmq/broker/certs/server:key`
 
+## `metrics-emitter`
+
+Requires `broker` to be enabled. Co-locates a metrics emitter for RabbitMQ on
+the broker VM, which sends RabbitMQ metrics to the Cloud Foundry Loggregator.
+
+### Parameters
+
+* `cf_skip_ssl_validation` - (_Default_: `false`) Whether to skip SSL validation
+when communicating with the CF API.
+
 ## `mqtt`
 
 Enables the RabbitMQ MQTT plugin
