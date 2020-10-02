@@ -8,6 +8,7 @@ meta:
 
   cf:
     exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
+    deployment_name: (( concat meta.environment "-cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:    (( concat "https://api." meta.cf.system_domain ))
     username:   (( vault meta.cf.exodus_path ":admin_username" ))
@@ -42,7 +43,7 @@ instance_groups:
       #cf:
       #  domain: (( grab meta.cf.system_domain ))
       rabbitmq-service-broker:
-        #route: 
+        #route:
         #cc_endpoint: (( grab meta.cf.api_url ))
         service:
           username:  (( grab meta.broker.username ))
