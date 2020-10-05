@@ -1,0 +1,283 @@
+exodus:
+  broker_name: p-rabbitmq
+  broker_password: <!{meta.vault}/broker/auth:password!>
+  broker_url: https://test-broker-domain:4566
+  broker_username: broker
+  features: broker,metrics-emitter
+  management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
+  management_url: https://test-rmq-domain:15671
+  management_username: management
+  service_name: p-rabbitmq
+instance_groups:
+- azs:
+  - z1
+  instances: 3
+  jobs:
+  - name: rabbitmq-server
+    properties:
+      rabbitmq-server:
+        administrators:
+          broker:
+            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+            username: broker
+          management:
+            password: <!{meta.vault}/rabbitmq/admin/management:password!>
+            username: management
+        check_queue_sync: false
+        cluster_partition_handling: pause_minority
+        cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+        management_tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          cert: <!{meta.vault}/mgmt/certs/server:certificate!>
+          enabled: true
+          key: <!{meta.vault}/mgmt/certs/server:key!>
+        plugins:
+        - rabbitmq_management
+        ports:
+        - 5672
+        - 5671
+        - 15671
+        - 15672
+        ssl:
+          cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+          cert: <!{meta.vault}/rabbitmq/certs/server:certificate!>
+          enabled: true
+          fail_if_no_peer_cert: false
+          key: <!{meta.vault}/rabbitmq/certs/server:key!>
+          verification_depth: 5
+          verify: false
+          versions:
+          - tlsv1.2
+        version: "3.8"
+    release: cf-rabbitmq
+  name: rmq-server
+  networks:
+  - name: rabbitmq
+  persistent_disk_type: rabbitmq
+  stemcell: default
+  vm_type: medium
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  name: haproxy
+  networks:
+  - name: rabbitmq
+    static_ips:
+    - 10.99.0.16
+  stemcell: default
+  vm_type: small
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-service-broker
+    properties:
+      rabbitmq-service-broker:
+        logging:
+          level: debug
+          print_stack_traces: false
+        rabbitmq:
+          administrator:
+            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+            username: broker
+          management:
+            username: management
+          management_domain: test-rmq-domain:15671
+          management_tls:
+            cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+            enabled: true
+          operator_set_policy:
+            enabled: true
+            policy_definition: '{"ha-mode":"exactly","ha-params": 2,"ha-sync-mode":"manual"}'
+            policy_name: operator_set_policy
+            policy_priority: 50
+          ssl: true
+        service:
+          name: p-rabbitmq
+          password: <!{meta.vault}/broker/auth:password!>
+          plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
+          shareable: true
+          username: broker
+          uuid: 54766614-4530-41e6-b5df-8ccb2dc3fd3f
+    release: cf-rabbitmq-multitenant-broker
+  - name: bpm
+    release: bpm
+  - name: cf-cli-6-linux
+    release: cf-cli
+  - name: broker-registrar
+    properties:
+      broker:
+        host: test-broker-domain:4566
+        name: p-rabbitmq
+        password: <!{meta.vault}/broker/auth:password!>
+        protocol: https
+        service:
+          name: p-rabbitmq
+        username: broker
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+    release: cf-rabbitmq-multitenant-broker
+  - name: broker-deregistrar
+    properties:
+      broker:
+        name: p-rabbitmq
+        service:
+          name: p-rabbitmq
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+    release: cf-rabbitmq-multitenant-broker
+  - name: smoke-tests
+    properties:
+      broker:
+        name: p-rabbitmq
+        service:
+          name: p-rabbitmq
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+        domain: sys.test.cf.domain
+      smoke_tests:
+        org: system
+    release: cf-rabbitmq-smoke-tests
+  - name: haproxy
+    properties:
+      ha_proxy:
+        raw_config: |
+          global
+              log stdout len 1024 format raw syslog info
+              daemon
+              user vcap
+              group vcap
+              maxconn 64000
+              spread-checks 4
+              tune.ssl.default-dh-param 2048
+              tune.bufsize 16384
+              stats socket /var/vcap/sys/run/haproxy/stats.sock mode 600 expose-fd listeners level admin
+              stats timeout 2m
+              ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+              ssl-default-bind-ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+              ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+              ssl-default-server-ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+
+          defaults
+              log global
+              option log-health-checks
+              option log-separate-errors
+              maxconn 64000
+              option http-server-close
+              option httplog
+              option forwardfor
+              option contstats
+              timeout connect         5000ms
+              timeout client          30000ms
+              timeout server          30000ms
+              timeout tunnel          3600000ms
+              timeout http-keep-alive 6000ms
+              timeout http-request    5000ms
+              timeout queue           30000ms
+
+          frontend tcp-frontend-broker-https
+              mode tcp
+              bind :4566 ssl crt /var/vcap/jobs/haproxy/config/ssl
+              default_backend tcp-broker-https
+
+          backend tcp-broker-https
+              mode tcp
+              server node0 127.0.0.1:4567 check inter 1000
+        ssl_pem: |-
+          <!{meta.vault}/broker/certs/server:certificate!>
+          <!{meta.vault}/broker/certs/server:key!>
+    release: haproxy
+  - consumes:
+      doppler:
+        deployment: metrics-emitter-cf
+        from: doppler
+    name: loggregator_agent
+    properties:
+      loggregator:
+        tls:
+          agent:
+            cert: test-agent-cert
+            key: test-agent-key
+          ca_cert: test-cas
+    release: loggregator-agent
+  - name: rabbitmq-metrics-emitter
+    properties:
+      rabbitmq_metrics_emitter:
+        cloud_foundry:
+          api: https://api.sys.test.cf.domain
+          password: test_password
+          skip_ssl_validation: false
+          username: test_username
+        loggregator:
+          tls:
+            ca_cert: test-cas
+            cert: test-agent-cert
+            key: test-agent-key
+        rmq_management:
+          endpoint: https://test-rmq-domain:15671/api
+          password: <!{meta.vault}/rabbitmq/admin/management:password!>
+          user: management
+    release: rabbitmq-metrics-emitter
+  name: rmq-broker
+  networks:
+  - name: rabbitmq
+    static_ips:
+    - 10.99.0.17
+  stemcell: default
+  vm_type: small
+name: metrics-emitter-rabbitmq
+releases:
+- name: cf-rabbitmq
+  sha1: 1a90f68f8a0e353397eea2ef4ccc0a0bb50c5596
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=312.0.0
+  version: 312.0.0
+- name: bpm
+  sha1: dcf0582d838a73de29da273552ae79ac3098ee8b
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
+  version: 1.1.9
+- name: cf-rabbitmq-multitenant-broker
+  sha1: d256a6ba4d94254284930ebd7f0006315884437d
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=80.0.0
+  version: 80.0.0
+- name: cf-rabbitmq-smoke-tests
+  sha1: 133dfbefe41152094e92de2935ea7b280e36de74
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=66.0.0
+  version: 66.0.0
+- name: cf-cli
+  sha1: 7b4910ff8520040f3600f5d50a40aa2173777652
+  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.30.0
+  version: 1.30.0
+- name: haproxy
+  sha1: 97fbb573fc04d36c548915d8daef12a547e722d6
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.1.0
+  version: 10.1.0
+- name: rabbitmq-metrics-emitter
+  sha1: 05afc6f3559f45e0696c6a3760242045640e0df8
+  url: https://github.com/starkandwayne/rabbitmq-metrics-emitter-release/releases/download/0.4.1/rabbitmq-metrics-emitter-0.4.1.tgz
+  version: 0.4.1
+- name: loggregator-agent
+  sha1: bf723af956a61c7b51db0ba535c871bad24dd289
+  url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=3.9
+  version: "3.9"
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 5000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 5000-600000

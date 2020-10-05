@@ -1,0 +1,14 @@
+---
+kit:
+  features:
+    - broker
+    - metrics-emitter
+
+genesis:
+  env:       metrics-emitter
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  bosh_exodus_path: metrics-emitter/rabbitmq

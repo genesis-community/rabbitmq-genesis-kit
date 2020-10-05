@@ -1,0 +1,17 @@
+---
+kit:
+  features:
+    - broker
+    - nats-tls
+    - route-registrar
+
+genesis:
+  env:       nats-tls
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  bosh_exodus_path: nats-tls/rabbitmq
+  nats_client_cert: test-nats-client-cert
+  nats_client_key: test-nats-client-key

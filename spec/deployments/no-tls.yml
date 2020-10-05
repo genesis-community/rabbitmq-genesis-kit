@@ -1,0 +1,16 @@
+---
+kit:
+  features:
+    - broker
+    - no-rmq-tls
+    - no-mgmt-tls
+    - no-broker-tls
+
+genesis:
+  env:       no-tls
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  bosh_exodus_path: no-tls/rabbitmq

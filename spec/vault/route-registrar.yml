@@ -1,0 +1,38 @@
+secret/route/registrar/rabbitmq/broker/auth:
+  password: <!{meta.vault}/broker/auth:password!>
+secret/route/registrar/rabbitmq/broker/certs/ca:
+  certificate: <!{meta.vault}/broker/certs/ca:certificate!>
+  combined: <!{meta.vault}/broker/certs/ca:combined!>
+  crl: <!{meta.vault}/broker/certs/ca:crl!>
+  key: <!{meta.vault}/broker/certs/ca:key!>
+  serial: <!{meta.vault}/broker/certs/ca:serial!>
+secret/route/registrar/rabbitmq/broker/certs/server:
+  certificate: <!{meta.vault}/broker/certs/server:certificate!>
+  combined: <!{meta.vault}/broker/certs/server:combined!>
+  key: <!{meta.vault}/broker/certs/server:key!>
+secret/route/registrar/rabbitmq/mgmt/certs/ca:
+  certificate: <!{meta.vault}/mgmt/certs/ca:certificate!>
+  combined: <!{meta.vault}/mgmt/certs/ca:combined!>
+  crl: <!{meta.vault}/mgmt/certs/ca:crl!>
+  key: <!{meta.vault}/mgmt/certs/ca:key!>
+  serial: <!{meta.vault}/mgmt/certs/ca:serial!>
+secret/route/registrar/rabbitmq/mgmt/certs/server:
+  certificate: <!{meta.vault}/mgmt/certs/server:certificate!>
+  combined: <!{meta.vault}/mgmt/certs/server:combined!>
+  key: <!{meta.vault}/mgmt/certs/server:key!>
+secret/route/registrar/rabbitmq/rabbitmq/admin/broker:
+  password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+secret/route/registrar/rabbitmq/rabbitmq/admin/management:
+  password: <!{meta.vault}/rabbitmq/admin/management:password!>
+secret/route/registrar/rabbitmq/rabbitmq/certs/ca:
+  certificate: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+  combined: <!{meta.vault}/rabbitmq/certs/ca:combined!>
+  crl: <!{meta.vault}/rabbitmq/certs/ca:crl!>
+  key: <!{meta.vault}/rabbitmq/certs/ca:key!>
+  serial: <!{meta.vault}/rabbitmq/certs/ca:serial!>
+secret/route/registrar/rabbitmq/rabbitmq/certs/server:
+  certificate: <!{meta.vault}/rabbitmq/certs/server:certificate!>
+  combined: <!{meta.vault}/rabbitmq/certs/server:combined!>
+  key: <!{meta.vault}/rabbitmq/certs/server:key!>
+secret/route/registrar/rabbitmq/rabbitmq/erlang-cookie:
+  cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>

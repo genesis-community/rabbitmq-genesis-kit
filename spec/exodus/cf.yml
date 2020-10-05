@@ -1,0 +1,9 @@
+cf:
+  system_domain: sys.test.cf.domain
+  admin_password: test_password
+  admin_username: test_username
+  loggregator_tls_agent_cert: test-agent-cert
+  loggregator_tls_agent_key: test-agent-key
+  loggregator_ca: test-cas
+
+

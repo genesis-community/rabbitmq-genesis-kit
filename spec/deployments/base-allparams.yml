@@ -1,0 +1,22 @@
+---
+kit:
+  features:
+    - broker
+
+genesis:
+  env:       base-allparams
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  bosh_exodus_path: base-allparams/rabbitmq
+
+  stemcell_os: test-stemcell
+  stemcell_version: test-stemcell-version
+  broker_name: test-broker
+  service_name: test-service-name
+  broker_username: test-broker-user
+  ha_sync_mode: test-manual
+  mgmt_domain: test-mgmt-domain
+  check_queue_sync: true

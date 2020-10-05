@@ -1,0 +1,13 @@
+---
+kit:
+  features:
+    - broker
+
+genesis:
+  env:       base
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  bosh_exodus_path: base/rabbitmq
