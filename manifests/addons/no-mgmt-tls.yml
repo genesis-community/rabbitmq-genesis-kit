@@ -9,3 +9,5 @@
 - type: replace
   path: /meta/mgmt_scheme
   value: http
+- type: remove
+  path: /meta/mgmt_tls

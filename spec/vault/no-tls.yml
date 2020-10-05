@@ -1,0 +1,8 @@
+secret/no/tls/rabbitmq/broker/auth:
+  password: <!{meta.vault}/broker/auth:password!>
+secret/no/tls/rabbitmq/rabbitmq/admin/broker:
+  password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+secret/no/tls/rabbitmq/rabbitmq/admin/management:
+  password: <!{meta.vault}/rabbitmq/admin/management:password!>
+secret/no/tls/rabbitmq/rabbitmq/erlang-cookie:
+  cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>

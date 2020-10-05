@@ -1,0 +1,179 @@
+exodus:
+  broker_name: p-rabbitmq
+  broker_password: <!{meta.vault}/broker/auth:password!>
+  broker_url: http://test-broker-domain:4567
+  broker_username: broker
+  features: broker,no-rmq-tls,no-mgmt-tls,no-broker-tls
+  management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
+  management_url: https://test-rmq-domain:16572
+  management_username: management
+  service_name: p-rabbitmq
+instance_groups:
+- azs:
+  - z1
+  instances: 3
+  jobs:
+  - name: rabbitmq-server
+    properties:
+      rabbitmq-server:
+        administrators:
+          broker:
+            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+            username: broker
+          management:
+            password: <!{meta.vault}/rabbitmq/admin/management:password!>
+            username: management
+        check_queue_sync: false
+        cluster_partition_handling: pause_minority
+        cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+        plugins:
+        - rabbitmq_management
+        ports:
+        - 5672
+        - 5671
+        - 15671
+        - 15672
+        ssl:
+          enabled: false
+        version: "3.8"
+    release: cf-rabbitmq
+  name: rmq-server
+  networks:
+  - name: rabbitmq
+  persistent_disk_type: rabbitmq
+  stemcell: default
+  vm_type: medium
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  name: haproxy
+  networks:
+  - name: rabbitmq
+    static_ips:
+    - 10.99.0.16
+  stemcell: default
+  vm_type: small
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-service-broker
+    properties:
+      rabbitmq-service-broker:
+        logging:
+          level: debug
+          print_stack_traces: false
+        rabbitmq:
+          administrator:
+            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+            username: broker
+          management:
+            username: management
+          management_domain: test-rmq-domain:16572
+          operator_set_policy:
+            enabled: true
+            policy_definition: '{"ha-mode":"exactly","ha-params": 2,"ha-sync-mode":"manual"}'
+            policy_name: operator_set_policy
+            policy_priority: 50
+          ssl: true
+        service:
+          name: p-rabbitmq
+          password: <!{meta.vault}/broker/auth:password!>
+          plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
+          shareable: true
+          username: broker
+          uuid: 54766614-4530-41e6-b5df-8ccb2dc3fd3f
+    release: cf-rabbitmq-multitenant-broker
+  - name: bpm
+    release: bpm
+  - name: cf-cli-6-linux
+    release: cf-cli
+  - name: broker-registrar
+    properties:
+      broker:
+        host: test-broker-domain:4567
+        name: p-rabbitmq
+        password: <!{meta.vault}/broker/auth:password!>
+        protocol: http
+        service:
+          name: p-rabbitmq
+        username: broker
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+    release: cf-rabbitmq-multitenant-broker
+  - name: broker-deregistrar
+    properties:
+      broker:
+        name: p-rabbitmq
+        service:
+          name: p-rabbitmq
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+    release: cf-rabbitmq-multitenant-broker
+  - name: smoke-tests
+    properties:
+      broker:
+        name: p-rabbitmq
+        service:
+          name: p-rabbitmq
+      cf:
+        admin_password: test_password
+        admin_username: test_username
+        api_url: https://api.sys.test.cf.domain
+        domain: sys.test.cf.domain
+      smoke_tests:
+        org: system
+    release: cf-rabbitmq-smoke-tests
+  name: rmq-broker
+  networks:
+  - name: rabbitmq
+    static_ips:
+    - 10.99.0.17
+  stemcell: default
+  vm_type: small
+name: no-tls-rabbitmq
+releases:
+- name: cf-rabbitmq
+  sha1: 1a90f68f8a0e353397eea2ef4ccc0a0bb50c5596
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=312.0.0
+  version: 312.0.0
+- name: bpm
+  sha1: dcf0582d838a73de29da273552ae79ac3098ee8b
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
+  version: 1.1.9
+- name: cf-rabbitmq-multitenant-broker
+  sha1: d256a6ba4d94254284930ebd7f0006315884437d
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=80.0.0
+  version: 80.0.0
+- name: cf-rabbitmq-smoke-tests
+  sha1: 133dfbefe41152094e92de2935ea7b280e36de74
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=66.0.0
+  version: 66.0.0
+- name: cf-cli
+  sha1: 7b4910ff8520040f3600f5d50a40aa2173777652
+  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.30.0
+  version: 1.30.0
+- name: haproxy
+  sha1: 97fbb573fc04d36c548915d8daef12a547e722d6
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.1.0
+  version: 10.1.0
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 5000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 5000-600000
