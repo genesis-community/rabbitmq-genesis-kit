@@ -20,6 +20,7 @@ meta:
 params:
   rmq_domain: (( param "Please specify the domain of the RabbitMQ loadbalancer" ))
   mgmt_domain: (( grab params.rmq_domain ))
+  broker_domain: placeholder
   check_queue_sync: false
 
 instance_groups:
