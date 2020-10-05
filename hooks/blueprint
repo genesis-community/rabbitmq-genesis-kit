@@ -38,7 +38,7 @@ if want_feature "broker" ; then
       manifests/addons/route-registrar.yml
     )
 
-    if ! want_feature "no-broker-tls" ; then
+    if want_feature "no-broker-tls" ; then
       manifests+=(
         manifests/addons/broker-no-tls-route-registrar.yml
       )
