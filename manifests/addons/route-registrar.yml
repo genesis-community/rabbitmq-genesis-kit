@@ -14,7 +14,7 @@ meta:
     consumes:
       nats:
         from:       nats
-        deployment: (( grab meta.cf_deployment ))
+        deployment: (( grab meta.cf.deployment_name ))
       nats-tls: nil
     properties:
       host:            (( grab params.rmq_domain ))
@@ -34,12 +34,14 @@ instance_groups:
   jobs:
   - (( grab meta.mgmt_route_registrar_job ))
 
+- name: rmq-broker
+  jobs:
   - name: route_registrar
     release: routing
     consumes:
       nats:
         from:       nats
-        deployment: (( grab meta.cf_deployment ))
+        deployment: (( grab meta.cf.deployment_name ))
       nats-tls: nil
     properties:
       route_registrar:

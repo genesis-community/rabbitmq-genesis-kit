@@ -8,7 +8,7 @@ meta:
     consumes:
       nats-tls:
         from:       nats-tls
-        deployment: (( grab params.cf_deployment ))
+        deployment: (( grab meta.cf.deployment_name ))
     properties:
       nats:
         tls:
@@ -24,7 +24,7 @@ instance_groups:
     consumes:
       nats-tls:
         from:       nats-tls
-        deployment: (( grab params.cf_deployment ))
+        deployment: (( grab meta.cf.deployment_name ))
     properties:
       nats:
         tls:
