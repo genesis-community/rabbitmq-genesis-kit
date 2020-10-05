@@ -45,12 +45,16 @@ if want_feature "broker" ; then
     elif ! want_feature "provided-broker-cert" ; then
       bail "" "Cannot have no-broker-tls and provided-broker-cert features"
     fi
+  fi
 
-    if want_feature "nats-tls" ; then
-      manifests+=(
-        manifests/addons/nats-tls.yml
-      )
+  if want_feature "nats-tls" ; then
+    if ! want_feature "route-registrar" ; then
+      bail "" "Cannot have nats-tls feature without route-registrar feature"
     fi
+
+    manifests+=(
+      manifests/addons/nats-tls.yml
+    )
   fi
 
   if want_feature "metrics-emitter" ; then
