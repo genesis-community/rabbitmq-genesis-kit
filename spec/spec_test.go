@@ -57,7 +57,6 @@ var _ = Describe("Jumpbox Kit", func() {
 			Exodus:      "cf",
 			// Focus:       true,
 		})
-		//fails due to https://github.com/genesis-community/rabbitmq-genesis-kit/issues/4
 		Test(Environment{
 			Name:        "no-tls",
 			CloudConfig: "aws",
