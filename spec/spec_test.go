@@ -19,7 +19,7 @@ var _ = Describe("Jumpbox Kit", func() {
 			Name:        "base",
 			CloudConfig: "aws",
 			CPI:         "aws",
-			Focus:       true,
+			// Focus:       true,
 		})
 		Test(Environment{
 			Name:        "base-allparams",
@@ -33,7 +33,7 @@ var _ = Describe("Jumpbox Kit", func() {
 			CloudConfig: "aws",
 			CPI:         "aws",
 			Exodus:      "cf",
-			Focus:       true,
+			// Focus:       true,
 		})
 		Test(Environment{
 			Name:        "metrics-emitter",
@@ -68,7 +68,14 @@ var _ = Describe("Jumpbox Kit", func() {
 			CloudConfig: "aws",
 			CPI:         "aws",
 			Exodus:      "cf",
-			Focus:       true,
+			// Focus:       true,
+		})
+		Test(Environment{
+			Name:        "stomp",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			// Focus:       true,
 		})
 
 	})

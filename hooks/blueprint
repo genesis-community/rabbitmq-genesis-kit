@@ -14,7 +14,7 @@ set -eu
 
 
 validate_features broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls \
-                  external-rmq-lb route-registrar nats-tls \
+                  external-rmq-lb route-registrar nats-tls stomp \
                   provided-rmq-cert provided-mgmt-cert provided-broker-cert
 
 declare -a manifests
