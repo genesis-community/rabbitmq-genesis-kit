@@ -224,9 +224,9 @@ instance_groups:
       route_registrar:
         routes:
         - name: p-rabbitmq-broker
-          port: 4566
           registration_interval: 20s
           server_cert_domain_san: test-broker-domain
+          tls_port: 4566
           uris:
           - test-broker-domain
     release: routing
