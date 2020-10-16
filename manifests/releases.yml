@@ -1,19 +1,19 @@
 meta:
   releases:
   - name:    cf-rabbitmq
-    version: 312.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=312.0.0
-    sha1:    1a90f68f8a0e353397eea2ef4ccc0a0bb50c5596
+    version: 335.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=335.0.0
+    sha1:    7dce7778086df481d7ec0b87861501a596eb6175
 
   - name:    cf-rabbitmq-multitenant-broker
-    version: 80.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=80.0.0
-    sha1:    d256a6ba4d94254284930ebd7f0006315884437d
+    version: 82.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=82.0.0
+    sha1:    94432a54a403ad86b004722f5f2f79aaecf09e40
 
   - name:    cf-rabbitmq-smoke-tests
-    version: 66.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=66.0.0
-    sha1:    133dfbefe41152094e92de2935ea7b280e36de74
+    version: 72.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=72.0.0
+    sha1:    47dac3fab09a04910765ca0521117a7015fa8dbb
 
   - name:    bpm
     version: 1.1.9 
@@ -21,9 +21,9 @@ meta:
     sha1:    dcf0582d838a73de29da273552ae79ac3098ee8b
 
   - name:    cf-cli
-    version: 1.30.0
-    url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.30.0
-    sha1:    7b4910ff8520040f3600f5d50a40aa2173777652
+    version: 1.31.0
+    url:     https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.31.0
+    sha1:    016fdef94f6c7960daaa9f2318653cfa6f033cde
 
   - name:    haproxy
     version: 10.1.0
@@ -31,6 +31,6 @@ meta:
     sha1:    97fbb573fc04d36c548915d8daef12a547e722d6
 
   - name:    routing
-    version: 0.207.0
-    url:     https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.207.0
-    sha1:    9e703259a07f032e7ca96dca2730d0e0c2b61685
+    version: 0.208.0
+    url:     https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.208.0
+    sha1:    537d8303a083fb4efa5dadf24411fa4758e25b68
