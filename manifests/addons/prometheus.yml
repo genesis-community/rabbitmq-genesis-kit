@@ -6,3 +6,4 @@ instance_groups:
       rabbitmq-server:
       - (( append ))
       - rabbitmq_prometheus
+      cluster_name: (( grab genesis.env ))
