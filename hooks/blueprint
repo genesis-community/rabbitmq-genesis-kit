@@ -15,7 +15,8 @@ set -eu
 
 validate_features broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls \
                   external-rmq-lb route-registrar nats-tls stomp \
-                  provided-rmq-cert provided-mgmt-cert provided-broker-cert
+                  provided-rmq-cert provided-mgmt-cert provided-broker-cert \
+                  prometheus no-prometheus-tls
 
 declare -a manifests
 manifests+=( manifests/base.yml
