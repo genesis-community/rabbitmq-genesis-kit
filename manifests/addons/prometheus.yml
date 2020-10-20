@@ -4,6 +4,7 @@ instance_groups:
   - name: rabbitmq-server
     properties:
       rabbitmq-server:
-      - (( append ))
-      - rabbitmq_prometheus
-      cluster_name: (( grab genesis.env ))
+        plugins:
+        - (( append ))
+        - rabbitmq_prometheus
+        cluster_name: (( grab genesis.env ))
