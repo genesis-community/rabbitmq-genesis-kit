@@ -1,0 +1,8 @@
+instance_groups:
+- name: rmq-server
+  jobs:
+  - name: rabbitmq-server
+    properties:
+      rabbitmq-server:
+      - (( append ))
+      - rabbitmq_prometheus

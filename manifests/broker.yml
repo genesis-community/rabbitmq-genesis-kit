@@ -120,8 +120,6 @@ releases:
     .:    (( inject meta.releases.cf-rabbitmq-smoke-tests ))
   - name: cf-cli
     .:    (( inject meta.releases.cf-cli ))
-  - name: haproxy
-    .:    (( inject meta.releases.haproxy ))
 
 exodus:
   broker_url: (( concat meta.broker.protocol "://" params.broker_domain ":" meta.broker.port ))

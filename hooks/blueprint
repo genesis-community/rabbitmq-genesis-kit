@@ -76,6 +76,18 @@ if want_feature "stomp" ; then
   )
 fi
 
+if want_feature "prometheus" ; then
+  manifests+=(
+    manifests/addons/prometheus.yml
+  )
+
+  if ! want_feature "no-prometheus-tls"; then
+    manifests+=(
+      manifests/addons/prometheus-tls.yml
+    )
+  fi
+fi
+
 if want_feature "no-rmq-tls" ; then
   manifests+=(
     manifests/addons/no-rmq-tls.yml

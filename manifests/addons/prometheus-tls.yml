@@ -1,20 +1,13 @@
-meta:
-  broker_tls:
-    key:  (( vault meta.vault "/broker/certs/server:key" ))
-    cert: (( vault meta.vault "/broker/certs/server:certificate" ))
-
-  broker:
-    protocol: https
-    port:     4566
-
 instance_groups:
-- name: rmq-broker
+- name: rmq-server
   jobs:
-  - name:    haproxy
+  - name: bpm
+    release: bpm
+  - name: haproxy
     release: haproxy
     properties:
       ha_proxy:
-        ssl_pem: (( concat meta.broker_tls.cert "\n" meta.broker_tls.key ))
+        ssl_pem: (( concat meta.rabbitmq_tls.cert "\n" meta.rabbitmq_tls.key ))
         raw_config: |
           global
               log stdout len 1024 format raw syslog info
@@ -51,12 +44,12 @@ instance_groups:
 
           frontend tcp-frontend-broker-https
               mode tcp
-              bind :4566 ssl crt /var/vcap/jobs/haproxy/config/ssl
+              bind :15691 ssl crt /var/vcap/jobs/haproxy/config/ssl
               default_backend tcp-broker-https
 
           backend tcp-broker-https
               mode tcp
-              server node0 127.0.0.1:4567 check inter 1000
+              server node0 127.0.0.1:15691 check inter 1000
 
 releases:
 - name: haproxy

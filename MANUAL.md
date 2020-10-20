@@ -217,6 +217,16 @@ Enables the RabbitMQ MQTT plugin
 
 Enables the RabbitMQ STOMP plugin
 
+## `prometheus`
+
+Enables the RabbitMQ Prometheus plugin and metrics scraping endpoint on port
+15691. This TLS endpoint serves the same certificate as the RabbitMQ cluster.
+
+## `no-prometheus-tls`
+
+Disables the TLS frontend at 15691, and leaves the non-TLS Prometheus
+listener at port 15692.
+
 # Available Addons
 
 * `register-broker` - Register this broker with the Cloud Foundry in
