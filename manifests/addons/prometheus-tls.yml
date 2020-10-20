@@ -49,7 +49,7 @@ instance_groups:
 
           backend tcp-broker-https
               mode tcp
-              server node0 127.0.0.1:15691 check inter 1000
+              server node0 127.0.0.1:15692 check inter 1000
 
 releases:
 - name: haproxy
