@@ -167,7 +167,7 @@ forward are as follows:
 
 ### vm_extensions
 
-* `rmq_loadbalancer` - Applies to each of the rmq_server nodes. Should be used
+* `rmq-loadbalancer` - Applies to each of the rmq_server nodes. Should be used
 to attach the VMs to the backend pool of a load balancer.
 
 ## `provided-rmq-cert`
