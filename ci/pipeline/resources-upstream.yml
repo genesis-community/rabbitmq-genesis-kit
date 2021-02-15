@@ -1,0 +1,48 @@
+resources:
+  - name: bosh-release-cf-rabbitmq
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: pivotal-cf/cf-rabbitmq-release
+
+  - name: bosh-release-bpm
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: cloudfoundry/bpm-release
+
+  - name: bosh-release-cf-cli
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: bosh-packages/cf-cli-release
+
+  - name: bosh-release-cf-rabbitmq-multitenant-broker-release
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: pivotal-cf/cf-rabbitmq-multitenant-broker-release
+
+  - name: bosh-release-cf-rabbitmq-smoke-tests-release
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: pivotal-cf/cf-rabbitmq-smoke-tests-release
+
+  - name: bosh-release-haproxy
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: cloudfoundry-incubator/haproxy-boshrelease
+
+  # - name: bosh-release-rabbitmq-metrics-emitter
+  #   type: bosh-io-release
+  #   check_every: 24h
+  #   source:
+  #     repository: cloudfoundry-community/UPDATEME-boshrelease
+
+  - name: bosh-release-routing
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: cloudfoundry/routing-release

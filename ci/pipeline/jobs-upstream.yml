@@ -1,0 +1,234 @@
+jobs:
+- name: cf-rabbitmq-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-cf-rabbitmq
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-cf-rabbitmq
+        params:
+          OPS_FILE_PATH: manifests/releases/cf-rabbitmq.yml
+          RELEASE_NAME: cf-rabbitmq
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: bpm-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-bpm
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-bpm
+        params:
+          OPS_FILE_PATH: manifests/releases/bpm.yml
+          RELEASE_NAME: bpm
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: cf-cli-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-cf-cli
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-cf-cli
+        params:
+          OPS_FILE_PATH: manifests/releases/cf-cli.yml
+          RELEASE_NAME: cf-cli
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: cf-rabbitmq-multitenant-broker-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-cf-rabbitmq-multitenant-broker
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-cf-rabbitmq-multitenant-broker
+        params:
+          OPS_FILE_PATH: manifests/releases/cf-rabbitmq-multitenant-broker.yml
+          RELEASE_NAME: cf-rabbitmq-multitenant-broker
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: cf-rabbitmq-smoke-tests-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-cf-rabbitmq-smoke-tests
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-cf-rabbitmq-smoke-tests
+        params:
+          OPS_FILE_PATH: manifests/releases/cf-rabbitmq-smoke-tests.yml
+          RELEASE_NAME: cf-rabbitmq-smoke-tests
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: haproxy-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-haproxy
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-haproxy
+        params:
+          OPS_FILE_PATH: manifests/releases/haproxy.yml
+          RELEASE_NAME: haproxy
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+- name: loggregator-agent-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-loggregator-agent
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-loggregator-agent
+        params:
+          OPS_FILE_PATH: manifests/releases/loggregator-agent.yml
+          RELEASE_NAME: loggregator-agent
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
+
+# - name: rabbitmq-metrics-emitter-release
+#   public: true
+#   serial: true
+#   serial_groups: [bosh-release]
+#   plan:
+#     - do:
+#       - in_parallel:
+#         - { get: git, trigger: false, passed: [spec-tests] }
+#         - { get: git-ci, trigger: false }
+#         - get: bosh-release-rabbitmq-metrics-emitter
+#           trigger: true
+#           params:
+#             tarball: false
+#       - task: update-bosh-release
+#         file: git-ci/ci/tasks/update-bosh-release/task.yml
+#         input_mapping:
+#           bosh-release: bosh-release-rabbitmq-metrics-emitter
+#         params:
+#           OPS_FILE_PATH: manifests/releases/rabbitmq-metrics-emitter.yml
+#           RELEASE_NAME: rabbitmq-metrics-emitter
+#           BRANCH: (( grab meta.github.branch ))
+#       - put: git
+#         params:
+#           merge: true
+#           repository: pushme
+
+- name: routing-release
+  public: true
+  serial: true
+  serial_groups: [bosh-release]
+  plan:
+    - do:
+      - in_parallel:
+        - { get: git, trigger: false, passed: [spec-tests] }
+        - { get: git-ci, trigger: false }
+        - get: bosh-release-routing
+          trigger: true
+          params:
+            tarball: false
+      - task: update-bosh-release
+        file: git-ci/ci/tasks/update-bosh-release/task.yml
+        input_mapping:
+          bosh-release: bosh-release-routing
+        params:
+          OPS_FILE_PATH: manifests/releases/routing.yml
+          RELEASE_NAME: routing
+          BRANCH: (( grab meta.github.branch ))
+      - put: git
+        params:
+          merge: true
+          repository: pushme
