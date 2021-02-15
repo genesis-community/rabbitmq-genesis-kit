@@ -17,13 +17,13 @@ resources:
     source:
       repository: bosh-packages/cf-cli-release
 
-  - name: bosh-release-cf-rabbitmq-multitenant-broker-release
+  - name: bosh-release-cf-rabbitmq-multitenant-broker
     type: bosh-io-release
     check_every: 24h
     source:
       repository: pivotal-cf/cf-rabbitmq-multitenant-broker-release
 
-  - name: bosh-release-cf-rabbitmq-smoke-tests-release
+  - name: bosh-release-cf-rabbitmq-smoke-tests
     type: bosh-io-release
     check_every: 24h
     source:
@@ -34,6 +34,12 @@ resources:
     check_every: 24h
     source:
       repository: cloudfoundry-incubator/haproxy-boshrelease
+
+  - name: bosh-release-loggregator-agent
+    type: bosh-io-release
+    check_every: 24h
+    source:
+      repository: cloudfoundry/loggregator-agent-release
 
   # - name: bosh-release-rabbitmq-metrics-emitter
   #   type: bosh-io-release

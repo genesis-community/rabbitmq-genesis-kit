@@ -2,7 +2,7 @@
 meta:
   kit:     rabbitmq
   release: RabbitMQ Genesis Kit
-  target:  genesis@pipes
+  target:  pipes@genesis
   url:     https://pipes.starkandwayne.com
   exposed: yes
 
