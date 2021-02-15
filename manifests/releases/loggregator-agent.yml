@@ -1,0 +1,7 @@
+- type: replace
+  path: /releases?/name=loggregator-agent?
+  value:
+    name: loggregator-agent
+    url:     https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=3.9
+    version: "3.9"
+    sha1:    bf723af956a61c7b51db0ba535c871bad24dd289

@@ -1,0 +1,7 @@
+- type: replace
+  path: /releases?/name=cf-rabbitmq-smoke-tests?
+  value:
+    name: cf-rabbitmq-smoke-tests
+    version: 72.0.0
+    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=72.0.0
+    sha1:    47dac3fab09a04910765ca0521117a7015fa8dbb

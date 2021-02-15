@@ -113,14 +113,6 @@ instance_groups:
       smoke_tests:
         org: system
 
-releases:
-  - name: cf-rabbitmq-multitenant-broker
-    .:    (( inject meta.releases.cf-rabbitmq-multitenant-broker ))
-  - name: cf-rabbitmq-smoke-tests
-    .:    (( inject meta.releases.cf-rabbitmq-smoke-tests ))
-  - name: cf-cli
-    .:    (( inject meta.releases.cf-cli ))
-
 exodus:
   broker_url: (( concat meta.broker.protocol "://" params.broker_domain ":" meta.broker.port ))
   broker_username: (( grab meta.broker.username ))

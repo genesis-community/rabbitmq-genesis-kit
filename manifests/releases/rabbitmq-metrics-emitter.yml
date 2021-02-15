@@ -1,0 +1,8 @@
+- type: replace
+  path: /releases?/name=rabbitmq-metrics-emitter?
+  value:
+    name: rabbitmq-metrics-emitter
+    version: 0.4.1
+    url:     https://github.com/starkandwayne/rabbitmq-metrics-emitter-release/releases/download/v0.4.1/rabbitmq-metrics-emitter-0.4.1.tgz
+    sha1:    05afc6f3559f45e0696c6a3760242045640e0df8
+

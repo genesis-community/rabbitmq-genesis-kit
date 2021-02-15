@@ -89,12 +89,6 @@ instance_groups:
     static_ips: (( static_ips 0 ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
-releases:
-- name: cf-rabbitmq
-  .:    (( inject meta.releases.cf-rabbitmq ))
-- name: bpm
-  .:    (( inject meta.releases.bpm ))
-
 exodus:
   management_url: (( concat "https://" params.mgmt_domain ":" meta.mgmt_port ))
   management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))

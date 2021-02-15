@@ -62,7 +62,3 @@ instance_groups:
 exodus:
   broker_url: (( concat "https://" params.broker_domain ))
   management_url: (( concat "https://" params.mgmt_domain ))
-
-releases:
-- name: routing
-  .:    (( inject meta.releases.routing ))

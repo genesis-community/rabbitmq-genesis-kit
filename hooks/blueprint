@@ -20,17 +20,23 @@ validate_features broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls \
 
 declare -a manifests
 manifests+=( manifests/base.yml
-             manifests/releases.yml
-             manifests/server.yml )
+             manifests/server.yml
+             manifests/releases/cf-rabbitmq.yml
+             manifests/releases/bpm.yml
+             manifests/releases/haproxy.yml )
 
 if want_feature "broker" ; then
   manifests+=(
     manifests/broker.yml
+    manifests/releases/cf-rabbitmq-multitenant-broker.yml
+    manifests/releases/cf-rabbitmq-smoke-tests.yml
+    manifests/releases/cf-cli.yml
   )
 
   if ! want_feature "no-broker-tls" ; then
     manifests+=(
       manifests/addons/broker-tls.yml
+      # manifests/releases/haproxy.yml
     )
   fi
 
@@ -61,6 +67,8 @@ if want_feature "broker" ; then
   if want_feature "metrics-emitter" ; then
       manifests+=(
         manifests/addons/metrics-emitter.yml
+        manifests/releases/rabbitmq-metrics-emitter.yml
+        manifests/releases/loggregator-agent.yml
       )
   fi
 fi
@@ -85,6 +93,7 @@ if want_feature "prometheus" ; then
   if ! want_feature "no-prometheus-tls"; then
     manifests+=(
       manifests/addons/prometheus-tls.yml
+      # manifests/releases/haproxy.yml
     )
   fi
 fi
@@ -107,6 +116,7 @@ if want_feature "no-mgmt-tls" ; then
   if want_feature "route-registrar" ; then
     manifest+=(
       manifests/addons/no-mgmt-tls-route-registrar.yml
+      manifests/releases/routing.yml
     )
   fi
 
