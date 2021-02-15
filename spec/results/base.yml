@@ -69,13 +69,17 @@ instance_groups:
 name: base-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: 1a90f68f8a0e353397eea2ef4ccc0a0bb50c5596
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=312.0.0
-  version: 312.0.0
+  sha1: 7dce7778086df481d7ec0b87861501a596eb6175
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=335.0.0
+  version: 335.0.0
 - name: bpm
   sha1: dcf0582d838a73de29da273552ae79ac3098ee8b
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
   version: 1.1.9
+- name: haproxy
+  sha1: 97fbb573fc04d36c548915d8daef12a547e722d6
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.1.0
+  version: 10.1.0
 stemcells:
 - alias: default
   os: ubuntu-xenial
