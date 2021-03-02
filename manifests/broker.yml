@@ -108,6 +108,8 @@ instance_groups:
     release: cf-rabbitmq-smoke-tests
     properties:
       .: (( inject instance_groups.rmq-broker.jobs.broker-deregistrar.properties ))
+      broker:
+        name: (( grab params.service_name ))
       cf:
         domain:  (( grab meta.cf.system_domain ))
       smoke_tests:
