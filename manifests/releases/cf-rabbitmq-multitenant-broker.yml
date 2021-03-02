@@ -2,6 +2,6 @@
   path: /releases?/name=cf-rabbitmq-multitenant-broker?
   value:
     name: cf-rabbitmq-multitenant-broker
-    version: 82.0.0
-    url:     https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=82.0.0
-    sha1:    94432a54a403ad86b004722f5f2f79aaecf09e40
+    version: 83.0.0
+    url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=83.0.0
+    sha1: fd501aa3c302c6d380fc04debb41712b8ae34313
