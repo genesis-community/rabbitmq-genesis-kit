@@ -163,9 +163,9 @@ releases:
   url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=72.0.0
   version: 72.0.0
 - name: cf-cli
-  sha1: 016fdef94f6c7960daaa9f2318653cfa6f033cde
-  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.31.0
-  version: 1.31.0
+  sha1: b89a74153143fe8af2c681ed0cd64185ae61f5f9
+  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.32.0
+  version: 1.32.0
 stemcells:
 - alias: default
   os: ubuntu-xenial
