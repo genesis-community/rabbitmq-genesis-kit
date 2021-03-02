@@ -255,9 +255,9 @@ releases:
   url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release?v=82.0.0
   version: 82.0.0
 - name: cf-rabbitmq-smoke-tests
-  sha1: 47dac3fab09a04910765ca0521117a7015fa8dbb
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=72.0.0
-  version: 72.0.0
+  sha1: bebca4463971a69b964b55629395890e04f05caf
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=73.0.0
+  version: 73.0.0
 - name: cf-cli
   sha1: 016fdef94f6c7960daaa9f2318653cfa6f033cde
   url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.31.0
