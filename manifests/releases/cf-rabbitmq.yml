@@ -2,6 +2,6 @@
   path: /releases?/name=cf-rabbitmq?
   value:
     name: cf-rabbitmq
-    version: 335.0.0
-    url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=335.0.0
-    sha1: 7dce7778086df481d7ec0b87861501a596eb6175
+    version: 336.0.0
+    url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=336.0.0
+    sha1: cf03e73395d376d8122b6495dc5eed2b10e92f2f

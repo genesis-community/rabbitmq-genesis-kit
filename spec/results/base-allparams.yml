@@ -208,9 +208,9 @@ instance_groups:
 name: base-allparams-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: 7dce7778086df481d7ec0b87861501a596eb6175
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=335.0.0
-  version: 335.0.0
+  sha1: cf03e73395d376d8122b6495dc5eed2b10e92f2f
+  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=336.0.0
+  version: 336.0.0
 - name: bpm
   sha1: dcf0582d838a73de29da273552ae79ac3098ee8b
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
