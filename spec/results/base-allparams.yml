@@ -138,7 +138,7 @@ instance_groups:
   - name: smoke-tests
     properties:
       broker:
-        name: test-broker
+        name: test-service-name
         service:
           name: test-service-name
       cf:
