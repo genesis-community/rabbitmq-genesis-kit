@@ -243,9 +243,9 @@ releases:
   url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=336.0.0
   version: 336.0.0
 - name: bpm
-  sha1: dcf0582d838a73de29da273552ae79ac3098ee8b
-  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.9
-  version: 1.1.9
+  sha1: 502e9446fa34accaf122ad2b28b6ffa543d5bbca
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.12
+  version: 1.1.12
 - name: haproxy
   sha1: 79a57d1711c73733f9d5d14ece95db338bbcd618
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.6.0
