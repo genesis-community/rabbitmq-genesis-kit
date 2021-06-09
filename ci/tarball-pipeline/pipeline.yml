@@ -1,0 +1,64 @@
+#Concourse Instanced Pipeline
+# set "project" instance var to one of
+# - cf-rabbitmq
+# - cf-rabbitmq-multitenant-broker
+# - cf-rabbitmq-smoke-tests
+
+resources:
+- name: github-release
+  type: github-release
+  check_every: 60m
+  source:
+    owner:      pivotal-cf
+    repository: ((project))-release
+    access_token: ((github.access_token))
+
+- name: release-tarball
+  type: s3
+  source:
+    bucket:            ((project))-genesis-releases
+    access_key_id:     ((aws.access_key_id))
+    secret_access_key: ((aws.secret_access_key))
+    regexp: ((project))-(.*).tgz
+
+jobs:
+- name: create-release-tarball
+  plan:
+  - get: github-release
+    params:
+      globs: []
+      include_source_tarball: true
+    trigger: true
+  - task: untar-source
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: ubuntu}
+      inputs:  [name: github-release]
+      outputs: [name: repository]
+      run:
+        path: tar
+        args: [ -xzvf, github-release/source.tar.gz, -C, repository/, --strip-components=1] 
+  - load_var: release-version
+    file: github-release/version
+  - task: create-release
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: klaue/cleanup}
+      inputs:  [name: repository]
+      outputs: [name: output-tarball]
+      run:
+        path: bosh
+        args: [
+          create-release, 
+          --dir, repository,
+          --tarball, output-tarball/((project))-((.:release-version)).tgz,
+          repository/releases/((project))/((project))-((.:release-version)).yml 
+          ]
+  - put: release-tarball
+    params:
+      file: output-tarball/((project))-((.:release-version)).tgz
+      acl:  public-read

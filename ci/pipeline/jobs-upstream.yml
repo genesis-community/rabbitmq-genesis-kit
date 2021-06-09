@@ -8,10 +8,13 @@ jobs:
       - in_parallel:
         - { get: git, trigger: false, passed: [spec-tests] }
         - { get: git-ci, trigger: false }
-        - get: bosh-release-cf-rabbitmq
+        - get: s3-release-blob
+          resource: bosh-release-cf-rabbitmq
           trigger: true
           params:
             tarball: false
+      - task: map-s3-blob-to-boshio-output
+        file: git-ci/ci/tasks/s3-to-boshio
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         input_mapping:
@@ -86,14 +89,13 @@ jobs:
       - in_parallel:
         - { get: git, trigger: false, passed: [spec-tests] }
         - { get: git-ci, trigger: false }
-        - get: bosh-release-cf-rabbitmq-multitenant-broker
+        - get: s3-release-blob
+          resource: bosh-release-cf-rabbitmq-multitenant-broker
           trigger: true
-          params:
-            tarball: false
+      - task: map-s3-blob-to-boshio-output
+        file: git-ci/ci/tasks/s3-to-boshio
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
-        input_mapping:
-          bosh-release: bosh-release-cf-rabbitmq-multitenant-broker
         params:
           OPS_FILE_PATH: manifests/releases/cf-rabbitmq-multitenant-broker.yml
           RELEASE_NAME: cf-rabbitmq-multitenant-broker
@@ -112,10 +114,13 @@ jobs:
       - in_parallel:
         - { get: git, trigger: false, passed: [spec-tests] }
         - { get: git-ci, trigger: false }
-        - get: bosh-release-cf-rabbitmq-smoke-tests
+        - get: s3-release-blob
+          resource: bosh-release-cf-rabbitmq-smoke-tests
           trigger: true
           params:
             tarball: false
+      - task: map-s3-blob-to-boshio-output
+        file: git-ci/ci/tasks/s3-to-boshio
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         input_mapping:

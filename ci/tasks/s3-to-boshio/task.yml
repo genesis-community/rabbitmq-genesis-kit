@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: starkandwayne/concourse-go
+    tag: '1.14' 
+
+inputs:
+- name: git-ci
+- name: s3-release-blob
+
+outputs:
+- name: bosh-release
+
+run:
+  path: git-ci/ci/tasks/s3-to-boshio/task
+

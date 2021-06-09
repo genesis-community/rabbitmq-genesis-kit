@@ -1,9 +1,12 @@
 resources:
   - name: bosh-release-cf-rabbitmq
-    type: bosh-io-release
+    type: s3
     check_every: 24h
     source:
-      repository: pivotal-cf/cf-rabbitmq-release
+      bucket:            cf-rabbitmq-genesis-releases
+      access_key_id:     ((aws.access_key_id))
+      secret_access_key: ((aws.secret_access_key))
+      regexp:            cf-rabbitmq-(.*).tgz
 
   - name: bosh-release-bpm
     type: bosh-io-release
@@ -18,16 +21,22 @@ resources:
       repository: bosh-packages/cf-cli-release
 
   - name: bosh-release-cf-rabbitmq-multitenant-broker
-    type: bosh-io-release
+    type: s3
     check_every: 24h
     source:
-      repository: pivotal-cf/cf-rabbitmq-multitenant-broker-release
+      bucket:            cf-rabbitmq-multitenant-broker-genesis-releases
+      access_key_id:     ((aws.access_key_id))
+      secret_access_key: ((aws.secret_access_key))
+      regexp:            cf-rabbitmq-multitenant-broker-(.*).tgz
 
   - name: bosh-release-cf-rabbitmq-smoke-tests
-    type: bosh-io-release
+    type: s3
     check_every: 24h
     source:
-      repository: pivotal-cf/cf-rabbitmq-smoke-tests-release
+      bucket:            cf-rabbitmq-smoke-tests-genesis-releases
+      access_key_id:     ((aws.access_key_id))
+      secret_access_key: ((aws.secret_access_key))
+      regexp:            cf-rabbitmq-smoke-tests-(.*).tgz
 
   - name: bosh-release-haproxy
     type: bosh-io-release
