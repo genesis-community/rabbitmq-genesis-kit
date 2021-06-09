@@ -14,7 +14,7 @@ jobs:
           params:
             tarball: false
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         params:
@@ -91,7 +91,7 @@ jobs:
           resource: bosh-release-cf-rabbitmq-multitenant-broker
           trigger: true
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         params:
@@ -118,7 +118,7 @@ jobs:
           params:
             tarball: false
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         params:
