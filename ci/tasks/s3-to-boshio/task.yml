@@ -17,3 +17,5 @@ outputs:
 run:
   path: git-ci/ci/tasks/s3-to-boshio/task
 
+params:
+  RELEASE_NAME:

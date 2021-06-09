@@ -14,11 +14,11 @@ jobs:
           params:
             tarball: false
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
+        params:
+          RELEASE_NAME: cf-rabbitmq
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
-        input_mapping:
-          bosh-release: bosh-release-cf-rabbitmq
         params:
           OPS_FILE_PATH: manifests/releases/cf-rabbitmq.yml
           RELEASE_NAME: cf-rabbitmq
@@ -93,7 +93,9 @@ jobs:
           resource: bosh-release-cf-rabbitmq-multitenant-broker
           trigger: true
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
+        params:
+          RELEASE_NAME: cf-rabbitmq-multitenant-broker
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
         params:
@@ -120,11 +122,11 @@ jobs:
           params:
             tarball: false
       - task: map-s3-blob-to-boshio-output
-        file: git-ci/ci/tasks/s3-to-boshio
+        file: git-ci/ci/tasks/s3-to-boshio/task.yml
+        params:
+          RELEASE_NAME: cf-rabbitmq-smoke-tests
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
-        input_mapping:
-          bosh-release: bosh-release-cf-rabbitmq-smoke-tests
         params:
           OPS_FILE_PATH: manifests/releases/cf-rabbitmq-smoke-tests.yml
           RELEASE_NAME: cf-rabbitmq-smoke-tests
