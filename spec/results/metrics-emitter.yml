@@ -239,9 +239,9 @@ instance_groups:
 name: metrics-emitter-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: cf03e73395d376d8122b6495dc5eed2b10e92f2f
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=336.0.0
-  version: 336.0.0
+  sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709  s3-release-blob/cf-rabbitmq-378.0.0.tgz
+  url: https://-genesis-releases.s3.amazonaws.com/cf-rabbitmq-378.0.0.tgz
+  version: 378.0.0
 - name: bpm
   sha1: 502e9446fa34accaf122ad2b28b6ffa543d5bbca
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.12
