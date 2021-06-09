@@ -17,8 +17,6 @@ jobs:
         file: git-ci/ci/tasks/s3-to-boshio
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
-        input_mapping:
-          bosh-release: bosh-release-cf-rabbitmq
         params:
           OPS_FILE_PATH: manifests/releases/cf-rabbitmq.yml
           RELEASE_NAME: cf-rabbitmq
@@ -123,8 +121,6 @@ jobs:
         file: git-ci/ci/tasks/s3-to-boshio
       - task: update-bosh-release
         file: git-ci/ci/tasks/update-bosh-release/task.yml
-        input_mapping:
-          bosh-release: bosh-release-cf-rabbitmq-smoke-tests
         params:
           OPS_FILE_PATH: manifests/releases/cf-rabbitmq-smoke-tests.yml
           RELEASE_NAME: cf-rabbitmq-smoke-tests
