@@ -3,6 +3,10 @@
 IN_DIR=s3-release-blob
 OUT_DIR=bosh-release
 
+# the s3 resource puts out the url that it got the blob from, except for when
+# its the first resource that's getting pulled. I don't know why. So made
+# a hackier way to get the url together
+FILENAME="$(basename "$(ls "${IN_DIR}"/*.tgz)")"
+echo -n "https://${RELEASE_NAME}-genesis-releases.s3.amazonaws.com/"${FILENAME} > "${OUT_DIR}/url"
 cp "${IN_DIR}/version"      "${OUT_DIR}/version"
-cp "${IN_DIR}/url"          "${OUT_DIR}/url"
 sha1sum "${IN_DIR}"/*.tgz > "${OUT_DIR}/sha1"
