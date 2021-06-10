@@ -203,9 +203,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=10.6.0
   version: 10.6.0
 - name: cf-rabbitmq-multitenant-broker
-  sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  sha1: 2a1773c3599dddced9d3b6e776eae53454837bbe
   url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-95.0.0.tgz
-  version: 94.0.0
+  version: 95.0.0
 - name: cf-rabbitmq-smoke-tests
   sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
   url: https://cf-rabbitmq-smoke-tests-genesis-releases.s3.amazonaws.com/cf-rabbitmq-smoke-tests-101.0.0.tgz
