@@ -9,4 +9,4 @@ OUT_DIR=bosh-release
 FILENAME="$(basename "$(ls "${IN_DIR}"/*.tgz)")"
 echo -n "https://${RELEASE_NAME}-genesis-releases.s3.amazonaws.com/"${FILENAME} > "${OUT_DIR}/url"
 cp "${IN_DIR}/version"      "${OUT_DIR}/version"
-sha1sum "${IN_DIR}"/*.tgz > "${OUT_DIR}/sha1"
+sha1sum "${IN_DIR}"/*.tgz | awk '{ print $1 }' > "${OUT_DIR}/sha1"
