@@ -270,9 +270,9 @@ releases:
   url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-95.0.0.tgz
   version: 95.0.0
 - name: cf-rabbitmq-smoke-tests
-  sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  sha1: 165ece0663a97737a48aca439477c30f80746d2e
   url: https://cf-rabbitmq-smoke-tests-genesis-releases.s3.amazonaws.com/cf-rabbitmq-smoke-tests-101.0.0.tgz
-  version: 100.0.0
+  version: 101.0.0
 - name: cf-cli
   sha1: b89a74153143fe8af2c681ed0cd64185ae61f5f9
   url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.32.0
