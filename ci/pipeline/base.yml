@@ -19,6 +19,8 @@ meta:
   url:      (( param "Please specify the full url of the target Concourse CI" ))
   pipeline: (( grab meta.name ))
 
+  initial_version: 0.3.1
+
   vault:
     url:   (( param "Please provide the address of your Vault" ))
     token: (( param "Please provide a Vault Token" ))

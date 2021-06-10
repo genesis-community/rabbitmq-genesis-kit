@@ -7,7 +7,7 @@ resources:
       access_key_id:     ((aws.access_key_id))
       secret_access_key: ((aws.secret_access_key))
       regexp:            cf-rabbitmq-(.*).tgz
-      initial_path:      cf-rabbitmq-378.0.0.tgz
+      initial_path:      cf-rabbitmq-1.0.0.tgz
 
   - name: bosh-release-bpm
     type: bosh-io-release
@@ -29,7 +29,7 @@ resources:
       access_key_id:     ((aws.access_key_id))
       secret_access_key: ((aws.secret_access_key))
       regexp:            cf-rabbitmq-multitenant-broker-(.*).tgz
-      initial_path:      cf-rabbitmq-multitenant-broker-95.0.0.tgz
+      initial_path:      cf-rabbitmq-multitenant-broker-1.0.0.tgz
 
   - name: bosh-release-cf-rabbitmq-smoke-tests
     type: s3
@@ -39,7 +39,7 @@ resources:
       access_key_id:     ((aws.access_key_id))
       secret_access_key: ((aws.secret_access_key))
       regexp:            cf-rabbitmq-smoke-tests-(.*).tgz
-      initial_path:      cf-rabbitmq-smoke-tests-101.0.0.tgz
+      initial_path:      cf-rabbitmq-smoke-tests-1.0.0.tgz
 
   - name: bosh-release-haproxy
     type: bosh-io-release

@@ -2,6 +2,6 @@
   path: /releases?/name=cf-rabbitmq-smoke-tests?
   value:
     name: cf-rabbitmq-smoke-tests
-    version: 101.0.0
+    version: 100.0.0
     url: https://cf-rabbitmq-smoke-tests-genesis-releases.s3.amazonaws.com/cf-rabbitmq-smoke-tests-101.0.0.tgz
     sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
