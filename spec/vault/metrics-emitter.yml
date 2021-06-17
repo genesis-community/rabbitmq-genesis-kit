@@ -36,3 +36,13 @@ secret/metrics/emitter/rabbitmq/rabbitmq/certs/server:
   key: <!{meta.vault}/rabbitmq/certs/server:key!>
 secret/metrics/emitter/rabbitmq/rabbitmq/erlang-cookie:
   cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+secret/metrics/emitter/rabbitmq/loggregator-agent/certs/ca:
+  certificate: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:certificate!>
+  combined: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:combined!>
+  crl: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:crl!>
+  key: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:key!>
+  serial: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:serial!>
+secret/metrics/emitter/rabbitmq/loggregator-agent/certs/metrics:
+  certificate: <!{meta.vault}/rabbitmq/loggregator-agent/certs/metrics:certificate!>
+  combined: <!{meta.vault}/rabbitmq/loggregator-agent/certs/metrics:combined!>
+  key: <!{meta.vault}/rabbitmq/loggregator-agent/certs/metrics:key!>
