@@ -2,6 +2,6 @@
   path: /releases?/name=routing?
   value:
     name: routing
-    version: 0.214.0
-    url: https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.214.0
-    sha1: 3adfaa6a70a63c597026455ec9819c19e69a46d8
+    version: 0.215.0
+    url: https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.215.0
+    sha1: a7cebf32d471e42b1f85e39a34f2f25371744e87
