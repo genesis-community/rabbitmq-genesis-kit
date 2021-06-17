@@ -17,6 +17,12 @@ instance_groups:
           agent:
             cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
             key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+      metrics:
+        server_name: (( concat genesis.env "-rabbitmq-metrics-emitter" ))
+        ca_cert: (( vault meta.vault "/loggregator-agent/certs/ca:certificate" ))
+        cert:    (( vault meta.vault "/loggregator-agent/certs/metrics:certificate" ))
+        key:     (( vault meta.vault "/loggregator-agent/certs/metrics:key" ))
+        
   - name: rabbitmq-metrics-emitter
     release: rabbitmq-metrics-emitter
     properties:
