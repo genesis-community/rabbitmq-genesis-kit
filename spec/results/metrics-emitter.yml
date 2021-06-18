@@ -1,11 +1,11 @@
 exodus:
   broker_name: p-rabbitmq
   broker_password: <!{meta.vault}/broker/auth:password!>
-  broker_url: https://test-broker-domain
+  broker_url: https://test-broker-domain:4566
   broker_username: broker
-  features: broker,nats-tls,route-registrar
+  features: broker,metrics-emitter
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
-  management_url: https://rabbitmq-management.sys.test.cf.domain
+  management_url: https://test-rmq-domain:15671
   management_username: management
   service_name: p-rabbitmq
 instance_groups:
@@ -60,30 +60,8 @@ instance_groups:
   - z1
   instances: 1
   jobs:
-  - consumes:
-      nats:
-        deployment: nats-tls-cf
-        from: nats
-      nats-tls:
-        deployment: nats-tls-cf
-        from: nats-tls
-    name: route_registrar
-    properties:
-      host: test-rmq-domain
-      nats:
-        tls:
-          client_cert: test-nats-client-cert
-          client_key: test-nats-client-key
-          enabled: true
-      route_registrar:
-        routes:
-        - name: nats-tls-rabbitmq-mgmt
-          registration_interval: 20s
-          server_cert_domain_san: rabbitmq-management.sys.test.cf.domain
-          tls_port: 15671
-          uris:
-          - rabbitmq-management.sys.test.cf.domain
-    release: routing
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
   - name: bpm
     release: bpm
   name: haproxy
@@ -109,7 +87,7 @@ instance_groups:
             username: broker
           management:
             username: management
-          management_domain: rabbitmq-management.sys.test.cf.domain:15671
+          management_domain: test-rmq-domain:15671
           management_tls:
             cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
             enabled: true
@@ -134,7 +112,7 @@ instance_groups:
   - name: broker-registrar
     properties:
       broker:
-        host: test-broker-domain:443
+        host: test-broker-domain:4566
         name: p-rabbitmq
         password: <!{meta.vault}/broker/auth:password!>
         protocol: https
@@ -221,29 +199,41 @@ instance_groups:
           <!{meta.vault}/broker/certs/server:key!>
     release: haproxy
   - consumes:
-      nats:
-        deployment: nats-tls-cf
-        from: nats
-      nats-tls:
-        deployment: nats-tls-cf
-        from: nats-tls
-    name: route_registrar
+      doppler:
+        deployment: metrics-emitter-cf
+        from: doppler
+    name: loggregator_agent
     properties:
-      host: test-broker-domain
-      nats:
+      loggregator:
         tls:
-          client_cert: test-nats-client-cert
-          client_key: test-nats-client-key
-          enabled: true
-      route_registrar:
-        routes:
-        - name: p-rabbitmq-broker
-          registration_interval: 20s
-          server_cert_domain_san: test-broker-domain
-          tls_port: 4566
-          uris:
-          - test-broker-domain
-    release: routing
+          agent:
+            cert: test-agent-cert
+            key: test-agent-key
+          ca_cert: test-cas
+      metrics:
+        ca_cert: <!{meta.vault}/rabbitmq/loggregator-agent/certs/ca:certificate!>
+        cert: <!{meta.vault}/rabbitmq/loggregator-agent/certs/metrics:certificate!>
+        key: <!{meta.vault}/rabbitmq/loggregator-agent/certs/metrics:key!>
+        server_name: metrics-emitter-rabbitmq-metrics-emitter
+    release: loggregator-agent
+  - name: rabbitmq-metrics-emitter
+    properties:
+      rabbitmq_metrics_emitter:
+        cloud_foundry:
+          api: https://api.sys.test.cf.domain
+          password: test_password
+          skip_ssl_validation: false
+          username: test_username
+        loggregator:
+          tls:
+            ca_cert: test-cas
+            cert: test-agent-cert
+            key: test-agent-key
+        rmq_management:
+          endpoint: https://test-rmq-domain:15671/api
+          password: <!{meta.vault}/rabbitmq/admin/management:password!>
+          user: management
+    release: rabbitmq-metrics-emitter
   name: rmq-broker
   networks:
   - name: rabbitmq
@@ -251,7 +241,7 @@ instance_groups:
     - 10.99.0.17
   stemcell: default
   vm_type: small
-name: nats-tls-rabbitmq
+name: metrics-emitter-rabbitmq
 releases:
 - name: cf-rabbitmq
   sha1: fc3890f4f35deebf180e13b7811229acdf8980aa
@@ -277,6 +267,14 @@ releases:
   sha1: b89a74153143fe8af2c681ed0cd64185ae61f5f9
   url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.32.0
   version: 1.32.0
+- name: rabbitmq-metrics-emitter
+  sha1: 05afc6f3559f45e0696c6a3760242045640e0df8
+  url: https://github.com/starkandwayne/rabbitmq-metrics-emitter-release/releases/download/v0.4.1/rabbitmq-metrics-emitter-0.4.1.tgz
+  version: 0.4.1
+- name: loggregator-agent
+  sha1: e8386f41e967cc609a3e9a1d6ecf674c3c903fb3
+  url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=6.3.3
+  version: 6.3.3
 stemcells:
 - alias: default
   os: ubuntu-xenial
