@@ -2,6 +2,6 @@
   path: /releases?/name=cf-rabbitmq?
   value:
     name: cf-rabbitmq
-    version: 382.0.0
-    url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-382.0.0.tgz
-    sha1: 84ebb3f267833b02c059d2d4599064e5f2297cc8
+    version: 385.0.0
+    url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-385.0.0.tgz
+    sha1: fd990d7467486c56c2c89e62a48ded3131e42682
