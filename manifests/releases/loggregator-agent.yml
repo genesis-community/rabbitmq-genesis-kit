@@ -2,6 +2,6 @@
   path: /releases?/name=loggregator-agent?
   value:
     name: loggregator-agent
-    version: 6.3.3
-    url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=6.3.3
-    sha1: e8386f41e967cc609a3e9a1d6ecf674c3c903fb3
+    version: 6.3.4
+    url: https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=6.3.4
+    sha1: 9dd3ad00fb49bebd8290fad8ce7b2e4992dac31f
