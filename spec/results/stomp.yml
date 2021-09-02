@@ -73,9 +73,9 @@ instance_groups:
 name: stomp-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: fd990d7467486c56c2c89e62a48ded3131e42682
-  url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-385.0.0.tgz
-  version: 385.0.0
+  sha1: d59134e74eb5488a2d2a430184e64319f0951b2b
+  url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-387.0.0.tgz
+  version: 387.0.0
 - name: bpm
   sha1: 82322898b2393951108617caac43752e498632a2
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.13
