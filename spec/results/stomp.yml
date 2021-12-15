@@ -81,9 +81,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.15
   version: 1.1.15
 - name: haproxy
-  sha1: 386f80c2e64775623680798f73de8f78bdfe9be9
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.8.0
-  version: 11.8.0
+  sha1: 4cc5ff35eb059e9c01b03396b7ac165b12472c8e
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.9.1
+  version: 11.9.1
 stemcells:
 - alias: default
   os: ubuntu-xenial
