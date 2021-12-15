@@ -143,9 +143,9 @@ instance_groups:
 name: no-tls-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: 678ab3f9654a8c7eee14ecf77a455ef1ba1a53f5
-  url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-404.0.0.tgz
-  version: 404.0.0
+  sha1: 188506761989eeb5bdd400dbf41fd6add8ff6071
+  url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-410.0.0.tgz
+  version: 410.0.0
 - name: bpm
   sha1: 0d48aa01a65b947b97570234eb2401e821a8bd35
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.15
