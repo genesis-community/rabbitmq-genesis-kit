@@ -216,9 +216,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.15
   version: 1.1.15
 - name: haproxy
-  sha1: 4cc5ff35eb059e9c01b03396b7ac165b12472c8e
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.9.1
-  version: 11.9.1
+  sha1: 6eda448168cc958d7b3d50914c3f7b2dc6c8a272
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.9.2
+  version: 11.9.2
 - name: cf-rabbitmq-multitenant-broker
   sha1: 9fceb146e6133d31e54d23ac332456f81e2c0567
   url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-103.0.0.tgz
