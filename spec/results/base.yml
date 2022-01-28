@@ -82,7 +82,7 @@ releases:
   version: 11.9.2
 stemcells:
 - alias: default
-  os: ubuntu-xenial
+  os: ubuntu-bionic
   version: latest
 update:
   canaries: 1

@@ -277,7 +277,7 @@ releases:
   version: 6.3.8
 stemcells:
 - alias: default
-  os: ubuntu-xenial
+  os: ubuntu-bionic
   version: latest
 update:
   canaries: 1
