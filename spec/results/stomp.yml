@@ -3,6 +3,9 @@ exodus:
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://test-rmq-domain:15671
   management_username: management
+  bosh: stomp
+  is_director: false
+  use_create_env: false
 instance_groups:
 - azs:
   - z1

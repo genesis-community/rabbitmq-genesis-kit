@@ -8,6 +8,9 @@ exodus:
   management_url: https://rabbitmq-management.sys.test.cf.domain
   management_username: management
   service_name: p-rabbitmq
+  bosh: nats-tls
+  is_director: false
+  use_create_env: false
 instance_groups:
 - azs:
   - z1

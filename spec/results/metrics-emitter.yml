@@ -8,6 +8,9 @@ exodus:
   management_url: https://test-rmq-domain:15671
   management_username: management
   service_name: p-rabbitmq
+  bosh: metrics-emitter
+  is_director: false
+  use_create_env: false
 instance_groups:
 - azs:
   - z1
