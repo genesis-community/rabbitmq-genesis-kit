@@ -4,4 +4,4 @@
     name: cf-rabbitmq
     version: 418.0.0
     url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-418.0.0.tgz
-    sha1: 188506761989eeb5bdd400dbf41fd6add8ff6071
+    # sha1: 188506761989eeb5bdd400dbf41fd6add8ff6071

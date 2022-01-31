@@ -4,4 +4,4 @@
     name: cf-rabbitmq-multitenant-broker
     version: 107.0.0
     url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-107.0.0.tgz
-    sha1: 9fceb146e6133d31e54d23ac332456f81e2c0567
+    # sha1: 9fceb146e6133d31e54d23ac332456f81e2c0567

@@ -4,4 +4,4 @@
     name: cf-rabbitmq-smoke-tests
     version: 120.0.0
     url: https://cf-rabbitmq-smoke-tests-genesis-releases.s3.amazonaws.com/cf-rabbitmq-smoke-tests-120.0.0.tgz
-    sha1: 53e11f553a95f116c0a4c128afa1b01516ef0b11
+    # sha1: 53e11f553a95f116c0a4c128afa1b01516ef0b11
