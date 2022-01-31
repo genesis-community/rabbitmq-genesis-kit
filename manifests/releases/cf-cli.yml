@@ -4,4 +4,4 @@
     name: cf-cli
     version: 1.36.0
     url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.36.0
-    # sha1: c038fdb8e9c0707dc407bf0f2846ad324a5d8d9b
+    sha1: 579466410a0a9c37d8e1994941e15529db8c54cd
