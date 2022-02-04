@@ -33,6 +33,8 @@ instance_groups:
 - name: haproxy
   jobs:
   - (( grab meta.mgmt_route_registrar_job ))
+  - name: route_registrar
+    release: haproxy
 
 - name: rmq-broker
   jobs:
@@ -61,4 +63,4 @@ instance_groups:
 
 exodus:
   broker_url: (( concat "https://" params.broker_domain ))
-  management_url: (( concat "https://" params.mgmt_domain ))
+  30management_url: (( concat "https://" params.mgmt_domain ))
