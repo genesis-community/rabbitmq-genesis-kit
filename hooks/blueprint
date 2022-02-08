@@ -43,6 +43,7 @@ if want_feature "broker" ; then
   if want_feature "route-registrar" ; then
     manifests+=(
       manifests/addons/route-registrar.yml
+      manifests/releases/routing.yml
     )
 
     if want_feature "no-broker-tls" ; then
@@ -139,6 +140,7 @@ if want_feature "external-rmq-lb" ; then
   if want_feature "route-registrar" ; then
     manifests+=(
       manifests/addons/external-rmq-lb-route-registrar.yml
+      manifests/releases/routing.yml
     )
   fi
 fi

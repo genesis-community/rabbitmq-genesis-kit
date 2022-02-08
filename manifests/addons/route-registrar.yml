@@ -33,8 +33,6 @@ instance_groups:
 - name: haproxy
   jobs:
   - (( grab meta.mgmt_route_registrar_job ))
-  - name: route_registrar
-    release: haproxy
 
 - name: rmq-broker
   jobs:
