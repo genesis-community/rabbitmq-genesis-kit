@@ -35,15 +35,15 @@ list)
   ;;
 
 register-broker|broker-registrar)
-  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-registrar
+  bosh run-errand broker-registrar
   ;;
 
 deregister-broker|broker-deregistrar)
-  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand broker-deregistrar
+  bosh run-errand broker-deregistrar
   ;;
 
 smoketest|smoke-tests)
-  $GENESIS_BOSH_COMMAND -e $BOSH_ENVIRONMENT -d $BOSH_DEPLOYMENT run-errand smoke-tests
+  bosh run-errand smoke-tests
   ;;
 
 *)
