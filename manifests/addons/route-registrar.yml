@@ -1,4 +1,30 @@
 ---
+addons:
+- name: bosh-dns-aliases
+  include:
+    jobs:
+    - name: route_registrar
+      release: routing
+  jobs:
+  - name: bosh-dns-aliases
+    release: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: nats.service.cf.internal
+        targets:
+        - deployment: (( grab params.cf_deployment ))
+          domain: bosh
+          instance_group: nats
+          network: (( grab params.cf_core_network ))
+          query: '*'
+      - domain: _.nats.service.cf.internal
+        targets:
+        - deployment: (( grab params.cf_deployment))
+          domain: bosh
+          instance_group: nats
+          network: (( grab params.cf_core_network ))
+          query: _
+---
 params:
   broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
   mgmt_domain:   (( concat "rabbitmq-management." meta.cf_system_domain ))
@@ -32,7 +58,22 @@ meta:
 instance_groups:
 - name: haproxy
   jobs:
-  - (( grab meta.mgmt_route_registrar_job ))
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats:
+        from:       nats
+        deployment: (( grab meta.cf.deployment_name ))
+    properties:
+      host:            (( grab params.rmq_domain ))
+      route_registrar:
+        routes:
+        - name: (( concat meta.environment "-rabbitmq-mgmt" ))
+          tls_port: 15671
+          registration_interval: 20s
+          server_cert_domain_san: (( grab params.mgmt_domain ))
+          uris:
+          - (( grab params.mgmt_domain ))
 
 - name: rmq-broker
   jobs:
@@ -42,7 +83,6 @@ instance_groups:
       nats:
         from:       nats
         deployment: (( grab meta.cf.deployment_name ))
-      nats-tls: nil
     properties:
       route_registrar:
         routes:
@@ -53,11 +93,6 @@ instance_groups:
           - (( grab params.broker_domain ))
           server_cert_domain_san: (( grab params.broker_domain ))
       host: (( grab params.broker_domain ))
-
-  - name: broker-registrar
-    properties:
-      broker:
-        host: (( concat params.broker_domain ":443" ))
 
 exodus:
   broker_url: (( concat "https://" params.broker_domain ))
