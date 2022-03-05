@@ -1,7 +1,7 @@
 ---
 params:
-  nats_client_cert: (( param "Please provide the client certificate to use when connecting to the CF nats bus" ))
-  nats_client_key:  (( param "Please provide the client private key to use when connecting to the CF nats bus" ))
+  nats_client_cert: (( vault meta.cf.exodus ":nats_client_cert" ))
+  nats_client_key:  (( vault meta.cf.exodus ":nats_client_key" ))
 
 meta:
   nats-tls-route-registrar-job:
@@ -16,7 +16,6 @@ meta:
           enabled: true
           client_cert: (( grab params.nats_client_cert ))
           client_key:  (( grab params.nats_client_key ))
-
 
 instance_groups:
 - name: rmq-broker

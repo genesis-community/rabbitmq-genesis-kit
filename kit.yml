@@ -27,7 +27,7 @@ certificates:
         names:     ["rabbitmqCA"]
       server:
         valid_for: 1y
-        names:     ["${params.rmq_domain}"]
+        names:     ["rabbitmq-server","${params.rmq_domain}"]
 
   +broker-tls:
     broker/certs:
@@ -36,7 +36,7 @@ certificates:
         names:     ["rmqbrokerCA"]
       server:
         valid_for: 1y
-        names:     ["${params.broker_domain}"]
+        names:     ["rabbitmq-broker","${params.broker_domain}"]
 
   +mgmt-tls:
     mgmt/certs:
@@ -45,7 +45,7 @@ certificates:
         names:     ["RMQManagementAPICA"]
       server:
         valid_for: 1y
-        names:     ["${params.mgmt_domain}"]
+        names:     ["rabbitmq-mgmt","${params.mgmt_domain}"]
 
   metrics-emitter:
     loggregator-agent/certs:
@@ -54,7 +54,7 @@ certificates:
         names:     ["loggregatorAgentCA"]
       metrics:
         valid_for: 1y
-        names:     ["${params.broker_domain}"]
+        names:     ["rabbitmq-metrics-emitter","${params.broker_domain}"]
 
 provided:
   provided-rmq-cert:

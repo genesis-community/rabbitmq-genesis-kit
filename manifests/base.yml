@@ -2,6 +2,14 @@ meta:
   default:
     azs: [z1]
 
+  cf:
+    exodus:  (( concat $GENESIS_EXODUS_MOUNT params.cf_deployment_env "/" params.cf_deployment_type ))
+    deployment_name: (( concat params.cf_deployment_env "-" params.cf_deployment_type ))
+    
+params:
+  cf_deployment_env:  (( grab genesis.env )) # assumes same name as cf env
+  cf_deployment_type: cf # for crazy people using an "non-cf" cf deployment named something else
+
 instance_groups:
 - name: rmq-server
 

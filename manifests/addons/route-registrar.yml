@@ -12,14 +12,14 @@ addons:
       aliases:
       - domain: nats.service.cf.internal
         targets:
-        - deployment: (( grab params.cf_deployment ))
+        - deployment: (( grab meta.cf.deployment_name ))
           domain: bosh
           instance_group: nats
           network: (( grab params.cf_core_network ))
           query: '*'
       - domain: _.nats.service.cf.internal
         targets:
-        - deployment: (( grab params.cf_deployment))
+        - deployment: (( grab meta.cf.deployment_name ))
           domain: bosh
           instance_group: nats
           network: (( grab params.cf_core_network ))
