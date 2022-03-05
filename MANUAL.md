@@ -41,7 +41,7 @@ attached to the RabbitMQ server cluster nodes. The persistent disk is used to
 back data for cluster configuration, queue configuration, and durable queue 
 data.
 
-* `stemcell_os` - (_Default_: `ubuntu-xenial`) The OS of the stemcell to use.
+* `stemcell_os` - (_Default_: `ubuntu-bionic`) The OS of the stemcell to use.
 
 * `stemcell_version` - (_Default_: `latest`) The version of the stemcell to use.
 

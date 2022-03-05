@@ -8,6 +8,9 @@ exodus:
   management_url: https://test-rmq-domain:15671
   management_username: management
   service_name: p-rabbitmq
+  bosh: external-rmq-lb
+  is_director: false
+  use_create_env: false
 instance_groups:
 - azs:
   - z1
@@ -195,28 +198,28 @@ releases:
   url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-419.0.0.tgz
   version: 419.0.0
 - name: bpm
-  sha1: 0d48aa01a65b947b97570234eb2401e821a8bd35
-  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.15
-  version: 1.1.15
+  sha1: a4b8a7601e8450a66a97a789ce7574248d188c41
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.16
+  version: 1.1.16
 - name: haproxy
-  sha1: 6eda448168cc958d7b3d50914c3f7b2dc6c8a272
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.9.2
-  version: 11.9.2
+  sha1: 2a84185be6c31dd7ead89da81fa38ae691bc4559
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/haproxy-boshrelease?v=11.9.3
+  version: 11.9.3
 - name: cf-rabbitmq-multitenant-broker
-  sha1: 9fceb146e6133d31e54d23ac332456f81e2c0567
-  url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-103.0.0.tgz
-  version: 103.0.0
+  sha1: 3f91bd4e44cef1b4d13ae077a2e4269694a0d81a
+  url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-107.0.0.tgz
+  version: 107.0.0
 - name: cf-rabbitmq-smoke-tests
   sha1: 4431e40e869113afcfc7d92aa37e84d8415eee11
   url: https://cf-rabbitmq-smoke-tests-genesis-releases.s3.amazonaws.com/cf-rabbitmq-smoke-tests-120.0.0.tgz
   version: 120.0.0
 - name: cf-cli
-  sha1: c038fdb8e9c0707dc407bf0f2846ad324a5d8d9b
-  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.33.0
-  version: 1.33.0
+  sha1: 579466410a0a9c37d8e1994941e15529db8c54cd
+  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.36.0
+  version: 1.36.0
 stemcells:
 - alias: default
-  os: ubuntu-xenial
+  os: ubuntu-bionic
   version: latest
 update:
   canaries: 1

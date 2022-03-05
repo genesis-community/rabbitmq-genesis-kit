@@ -2,6 +2,6 @@
   path: /releases?/name=cf-rabbitmq-multitenant-broker?
   value:
     name: cf-rabbitmq-multitenant-broker
-    version: 103.0.0
-    url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-103.0.0.tgz
-    sha1: 9fceb146e6133d31e54d23ac332456f81e2c0567
+    version: 107.0.0
+    url: https://cf-rabbitmq-multitenant-broker-genesis-releases.s3.amazonaws.com/cf-rabbitmq-multitenant-broker-107.0.0.tgz
+    sha1: 3f91bd4e44cef1b4d13ae077a2e4269694a0d81a

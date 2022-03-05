@@ -44,6 +44,7 @@ if want_feature "broker" ; then
     manifests+=(
       manifests/addons/route-registrar.yml
       manifests/releases/routing.yml
+      manifests/releases/bosh-dns-alias.yml
     )
 
     if want_feature "no-broker-tls" ; then
@@ -118,6 +119,7 @@ if want_feature "no-mgmt-tls" ; then
     manifest+=(
       manifests/addons/no-mgmt-tls-route-registrar.yml
       manifests/releases/routing.yml
+      manifests/releases/bosh-dns-alias.yml
     )
   fi
 
@@ -141,6 +143,7 @@ if want_feature "external-rmq-lb" ; then
     manifests+=(
       manifests/addons/external-rmq-lb-route-registrar.yml
       manifests/releases/routing.yml
+      manifests/releases/bosh-dns-alias.yml
     )
   fi
 fi
