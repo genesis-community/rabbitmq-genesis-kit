@@ -5,7 +5,7 @@ kit:
 
 genesis:
   env:       ci-baseline
-  bosh_env:  genesis-ci
+  bosh_env:  snw-genesis-ci
 
 params:
   rmq_domain:     10.128.9.32
