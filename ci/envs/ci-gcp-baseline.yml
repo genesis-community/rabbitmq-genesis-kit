@@ -1,0 +1,13 @@
+---
+kit:
+  features:
+    - ((append))
+    - broker
+
+genesis:
+  env:   ci-gcp-baseline
+
+params:
+  rmq_domain:     10.4.8.32
+  broker_domain:  10.4.8.33
+  server_vm_type: medium

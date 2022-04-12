@@ -1,0 +1,12 @@
+---
+kit:
+  features:
+    - broker
+
+genesis:
+  env:   ci-vsphere-baseline
+
+params:
+  rmq_domain:     10.128.9.32
+  broker_domain:  10.128.9.33
+  server_vm_type: medium
