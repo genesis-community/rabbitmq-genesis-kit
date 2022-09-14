@@ -16,7 +16,7 @@ set -eu
 validate_features broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls \
                   external-rmq-lb route-registrar nats-tls stomp \
                   provided-rmq-cert provided-mgmt-cert provided-broker-cert \
-                  prometheus no-prometheus-tls
+                  prometheus no-prometheus-tls use-ip-addresses
 
 declare -a manifests
 manifests+=( manifests/base.yml
@@ -126,6 +126,12 @@ if want_feature "no-mgmt-tls" ; then
   if want_feature "provided-mgmt-cert" ; then
     bail "" "Cannot have no-mgmt-tls and provided-mgmt-cert features"
   fi
+fi
+
+if want_feature "use-ip-addresses" ; then
+  manifests+=(
+    manifests/addons/use-ip-addresses.yml
+  )
 fi
 
 if want_feature "external-rmq-lb" ; then
