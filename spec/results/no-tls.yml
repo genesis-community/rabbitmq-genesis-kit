@@ -150,7 +150,7 @@ releases:
   url: https://cf-rabbitmq-genesis-releases.s3.amazonaws.com/cf-rabbitmq-419.0.0.tgz
   version: 419.0.0
 - name: bpm
-  sha1: a4b8a7601e8450a66a97a789ce7574248d188c41
+  sha1: 492f181f4efa08c5f0b45d22cbe54f0a20edf99e
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.16
   version: 1.1.16
 - name: haproxy
