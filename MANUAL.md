@@ -10,7 +10,7 @@ the static IP that the RabbitMQ proxy will be deployed to (the first static
 IP in the network). If you are utilizing DNS, use the DNS hostname. This
 value should _not_ include a scheme or port in the value.
 
-* `mgmt_domain` - (_Default_: `<value of rmq_domain>) The domain that the
+* `mgmt_domain` - (_Default_: `<value of rmq_domain>`) The domain that the
 RabbitMQ Management API will be located at.
 
 * `rmq_instances` - (_Default_: `3`) The number of RabbitMQ nodes in the 
@@ -41,7 +41,7 @@ attached to the RabbitMQ server cluster nodes. The persistent disk is used to
 back data for cluster configuration, queue configuration, and durable queue 
 data.
 
-* `stemcell_os` - (_Default_: `ubuntu-bionic`) The OS of the stemcell to use.
+* `stemcell_os` - (_Default_: `ubuntu-jammy`) The OS of the stemcell to use.
 
 * `stemcell_version` - (_Default_: `latest`) The version of the stemcell to use.
 

@@ -1,6 +1,6 @@
 name:    rabbitmq
 version: 0.0.1
-author:  Thomas Mitchell <tmitchell@starkandwayne.com>
+author:  Thomas Mitchell <tmitchell@starkandwayne.com>, Kevin Rutten <krutten@fivetwenty.io>
 docs:    https://github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release 
 code:    https://github.com/genesis-community/rabbitmq-genesis-kit
 
