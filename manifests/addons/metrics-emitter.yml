@@ -13,10 +13,10 @@ instance_groups:
     properties:
       loggregator:
         tls:
-          ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+          ca_cert: (( vault meta.cf.exodus ":loggregator_ca" ))
           agent:
-            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
-            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+            cert: (( vault meta.cf.exodus ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus ":loggregator_tls_agent_key" ))
       metrics:
         server_name: (( concat genesis.env "-rabbitmq-metrics-emitter" ))
         ca_cert: (( vault meta.vault "/loggregator-agent/certs/ca:certificate" ))
@@ -30,14 +30,14 @@ instance_groups:
         cloud_foundry:
           api:    (( grab meta.cf.api_url ))
           skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
-          username:   (( vault meta.cf.exodus_path ":admin_username" ))
-          password:   (( vault meta.cf.exodus_path ":admin_password" ))
+          username:   (( vault meta.cf.exodus ":admin_username" ))
+          password:   (( vault meta.cf.exodus ":admin_password" ))
         rmq_management:
           endpoint: (( concat meta.mgmt_scheme "://" params.mgmt_domain ":" meta.mgmt_port "/api" ))
           user: management
           password: (( vault meta.vault "/rabbitmq/admin/management:password" ))
         loggregator:
           tls:
-            cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
-            key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
-            ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+            cert: (( vault meta.cf.exodus ":loggregator_tls_agent_cert" ))
+            key: (( vault meta.cf.exodus ":loggregator_tls_agent_key" ))
+            ca_cert: (( vault meta.cf.exodus ":loggregator_ca" ))

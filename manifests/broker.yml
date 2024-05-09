@@ -3,21 +3,17 @@
 # This file configures the RabbitMQ Multitenant Broker node.
 # ===========================================================
 meta:
-  environment: (( grab genesis.env || params.env ))
-  bosh_exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
-
-  cf:
-    exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
-    deployment_name: (( concat meta.environment "-cf" ))
-    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
-    api_url:    (( concat "https://api." meta.cf.system_domain ))
-    username:   (( vault meta.cf.exodus_path ":admin_username" ))
-    password:   (( vault meta.cf.exodus_path ":admin_password" ))
   broker:
     username: (( grab params.broker_username ))
     password: (( vault meta.vault "/broker/auth:password" ))
     protocol: http
     port:     4567
+  cf:
+    api_url:    (( concat "https://api." meta.cf.system_domain ))
+    system_domain: (( vault meta.cf.exodus ":system_domain" ))
+    core_network:   (( vault meta.cf.exodus ":core_network" ))
+    username:   (( vault meta.cf.exodus ":admin_username" ))
+    password:   (( vault meta.cf.exodus ":admin_password" ))
 
 params:
   broker_name:  p-rabbitmq

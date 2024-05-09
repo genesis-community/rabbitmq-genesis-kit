@@ -15,24 +15,25 @@ addons:
         - deployment: (( grab meta.cf.deployment_name ))
           domain: bosh
           instance_group: nats
-          network: (( grab params.cf_core_network ))
+          network: (( grab params.cf_core_network || meta.cf.core_network ))
           query: '*'
       - domain: _.nats.service.cf.internal
         targets:
         - deployment: (( grab meta.cf.deployment_name ))
           domain: bosh
           instance_group: nats
-          network: (( grab params.cf_core_network ))
+          network: (( grab params.cf_core_network || meta.cf.core_network ))
           query: _
 ---
 params:
-  broker_domain: (( concat "rabbitmq-broker." meta.cf_system_domain ))
-  mgmt_domain:   (( concat "rabbitmq-management." meta.cf_system_domain ))
+  broker_domain: (( concat "rabbitmq-broker." meta.cf.system_domain ))
+  mgmt_domain:   (( concat "rabbitmq-management." meta.cf.system_domain ))
 
 meta:
   broker:
     protocol: https
-  cf_system_domain: (( vault "secret/exodus/" meta.bosh_exodus_path "/cf:system_domain" ))
+
+  environment: (( grab genesis.env || params.env ))
 
   mgmt_route_registrar_job:
     name: route_registrar
