@@ -1,5 +1,6 @@
 cf:
   system_domain: sys.test.cf.domain
+  core_network: core_network
   admin_password: test_password
   admin_username: test_username
   loggregator_tls_agent_cert: test-agent-cert
