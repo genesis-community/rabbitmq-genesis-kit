@@ -1,15 +1,15 @@
 exodus:
+  bosh: no-tls
   broker_name: p-rabbitmq
   broker_password: <!{meta.vault}/broker/auth:password!>
   broker_url: http://test-broker-domain:4567
   broker_username: broker
   features: broker,no-rmq-tls,no-mgmt-tls,no-broker-tls
+  is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://test-rmq-domain:16572
   management_username: management
   service_name: p-rabbitmq
-  bosh: no-tls
-  is_director: false
   use_create_env: false
 instance_groups:
 - azs:

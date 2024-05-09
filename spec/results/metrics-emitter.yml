@@ -1,15 +1,15 @@
 exodus:
+  bosh: metrics-emitter
   broker_name: p-rabbitmq
   broker_password: <!{meta.vault}/broker/auth:password!>
   broker_url: https://test-broker-domain:4566
   broker_username: broker
   features: broker,metrics-emitter
+  is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://test-rmq-domain:15671
   management_username: management
   service_name: p-rabbitmq
-  bosh: metrics-emitter
-  is_director: false
   use_create_env: false
 instance_groups:
 - azs:
@@ -155,7 +155,7 @@ instance_groups:
   - name: haproxy
     properties:
       ha_proxy:
-        raw_config: |-
+        raw_config: |
           global
               log stdout len 1024 format raw syslog info
               daemon

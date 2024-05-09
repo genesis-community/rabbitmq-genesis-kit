@@ -1,15 +1,40 @@
+addons:
+- include:
+    jobs:
+    - name: route_registrar
+      release: routing
+  jobs:
+  - name: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: nats.service.cf.internal
+        targets:
+        - deployment: nats-tls-cf
+          domain: bosh
+          instance_group: nats
+          network: core_network
+          query: '*'
+      - domain: _.nats.service.cf.internal
+        targets:
+        - deployment: nats-tls-cf
+          domain: bosh
+          instance_group: nats
+          network: core_network
+          query: _
+    release: bosh-dns-aliases
+  name: bosh-dns-aliases
 exodus:
+  bosh: nats-tls
   broker_name: p-rabbitmq
   broker_password: <!{meta.vault}/broker/auth:password!>
   broker_url: https://test-broker-domain
   broker_username: broker
   features: broker,nats-tls,route-registrar
+  is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://rabbitmq-management.sys.test.cf.domain
   management_username: management
   service_name: p-rabbitmq
-  bosh: nats-tls
-  is_director: false
   use_create_env: false
 instance_groups:
 - azs:
@@ -63,10 +88,11 @@ instance_groups:
   - z1
   instances: 1
   jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
   - consumes:
-      nats:
-        deployment: nats-tls-cf
-        from: nats
       nats-tls:
         deployment: nats-tls-cf
         from: nats-tls
@@ -87,8 +113,6 @@ instance_groups:
           uris:
           - rabbitmq-management.sys.test.cf.domain
     release: routing
-  - name: bpm
-    release: bpm
   name: haproxy
   networks:
   - name: rabbitmq
@@ -137,7 +161,7 @@ instance_groups:
   - name: broker-registrar
     properties:
       broker:
-        host: test-broker-domain:443
+        host: test-broker-domain:4566
         name: p-rabbitmq
         password: <!{meta.vault}/broker/auth:password!>
         protocol: https
@@ -177,7 +201,7 @@ instance_groups:
   - name: haproxy
     properties:
       ha_proxy:
-        raw_config: |-
+        raw_config: |
           global
               log stdout len 1024 format raw syslog info
               daemon
@@ -224,9 +248,6 @@ instance_groups:
           <!{meta.vault}/broker/certs/server:key!>
     release: haproxy
   - consumes:
-      nats:
-        deployment: nats-tls-cf
-        from: nats
       nats-tls:
         deployment: nats-tls-cf
         from: nats-tls
@@ -280,6 +301,14 @@ releases:
   sha1: 579466410a0a9c37d8e1994941e15529db8c54cd
   url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.36.0
   version: 1.36.0
+- name: routing
+  sha1: b0f1e8feca2262f3ac0dce89586b038407ed45cc
+  url: https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.228.0
+  version: 0.228.0
+- name: bosh-dns-aliases
+  sha1: 55b3dced813ff9ed92a05cda02156e4b5604b273
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
+  version: 0.0.4
 stemcells:
 - alias: default
   os: ubuntu-bionic
