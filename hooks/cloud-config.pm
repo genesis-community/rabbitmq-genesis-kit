@@ -50,6 +50,9 @@ sub perform {
               'net_id' => $self->network_reference('id'),
               'security_groups' => ['default']
             },
+            aws => {
+              'subnet' => $self->network_reference('subnet_id')
+            },
           },
         },
       ),
@@ -64,6 +67,9 @@ sub perform {
               'net_id' => $self->network_reference('id'),
               'security_groups' => ['default']
             },
+            aws => {
+              'subnet' => $self->network_reference('subnet_id')
+            },
           },
         },
       ),
@@ -77,6 +83,9 @@ sub perform {
             openstack => {
               'net_id' => $self->network_reference('id'),
               'security_groups' => ['default']
+            },
+            aws => {
+              'subnet' => $self->network_reference('subnet_id')
             },
           },
         },
@@ -95,6 +104,15 @@ sub perform {
               'size' => 32 # in gigabytes
             },
           },
+          aws => {
+            'instance_type' => $self->for_scale({
+              dev => 'm5.large',
+              prod => 'm5.xlarge'
+            }, 'm5.large'),
+            'ephemeral_disk' => {
+              'size' => 25000 # in megabytes
+            },
+          },
         },
       ),
       $self->vm_type_definition($proxy_vm_type,
@@ -107,6 +125,15 @@ sub perform {
             'boot_from_volume' => $self->TRUE,
             'root_disk' => {
               'size' => 16 # in gigabytes
+            },
+          },
+          aws => {
+            'instance_type' => $self->for_scale({
+              dev => 'm2.small',
+              prod => 'm4.large'
+            }, 'm2.small'),
+            'ephemeral_disk' => {
+              'size' => 25000 # in megabytes
             },
           },
         },
@@ -123,6 +150,15 @@ sub perform {
               'size' => 16 # in gigabytes
             },
           },
+          aws => {
+            'instance_type' => $self->for_scale({
+              dev => 'm2.small',
+              prod => 'm4.xlarge'
+            }, 'm2.small'),
+            'ephemeral_disk' => {
+              'size' => 25000 # in megabytes
+            },
+          },
         },
       ),
     ],
@@ -137,6 +173,13 @@ sub perform {
         cloud_properties_for_iaas => {
           openstack => {
             'type' => 'storage_premium_perf6',
+          },
+          aws => {
+            # AWS uses bare disk size in megabytes
+            disk_size => $self->for_scale({
+              dev => 50000,
+              prod => 50000
+            }, 50000),
           },
         },
       ),
