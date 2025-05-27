@@ -59,7 +59,7 @@ sub perform {
   );
 
   system($cmd, "https://$url");
-  return $self->done(1);
+  return $self->done();
 }
 
 sub get_command_for_os {

@@ -41,7 +41,7 @@ sub perform {
   }
 
   $env->notify(success => "RabbitMQ broker successfully deregistered from Cloud Foundry.");
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

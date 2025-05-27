@@ -74,7 +74,7 @@ sub perform {
   # Offer environment editor
   $self->_offer_environment_editor();
 
-  return $self->done(1);
+  return $self->done();
 }
 
 sub _offer_environment_editor {

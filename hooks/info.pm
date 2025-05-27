@@ -53,7 +53,7 @@ sub perform {
       $exodus_data->{service_name} // $missing);
   }
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

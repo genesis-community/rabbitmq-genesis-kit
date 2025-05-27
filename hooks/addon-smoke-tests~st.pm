@@ -47,7 +47,7 @@ sub perform {
   }
 
   $env->notify(success => "RabbitMQ smoke tests completed successfully.");
-  return $self->done(1);
+  return $self->done();
 }
 
 1;
