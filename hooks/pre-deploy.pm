@@ -52,7 +52,7 @@ sub perform {
   }
 
   # No specific data to return for post-deploy
-  return $self->done();
+  return $self->done(1);
 }
 
 1;
