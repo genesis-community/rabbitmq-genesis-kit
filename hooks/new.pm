@@ -1,13 +1,11 @@
-#!/usr/bin/env perl
-# vim: set ts=2 sw=2 sts=2 et:
-package Genesis::Hook::New::RabbitMQ v2.0.0;
+# vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:
+package Genesis::Hook::New::RabbitMQ;
 
-use strict;
-use warnings;
-use v5.20; # Genesis supports min perl v5.20.
+use v5.20;
+use warnings; # Genesis supports min perl v5.20.
 
 BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
-use parent qw(Genesis::Hook);
+use parent qw(Genesis::Hook::New);
 
 use Genesis;
 use Genesis::UI qw(prompt_for prompt_for_boolean);
