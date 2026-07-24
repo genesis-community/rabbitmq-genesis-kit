@@ -31,7 +31,8 @@ instance_groups:
     release: cf-rabbitmq
     properties:
       rabbitmq-server:
-        version: "3.8"
+        version: "4.2"
+        erlang_major_version: 27
         plugins:
         - rabbitmq_management
         ports:
@@ -61,12 +62,18 @@ instance_groups:
           verify:                    false
           verification_depth:        5
           fail_if_no_peer_cert:      false
+        # RabbitMQ 4.x drops classic queue mirroring; this check now only
+        # applies to quorum queue sync status.
         check_queue_sync: (( grab params.check_queue_sync ))
         management_tls:
           enabled: true
           cacert: (( grab meta.mgmt_tls.cacert ))
           cert:   (( grab meta.mgmt_tls.cert ))
           key:    (( grab meta.mgmt_tls.key ))
+  - name: smoke-tests
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
 
   vm_type: (( grab params.server_vm_type || "rabbitmq" ))
   stemcell: default
@@ -87,6 +94,18 @@ instance_groups:
   networks:
   - name: (( grab params.proxy_network || "rabbitmq" ))
     static_ips: (( static_ips 0 ))
+  azs: (( grab params.availability_zones || meta.default.azs ))
+
+- name: acceptance-tests
+  lifecycle: errand
+  instances: 1
+  jobs:
+  - name: acceptance-tests
+    release: cf-rabbitmq
+  vm_type: (( grab params.acceptance_tests_vm_type || "small" ))
+  stemcell: default
+  networks:
+  - name: (( grab params.server_network || "rabbitmq" ))
   azs: (( grab params.availability_zones || meta.default.azs ))
 
 exodus:

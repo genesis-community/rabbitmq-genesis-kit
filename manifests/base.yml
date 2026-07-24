@@ -10,6 +10,12 @@ params:
   cf_deployment_env:  (( grab genesis.env || params.env)) # assumes same name as cf env
   cf_deployment_type: cf # for crazy people using an "non-cf" cf deployment named something else
 
+# rabbitmq-server derives erlang node names from the instance IP and ships a
+# static erl_inetrc; bosh-dns hostnames don't resolve for those node names,
+# so DNS-based addressing breaks cluster formation. Keep IP addressing.
+features:
+  use_dns_addresses: false
+
 instance_groups:
 - name: rmq-server
 
