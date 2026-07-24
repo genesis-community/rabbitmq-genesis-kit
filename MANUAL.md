@@ -39,7 +39,7 @@ The **RabbitMQ Genesis Kit** deploys a RabbitMQ cluster and, optionally, the CF 
 
 ## Overview
 
-The RabbitMQ Genesis Kit provides a production-ready RabbitMQ cluster deployment with optional integration to Cloud Foundry. It leverages the power of BOSH to manage the lifecycle of the RabbitMQ service, including deployment, updates, and recovery from failure scenarios.
+The RabbitMQ Genesis Kit provides a production-ready RabbitMQ cluster deployment with optional integration to Cloud Foundry. It leverages the power of BOSH to manage the lifecycle of the RabbitMQ service, including deployment, updates, and recovery from failure scenarios. The kit deploys RabbitMQ 4.2 (paired with Erlang 27) using the `cf-rabbitmq` BOSH release.
 
 ## Deployment Architecture
 
@@ -48,6 +48,10 @@ The standard RabbitMQ deployment architecture consists of:
 1. **RabbitMQ Server Nodes**: Multiple RabbitMQ server instances forming a cluster for high availability.
 2. **HAProxy Layer**: A proxying layer to provide load balancing across the cluster nodes (unless using external load balancing).
 3. **Service Broker** (optional): When integrating with Cloud Foundry, a service broker that manages RabbitMQ service instances.
+4. **Process Supervision**: The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under `bpm` (BOSH Process Manager). A `bpm` job is colocated on the `rmq-server` and `haproxy` instance groups to supervise them.
+5. **Test Errands**: A `smoke-tests` job is colocated on the `rmq-server` instance group, and a separate `acceptance-tests` errand instance group exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed cluster.
+
+The kit sets `features.use_dns_addresses: false` and this is not user-configurable. RabbitMQ derives its node name from the instance IP address and ships a static `erl_inetrc`; bosh-dns hostnames don't resolve for those node names and break cluster formation, so the kit keeps IP-based addressing.
 
 The deployment includes these key components:
 
@@ -69,7 +73,7 @@ The deployment includes these key components:
            ▲                                   ▲
            │                                   │
            └───────────────────────────────────┘
-                    Mirrored Queues
+                Quorum Queue Replication
                   Clustered Management
 
       ┌───────────────┐  (Optional)
@@ -92,7 +96,7 @@ The deployment includes these key components:
 | `server_disk_type` | The disk type for RabbitMQ server nodes. Used for cluster configuration, queue config, and durable queue data. | `rabbitmq` |
 | `stemcell_os` | The OS of the stemcell to use. | `ubuntu-jammy` |
 | `stemcell_version` | The version of the stemcell to use. | `latest` |
-| `check_queue_sync` | If true, pre-stop script will wait until mirrored and quorum queues are synced before shutting down. | `false` |
+| `check_queue_sync` | If true, pre-stop script will wait until quorum queues are synced before shutting down. RabbitMQ 4.x removed classic queue mirroring, so this check now applies to quorum queue sync only. | `false` |
 
 ### Example Configuration
 
@@ -118,6 +122,8 @@ params:
 #### `broker`
 
 Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Foundry to utilize the RabbitMQ cluster. The broker server listens on TCP port 4566 for HTTPS traffic.
+
+**Status on RabbitMQ 4.x**: The `broker` feature remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk. Validation against quorum queues is planned follow-up work.
 
 ##### Parameters
 
@@ -375,13 +381,16 @@ Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus liste
 | `no-prometheus-tls` | All | `prometheus` | - |
 | `metrics-emitter` | Most features | - | `broker` |
 
+`broker` is deployable on the 4.x-based release, but its `ha_sync_mode` policies are not yet validated against quorum queues, the RabbitMQ 4.x default queue type.
+
 ## Available Addons
 
 | Addon | Description |
 |-------|-------------|
 | `register-broker` | Register this broker with the Cloud Foundry in this environment. |
 | `deregister-broker` | Deregister this broker from the Cloud Foundry in this environment. |
-| `smoketest` | Run the smoke test errand for this deployment. This errand will not pass unless you have route registrar enabled. |
+| `smoke-tests` | Run the smoke test errand for this deployment. This errand will not pass unless you have route registrar enabled. |
+| `acceptance-tests` | Run the acceptance test errand for this deployment. Exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed RabbitMQ cluster. |
 
 ### Example Addon Usage
 
@@ -390,7 +399,10 @@ Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus liste
 genesis do my-env -- register-broker
 
 # Run smoke tests
-genesis do my-env -- smoketest
+genesis do my-env -- smoke-tests
+
+# Run acceptance tests
+genesis do my-env -- acceptance-tests
 
 # Deregister the broker from CF
 genesis do my-env -- deregister-broker
@@ -451,6 +463,8 @@ Proper sizing of your RabbitMQ deployment is critical for performance:
 
 ### Queue Mirroring
 
+**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default. The broker's mirrored-queue policies described below are not yet validated against RabbitMQ 4.x.
+
 When using the broker, the `ha_sync_mode` parameter controls queue mirroring behavior:
 
 - `manual`: Queues must be manually synchronized (default)
@@ -485,22 +499,20 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
 
 6. **Verify Functionality**: Run smoke tests after upgrading:
    ```bash
-   genesis do my-env -- smoketest
+   genesis do my-env -- smoke-tests
    ```
 
 ### Version-Specific Considerations
 
-#### Upgrading to RabbitMQ 3.8+
+#### Upgrading to RabbitMQ 4.x
 
-- Quorum queues are available as an alternative to mirrored queues
-- Management UI has significant changes
-- New Prometheus metrics format
+This kit deploys RabbitMQ 4.2 (paired with Erlang 27) via the `cf-rabbitmq` release. The same release also supports RabbitMQ 3.13 (paired with Erlang 26). Note the following when upgrading a cluster running an earlier RabbitMQ 3.x release:
 
-#### Upgrading to RabbitMQ 3.9+
-
-- Support for Streams
-- Feature flags system for controlling new features
-- Improved observability
+- Classic queue mirroring is removed. Quorum queues are the default queue type; migrate any classic mirrored queues to quorum queues before or during the upgrade.
+- `check_queue_sync` now waits for quorum queue sync only, not mirrored-queue sync.
+- The `broker` feature is not yet validated against RabbitMQ 4.x. Its `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release.
+- Feature flags gate cluster-wide behavior changes; all nodes must run compatible versions before enabling new feature flags.
+- Streams, added in RabbitMQ 3.9, and the feature flags system remain available.
 
 ## Troubleshooting
 

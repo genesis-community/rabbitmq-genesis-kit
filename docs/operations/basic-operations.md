@@ -150,8 +150,11 @@ genesis do my-env -- register-broker
 # Deregister the broker from Cloud Foundry
 genesis do my-env -- deregister-broker
 
-# Run smoke tests
-genesis do my-env -- smoketest
+# Run smoke tests (broker deployments only)
+genesis do my-env -- smoke-tests
+
+# Run the acceptance tests errand
+genesis do my-env -- acceptance-tests
 ```
 
 ## Common Maintenance Tasks

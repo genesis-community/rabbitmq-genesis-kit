@@ -2,6 +2,8 @@
 
 The RabbitMQ Genesis Kit includes support for deploying the Cloud Foundry RabbitMQ Multitenant Service Broker, which allows Cloud Foundry applications to use RabbitMQ as a managed service.
 
+**Status on RabbitMQ 4.x**: The broker remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk.
+
 ## Overview
 
 The service broker provides:
@@ -137,7 +139,7 @@ The broker provides service plans that define resource limits and policies. The 
 
 2. **ha** - High availability plan
    - Single vhost with HA enabled
-   - Mirrored queues across all nodes
+   - Mirrored queues across all nodes (not yet validated against RabbitMQ 4.x; see the status note above)
    - Default user permissions
 
 ## TLS Configuration
@@ -252,6 +254,8 @@ sudo monit restart rabbitmq-broker
 ```
 
 ### High Availability Settings
+
+**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default. The settings below are not yet validated against RabbitMQ 4.x.
 
 The `ha_sync_mode` parameter controls how queues are synchronized between nodes:
 
