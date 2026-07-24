@@ -1,5 +1,9 @@
 # vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:
-package Genesis::Hook::Check::RabbitMQ;
+# NOTE: this file is not a Genesis-dispatched hook (Genesis loads hooks/check.pm
+# for the "check" hook). It predates hooks/pre-deploy.pm, which now performs
+# the same rmq_domain/broker_domain checks. Package renamed to stop colliding
+# with hooks/check.pm's Genesis::Hook::Check::RabbitMQ; kept for reference.
+package Genesis::Hook::RabbitMQ::LegacyDomainCheck;
 
 use v5.20;
 use warnings; # Genesis supports min perl v5.20.
