@@ -22,12 +22,13 @@ sub perform {
   my ($self) = @_; # $self is the same as $blueprint
 
   # Validate features
-  $self->validate_features(qw(
+  $self->validate_features(valid_features => [qw(
     broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls
-    external-rmq-lb route-registrar nats-tls stomp
+    external-rmq-lb route-registrar nats-tls stomp mqtt
     provided-rmq-cert provided-mgmt-cert provided-broker-cert
     prometheus no-prometheus-tls
-  ));
+    +rmq-tls +mgmt-tls +broker-tls
+  )]);
 
   # Base manifests
   $self->add_files(qw(
@@ -40,6 +41,13 @@ sub perform {
 
   # Broker feature
   if ($self->want_feature("broker")) {
+    $self->env->notify(warning =>
+      "The 'broker' feature (CF multitenant service broker) is not yet ".
+      "validated against RabbitMQ 4.x. Classic queue mirroring was removed ".
+      "in RabbitMQ 4.x, so the broker's ha-mode policies are invalid on ".
+      "this release. Proceed only if you understand this risk."
+    );
+
     $self->add_files(qw(
       manifests/broker.yml
       manifests/releases/cf-rabbitmq-multitenant-broker.yml
