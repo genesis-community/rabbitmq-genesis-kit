@@ -1,17 +1,12 @@
 exodus:
-  bosh: external-rmq-lb
-  broker_name: p-rabbitmq
-  broker_password: <!{meta.vault}/broker/auth:password!>
-  broker_url: https://test-broker-domain:4566
-  broker_username: broker
-  features: broker,external-rmq-lb
+  bosh: prometheus
+  features: prometheus
   iaas: null
   is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://test-rmq-domain:15671
   management_username: management
   scale: null
-  service_name: p-rabbitmq
   services: null
   use_create_env: false
 features:
@@ -32,6 +27,7 @@ instance_groups:
             password: <!{meta.vault}/rabbitmq/admin/management:password!>
             username: management
         check_queue_sync: false
+        cluster_name: prometheus
         cluster_partition_handling: pause_minority
         cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
         erlang_major_version: 27
@@ -42,6 +38,12 @@ instance_groups:
           key: <!{meta.vault}/mgmt/certs/server:key!>
         plugins:
         - rabbitmq_management
+        - rabbitmq_prometheus
+        ports:
+        - 5672
+        - 5671
+        - 15671
+        - 15672
         ssl:
           cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
           cert: <!{meta.vault}/rabbitmq/certs/server:certificate!>
@@ -58,110 +60,10 @@ instance_groups:
     release: cf-rabbitmq
   - name: bpm
     release: bpm
-  name: rmq-server
-  networks:
-  - name: rabbitmq
-  persistent_disk_type: rabbitmq
-  stemcell: default
-  vm_extensions:
-  - rmq-loadbalancer
-  vm_type: medium
-- azs:
-  - z1
-  instances: 1
-  jobs:
-  - name: acceptance-tests
-    release: cf-rabbitmq
-  lifecycle: errand
-  name: acceptance-tests
-  networks:
-  - name: rabbitmq
-  stemcell: default
-  vm_type: small
-- azs:
-  - z1
-  instances: 1
-  jobs:
-  - name: rabbitmq-service-broker
-    properties:
-      rabbitmq-service-broker:
-        logging:
-          level: debug
-          print_stack_traces: false
-        rabbitmq:
-          administrator:
-            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
-            username: broker
-          dns_host: test-rmq-domain
-          management:
-            username: management
-          management_domain: test-rmq-domain:15671
-          management_tls:
-            cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
-            enabled: true
-            skip_verify: true
-          operator_set_policy:
-            enabled: true
-            policy_definition: '{"ha-mode":"exactly","ha-params": 2,"ha-sync-mode":"manual"}'
-            policy_name: operator_set_policy
-            policy_priority: 50
-          ssl: true
-        service:
-          name: p-rabbitmq
-          password: <!{meta.vault}/broker/auth:password!>
-          plan_uuid: f2b16201-b927-4a54-b744-2071ba299f0b
-          shareable: true
-          username: broker
-          uuid: 54766614-4530-41e6-b5df-8ccb2dc3fd3f
-    release: cf-rabbitmq-multitenant-broker
-  - name: bpm
-    release: bpm
-  - name: cf-cli-7-linux
-    release: cf-cli
-  - name: broker-registrar
-    properties:
-      broker:
-        host: test-broker-domain:4566
-        name: p-rabbitmq
-        password: <!{meta.vault}/broker/auth:password!>
-        protocol: https
-        service:
-          name: p-rabbitmq
-        username: broker
-      cf:
-        admin_password: test_password
-        admin_username: test_username
-        api_url: https://api.sys.test.cf.domain
-    release: cf-rabbitmq-multitenant-broker
-  - name: broker-deregistrar
-    properties:
-      broker:
-        name: p-rabbitmq
-        service:
-          name: p-rabbitmq
-      cf:
-        admin_password: test_password
-        admin_username: test_username
-        api_url: https://api.sys.test.cf.domain
-    release: cf-rabbitmq-multitenant-broker
-  - name: smoke-tests
-    properties:
-      broker:
-        name: p-rabbitmq
-        service:
-          name: p-rabbitmq
-      cf:
-        admin_password: test_password
-        admin_username: test_username
-        api_url: https://api.sys.test.cf.domain
-        domain: sys.test.cf.domain
-      smoke_tests:
-        org: system
-    release: cf-rabbitmq-smoke-tests
   - name: haproxy
     properties:
       ha_proxy:
-        raw_config: |
+        raw_config: |-
           global
               log stdout len 1024 format raw syslog info
               daemon
@@ -197,24 +99,50 @@ instance_groups:
 
           frontend tcp-frontend-broker-https
               mode tcp
-              bind :4566 ssl crt /var/vcap/jobs/haproxy/config/ssl
+              bind :15691 ssl crt /var/vcap/jobs/haproxy/config/ssl
               default_backend tcp-broker-https
 
           backend tcp-broker-https
               mode tcp
-              server node0 127.0.0.1:4567 check inter 1000
+              server node0 127.0.0.1:15692 check inter 1000
         ssl_pem: |-
-          <!{meta.vault}/broker/certs/server:certificate!>
-          <!{meta.vault}/broker/certs/server:key!>
+          <!{meta.vault}/rabbitmq/certs/server:certificate!>
+          <!{meta.vault}/rabbitmq/certs/server:key!>
     release: haproxy
-  name: rmq-broker
+  name: rmq-server
+  networks:
+  - name: rabbitmq
+  persistent_disk_type: rabbitmq
+  stemcell: default
+  vm_type: medium
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  name: haproxy
   networks:
   - name: rabbitmq
     static_ips:
-    - 10.99.0.17
+    - 10.99.0.16
   stemcell: default
   vm_type: small
-name: external-rmq-lb-rabbitmq
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: acceptance-tests
+    release: cf-rabbitmq
+  lifecycle: errand
+  name: acceptance-tests
+  networks:
+  - name: rabbitmq
+  stemcell: default
+  vm_type: small
+name: prometheus-rabbitmq
 releases:
 - name: cf-rabbitmq
   sha1: fa99fd8cae05d3af0d8cbd287de8cf0258f2d521
@@ -228,18 +156,6 @@ releases:
   sha1: 2d6892b6a86ac7dc47674f03ef2f09aa1bec28e4
   url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
   version: 13.4.0+2.8.5
-- name: cf-rabbitmq-multitenant-broker
-  sha1: 3f91bd4e44cef1b4d13ae077a2e4269694a0d81a
-  url: https://s3.amazonaws.com/cf-rabbitmq-multitenant-broker-genesis-releases/cf-rabbitmq-multitenant-broker-107.0.0.tgz
-  version: 107.0.0
-- name: cf-rabbitmq-smoke-tests
-  sha1: 1a0ff77c30f1b39b6121bb10008d0979db8bb08c
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=166.0.0
-  version: 166.0.0
-- name: cf-cli
-  sha1: c0aeacde21976b8710b7010976acf3c056d7a81d
-  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.60.0
-  version: 1.60.0
 stemcells:
 - alias: default
   os: ubuntu-jammy

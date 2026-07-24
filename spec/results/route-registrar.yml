@@ -30,12 +30,17 @@ exodus:
   broker_url: https://test-broker-domain
   broker_username: broker
   features: broker,route-registrar
+  iaas: null
   is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
   management_url: https://rabbitmq-management.sys.test.cf.domain
   management_username: management
+  scale: null
   service_name: p-rabbitmq
+  services: null
   use_create_env: false
+features:
+  use_dns_addresses: false
 instance_groups:
 - azs:
   - z1
@@ -54,6 +59,7 @@ instance_groups:
         check_queue_sync: false
         cluster_partition_handling: pause_minority
         cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+        erlang_major_version: 27
         management_tls:
           cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           cert: <!{meta.vault}/mgmt/certs/server:certificate!>
@@ -76,8 +82,12 @@ instance_groups:
           verify: false
           versions:
           - tlsv1.2
-        version: "3.8"
+        version: "4.2"
     release: cf-rabbitmq
+  - name: smoke-tests
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
   name: rmq-server
   networks:
   - name: rabbitmq
@@ -113,6 +123,18 @@ instance_groups:
   - name: rabbitmq
     static_ips:
     - 10.99.0.16
+  stemcell: default
+  vm_type: small
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: acceptance-tests
+    release: cf-rabbitmq
+  lifecycle: errand
+  name: acceptance-tests
+  networks:
+  - name: rabbitmq
   stemcell: default
   vm_type: small
 - azs:
@@ -269,9 +291,9 @@ instance_groups:
 name: route-registrar-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: 44f96bae361766253edc1561acec55c58b3c482d
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-release?v=483.0.0
-  version: 483.0.0
+  sha1: fa99fd8cae05d3af0d8cbd287de8cf0258f2d521
+  url: https://github.com/cloudfoundry-community/cf-rabbitmq-release/releases/download/v614.0.0/cf-rabbitmq-614.0.0.tgz
+  version: 614.0.0
 - name: bpm
   sha1: 6ccc8c07c05f5d4301df7e052772813533688955
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23

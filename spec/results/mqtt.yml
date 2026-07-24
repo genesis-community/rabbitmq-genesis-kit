@@ -1,6 +1,6 @@
 exodus:
-  bosh: stomp
-  features: stomp
+  bosh: mqtt
+  features: mqtt
   iaas: null
   is_director: false
   management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
@@ -37,15 +37,14 @@ instance_groups:
           key: <!{meta.vault}/mgmt/certs/server:key!>
         plugins:
         - rabbitmq_management
-        - rabbitmq_stomp
+        - rabbitmq_mqtt
         ports:
         - 5672
         - 5671
         - 15671
         - 15672
-        - 61613
-        - 61614
-        - 15674
+        - 1883
+        - 8883
         ssl:
           cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
           cert: <!{meta.vault}/rabbitmq/certs/server:certificate!>
@@ -95,7 +94,7 @@ instance_groups:
   - name: rabbitmq
   stemcell: default
   vm_type: small
-name: stomp-rabbitmq
+name: mqtt-rabbitmq
 releases:
 - name: cf-rabbitmq
   sha1: fa99fd8cae05d3af0d8cbd287de8cf0258f2d521

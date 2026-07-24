@@ -2,10 +2,10 @@
 kit:
   name: dev
   features:
-    - broker
+    - prometheus
 
 genesis:
-  env:       broker
+  env:       prometheus
 
 params:
   rmq_domain:     test-rmq-domain

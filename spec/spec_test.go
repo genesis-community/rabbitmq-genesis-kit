@@ -78,6 +78,20 @@ var _ = Describe("RabbitMQ Kit", func() {
 			Exodus:      "cf",
 			// Focus:       true,
 		})
+		Test(Environment{
+			Name:        "mqtt",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			// Focus:       true,
+		})
+		Test(Environment{
+			Name:        "prometheus",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			// Focus:       true,
+		})
 
 	})
 })

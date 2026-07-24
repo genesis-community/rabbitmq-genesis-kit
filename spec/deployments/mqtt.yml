@@ -2,10 +2,10 @@
 kit:
   name: dev
   features:
-    - broker
+    - mqtt
 
 genesis:
-  env:       broker
+  env:       mqtt
 
 params:
   rmq_domain:     test-rmq-domain
