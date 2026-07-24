@@ -25,10 +25,20 @@ sub perform {
   my ($self) = @_;
   my $env = $self->env;
 
-  # Check if broker feature is enabled (required for smoke tests)
+  # The smoke-tests errand only exists on broker-enabled deployments
+  # (release cf-rabbitmq-smoke-tests, errand instance group in
+  # manifests/broker.yml). Standalone (no-broker) deployments instead
+  # colocate the cf-rabbitmq smoke-tests job on the rmq-server instance
+  # group, which runs automatically on every deploy -- there is no
+  # errand to invoke.
   if (!$env->has_feature('broker')) {
-    $env->notify(error => "Cannot run smoke tests: broker feature is not enabled for this environment.");
-    return 0;
+    $env->notify(
+      "The 'smoke-tests' errand is only available when the broker feature ".
+      "is enabled. This deployment runs its smoke tests automatically as ".
+      "part of every deploy (colocated on the rmq-server instance group). ".
+      "Use the 'acceptance-tests' addon for on-demand verification."
+    );
+    return $self->done();
   }
 
   # Route registrar warning
