@@ -13,6 +13,7 @@ supports:
 - openstack
 - vsphere
 - stackit
+- pve
 
 credentials:
   base:
