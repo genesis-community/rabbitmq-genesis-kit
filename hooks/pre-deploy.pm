@@ -5,9 +5,11 @@ use v5.20;
 use warnings; # Genesis min perl version is 5.20
 use Genesis qw/bail info run/;
 # Only needed for development
-BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'./.genesis/lib'}
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
 
-use parent qw(Genesis::Hook::PreDeploy);
+# Genesis ships no Genesis::Hook::PreDeploy base class; pre-deploy module hooks
+# derive straight from Genesis::Hook.
+use parent qw(Genesis::Hook);
 sub init {
   my ($class, %ops) = @_;
   my $obj = $class->SUPER::init(%ops);
@@ -25,14 +27,14 @@ sub perform {
   my $vault_prefix = $ENV{GENESIS_VAULT_PREFIX};
 
   # Check for admin credentials
-  my $admin_password = $self->vault->get("$vault_prefix/admin:password");
+  my $admin_password = $env->vault->get("$vault_prefix/admin:password");
   if (!$admin_password) {
     $env->notify(warning => "Admin password not found in vault. Will be generated during deployment.");
   }
 
   # For broker feature, check for broker credentials
   if ($env->has_feature('broker')) {
-    my $broker_password = $self->vault->get("$vault_prefix/broker:password");
+    my $broker_password = $env->vault->get("$vault_prefix/broker:password");
     if (!$broker_password) {
       $env->notify(warning => "Broker password not found in vault. Will be generated during deployment.");
     }
