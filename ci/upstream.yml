@@ -1,8 +1,0 @@
----
-# This file contains patterns for generating links to upstream release notes,
-# for constituent releases.
-
-sections:
-- name:  releases
-  label: Releases
-  default: true

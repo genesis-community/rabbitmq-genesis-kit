@@ -8,15 +8,26 @@ meta:
   exposed:         false
   initial_version: 0.5.1
 
-  upstream: {}
+  upstream: 
+    bosh_releases:
+    - name:         cf-rabbitmq-multitenant-broker
+      type:         github-release
+      repository:   pivotal-cf/cf-rabbitmq-multitenant-broker-release
+      access_token: ((github.access_token))
+
+    - name:         cf-rabbitmq-smoke-tests
+      type:         github-release
+      repository:   pivotal-cf/cf-rabbitmq-smoke-tests-release
+      access_token: ((github.access_token))
+    
 
   vault:
     url:       ((vault.url))
     token:     ((vault.token))
 
   aws:
-    access_key:  ((cloudfoundry-community-aws.access_key_id))
-    secret_key:  ((cloudfoundry-community-aws.secret_access_key))
+    access_key: ((cloudfoundry-community-aws.access_key_id))
+    secret_key: ((cloudfoundry-community-aws.secret_access_key))
 
   github:
     owner:        genesis-community
@@ -25,6 +36,8 @@ meta:
     main-branch:  main
     private_key:  ((github.private_key))
     access_token: ((github.access_token))
+    name:         ((github.name))
+    email:        ((github.email))
 
   shout:
     url:      ((shout.url))
