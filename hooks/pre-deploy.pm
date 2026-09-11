@@ -3,9 +3,11 @@ package Genesis::Hook::PreDeploy::RabbitMQ;
 
 use v5.20;
 use warnings; # Genesis min perl version is 5.20
-use Genesis qw/bail info run/;
+
 # Only needed for development
 BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+
+use Genesis qw/bail info run/;
 
 # Genesis ships no Genesis::Hook::PreDeploy base class; pre-deploy module hooks
 # derive straight from Genesis::Hook.

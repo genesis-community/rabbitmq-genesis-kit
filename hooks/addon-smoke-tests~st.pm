@@ -3,9 +3,11 @@ package Genesis::Hook::Addon::RabbitMQ::Smoketest;
 
 use v5.20;
 use warnings; # Genesis min perl version is 5.20
-use Genesis qw/bail info run/;
+
 # Only needed for development
-BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'./.genesis/lib'}
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+
+use Genesis qw/bail info run/;
 
 use parent qw(Genesis::Hook::Addon);
 sub init {

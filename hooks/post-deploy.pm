@@ -3,9 +3,11 @@ package Genesis::Hook::PostDeploy::RabbitMQ;
 
 use v5.20;
 use warnings; # Genesis min perl version is 5.20
-use Genesis qw/info/;
+
 # Only needed for development
-BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'./.genesis/lib'}
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+
+use Genesis qw/info/;
 
 use parent qw(Genesis::Hook::PostDeploy);
 # Initialize the hook
