@@ -251,9 +251,7 @@ instance_groups:
 name: broker-rabbitmq
 releases:
 - name: cf-rabbitmq
-  sha1: cb62013f5c460ad1f30063090e993e95829ea5a3
-  url: https://github.com/cloudfoundry-community/cf-rabbitmq-release/releases/download/v615.0.0/cf-rabbitmq-615.0.0.tgz
-  version: 615.0.0
+  version: 616.0.0+dev.1
 - name: bpm
   sha1: 6ccc8c07c05f5d4301df7e052772813533688955
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23

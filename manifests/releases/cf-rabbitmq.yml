@@ -1,7 +1,11 @@
+# A dev release of cf-rabbitmq whose smoke-tests and acceptance-tests verify
+# the management certificate by the name rabbitmq-mgmt and read curl
+# credentials from a file.  It is built from the errand-tls-names branch of
+# cloudfoundry-community/cf-rabbitmq-release, so there is no url or sha1 and
+# the Director has to hold it already.  A final release will replace this pin,
+# and the final's url and sha1 go here with its version.
 - type: replace
   path: /releases?/name=cf-rabbitmq?
   value:
     name: cf-rabbitmq
-    version: 615.0.0
-    url: https://github.com/cloudfoundry-community/cf-rabbitmq-release/releases/download/v615.0.0/cf-rabbitmq-615.0.0.tgz
-    sha1: cb62013f5c460ad1f30063090e993e95829ea5a3
+    version: 616.0.0+dev.1
