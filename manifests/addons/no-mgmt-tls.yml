@@ -7,7 +7,7 @@
   path: /instance_groups/name=rmq-server/jobs/name=smoke-tests/properties
 - type: replace
   path: /meta/mgmt_port
-  value: 16572
+  value: 15672
 - type: replace
   path: /meta/mgmt_scheme
   value: http

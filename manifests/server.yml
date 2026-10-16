@@ -118,6 +118,6 @@ instance_groups:
   azs: (( grab params.availability_zones || meta.default.azs ))
 
 exodus:
-  management_url: (( concat "https://" params.mgmt_domain ":" meta.mgmt_port ))
+  management_url: (( concat meta.mgmt_scheme "://" params.mgmt_domain ":" meta.mgmt_port ))
   management_username: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.username ))
   management_password: (( grab instance_groups.rmq-server.jobs.rabbitmq-server.properties.rabbitmq-server.administrators.management.password ))
