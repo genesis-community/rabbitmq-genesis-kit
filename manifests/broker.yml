@@ -21,7 +21,15 @@ params:
   broker_domain: (( param "Please specify a broker domain" ))
   # the username used by the Cloud Controller to auth to the broker
   broker_username: broker
-  ha_sync_mode: manual
+  # The operator policy the broker applies to the vhosts it creates.  It is
+  # off by default, because the ha-mode policy the broker used to set is
+  # invalid on RabbitMQ 4.x.  To set one, enable it and give a JSON
+  # definition that RabbitMQ 4.x accepts, for example
+  # '{"dead-letter-exchange":"dlx"}'.
+  operator_policy_enabled: false
+  operator_policy_name: operator_set_policy
+  operator_policy_definition: "{}"
+  operator_policy_priority: 50
   # Verification is off because we don't currently have a way to
   # automagically sign the certificate for the bosh dns that the servers
   # will be dynamically assigned.
@@ -60,11 +68,10 @@ instance_groups:
           #hosts: actually uses bosh links
           ssl: true
           operator_set_policy:
-            enabled: true
-            policy_name: "operator_set_policy"
-            policy_definition: >-
-              (( concat "{\"ha-mode\":\"exactly\",\"ha-params\": 2,\"ha-sync-mode\":\"" params.ha_sync_mode "\"}" ))
-            policy_priority: 50
+            enabled: (( grab params.operator_policy_enabled ))
+            policy_name: (( grab params.operator_policy_name ))
+            policy_definition: (( grab params.operator_policy_definition ))
+            policy_priority: (( grab params.operator_policy_priority ))
           management_domain: (( concat params.mgmt_domain ":" meta.mgmt_port ))
           management_tls:
             enabled: true
