@@ -25,13 +25,13 @@ sub perform {
   # Base class has deploy_successful method to check if GENESIS_DEPLOY_RC == 0
   if ($self->deploy_successful) {
     info(
-      "\nt#M{$ENV{GENESIS_ENVIRONMENT}} RabbitMQ deployed!\n".
+      "\n\t#M{$ENV{GENESIS_ENVIRONMENT}} RabbitMQ deployed!\n".
       "\ntFor details about the deployment, run\n".
       "\t#G{$ENV{GENESIS_CALL_ENV} info}\n".
       "\nTo open the RabbitMQ Management UI:\n".
       "\t#G{$ENV{GENESIS_CALL_ENV} do -- open}\n".
       "\nTo run smoke tests:\n".
-      "\t#G{$ENV{GENESIS_CALL_ENV} do -- smoketest}\n".
+      "\t#G{$ENV{GENESIS_CALL_ENV} do -- smoke-tests}\n"
     );
 
     # If broker feature is enabled
@@ -40,7 +40,7 @@ sub perform {
         "\nTo register the broker with Cloud Foundry:\n".
         "\t#G{$ENV{GENESIS_CALL_ENV} do -- register-broker}\n".
         "\nTo deregister the broker from Cloud Foundry:\n".
-        "\t#G{$ENV{GENESIS_CALL_ENV} do -- deregister-broker}\n".
+        "\t#G{$ENV{GENESIS_CALL_ENV} do -- deregister-broker}\n"
       );
     }
   }
