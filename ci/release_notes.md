@@ -2,6 +2,8 @@
 
 * The kit has a new opt-in `resolute` feature for ubuntu-resolute stemcells. It sets the stemcell OS, uses a bpm release that runs on resolute, and refuses combinations it cannot support, such as `route-registrar` or `metrics-emitter` with `resolute`, a resolute stemcell without the feature, and the feature with a stemcell of another OS.
 
+* The `resolute` feature also pins haproxy-boshrelease 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute.
+
 * The `proxy_static_ip` and `broker_static_ip` parameters set a literal address for the HAProxy and broker VMs. They exist for Genesis 3 named cloud configs, where network names are dotted and the `static_ips` operator cannot resolve them.
 
 * The broker feature now pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. It replaces the pivotal-cf v107 pin, whose blobs return 403. The final release does not exist yet, so the kit pins the dev release `0+dev.1` with no URL or sha1. The release manifest holds a comment that shows where the URL and sha1 of `237.0.0+cfcommunity.1` go.

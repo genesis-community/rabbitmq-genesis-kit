@@ -1,0 +1,14 @@
+# haproxy for ubuntu-resolute.  Loaded by the resolute feature after
+# manifests/releases/haproxy.yml, because the haproxy package in releases
+# before 16.3.0+3.2.12 bundles a socat that does not compile on resolute
+# (filan.c assigns through strchr on a const pointer).  The kit only sets
+# ha_proxy.ssl_pem and ha_proxy.raw_config, which 16.13.0 still accepts
+# unchanged.  Bump this version together with manifests/releases/haproxy.yml
+# only when the base pin reaches a release that compiles on resolute.
+- type: replace
+  path: /releases?/name=haproxy?
+  value:
+    name: haproxy
+    version: "16.13.0+3.2.25"
+    url: "https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=16.13.0%2B3.2.25"
+    sha1: sha256:98135e4d408ee6f600ab2bb196b9f7f9881331ca3770d738d400da4e76b166ad

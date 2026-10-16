@@ -255,6 +255,10 @@ sub _process_resolute {
     # bpm runs on every instance group, and bpm releases older than 1.4.41 do
     # not compile on resolute.
     $self->add_files('manifests/releases/bpm-resolute.yml');
+    # The haproxy package in releases before 16.3.0+3.2.12 bundles a socat
+    # that does not compile on resolute, and the broker and prometheus TLS
+    # addons run the haproxy job.
+    $self->add_files('manifests/releases/haproxy-resolute.yml');
   } elsif ($self->env->lookup('params.stemcell_os', 'ubuntu-jammy') eq 'ubuntu-resolute') {
     bail(
       "The environment sets #c{params.stemcell_os} to ubuntu-resolute " .
