@@ -116,9 +116,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.41
   version: 1.4.41
 - name: haproxy
-  sha1: 2d6892b6a86ac7dc47674f03ef2f09aa1bec28e4
-  url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
-  version: 13.4.0+2.8.5
+  sha1: sha256:98135e4d408ee6f600ab2bb196b9f7f9881331ca3770d738d400da4e76b166ad
+  url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=16.13.0%2B3.2.25
+  version: 16.13.0+3.2.25
 stemcells:
 - alias: default
   os: ubuntu-resolute
