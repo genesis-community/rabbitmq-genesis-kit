@@ -1,4 +1,4 @@
-This is a major release. It moves the kit from cf-rabbitmq 483.0.0 with RabbitMQ 3.8 to cf-rabbitmq 615.0.0 with RabbitMQ 4.2 and Erlang 27, and it raises the Genesis floor to 3.1.0-rc.20. The kit version is now 1.0.0. Earlier published versions of this kit end at v0.5.2, so set `kit.version` to 1.0.0 in your environment files.
+This is a major release. It moves the kit from cf-rabbitmq 483.0.0 with RabbitMQ 3.8 to cf-rabbitmq 616.0.0 with RabbitMQ 4.2 and Erlang 27, and it raises the Genesis floor to 3.1.0-rc.20. The kit version is now 1.0.0. Earlier published versions of this kit end at v0.5.2, so set `kit.version` to 1.0.0 in your environment files.
 
 ## Breaking changes and upgrade steps
 
@@ -12,17 +12,17 @@ Work through these steps in order when you upgrade an existing environment.
 
 4. If you use the `broker` feature, create a UAA client for the broker smoke tests, with the `client_credentials` grant and the `cloud_controller.admin` authority. Set `params.cf_admin_client` to its name, then store its secret in Vault at `secret/<your/env>/rabbitmq/cf/admin-client` under the key `secret`. Running `genesis <env> add-secrets` prompts for the secret. The manifest will not build until the parameter is set, and `check-secrets` reports the secret as missing until it exists.
 
-5. If you use the `broker` feature, make sure the Director already has the broker release that the kit pins. The kit now pins the community fork of the broker release, because the pivotal-cf v107 release no longer serves its blobs. Until the fork's first final release is cut, the pin is a dev release, `0+dev.1`, with no URL, so the Director has to hold it already.
+5. If you use the `broker` feature, make sure the Director already has the broker release that the kit pins. The kit now pins the community fork of the broker release, because the pivotal-cf v107 release no longer serves its blobs. Until the fork's first final release is cut, the pin is a dev release, `0+dev.2`, with no URL, so the Director has to hold it already.
 
 6. Deploy the environment.
 
 7. If you use the `prometheus` feature, update your scrapers after the deploy. The kit no longer runs a haproxy sidecar in front of port 15691, so `https://<rmq_domain>:15691/metrics` no longer exists. Each RabbitMQ node serves port 15691 itself with the management certificate and port 15692 over plain HTTP. HAProxy does not forward either port, so scrape every node address as its own target. Trust the management CA (`/mgmt/certs/ca`) instead of the RabbitMQ CA, and set `server_name: rabbitmq-mgmt` in the scraper's TLS configuration, because the node addresses are not names in the management certificate. The `no-prometheus-tls` feature is still accepted but has no effect, and the kit prints a notice when you use it.
 
-The cf-rabbitmq release pin will move to a new final that verifies the management certificate by name, and this note will say what that means for existing environments once the pin lands.
+The kit pins cf-rabbitmq 616.0.0. Its smoke-tests job and the acceptance-tests errand in 616.0.0 verify the management certificate by the name `rabbitmq-mgmt`, and they take their curl credentials from a file instead of the command line. The management certificate therefore no longer needs the `localhost` and `127.0.0.1` names, so the kit stops requesting them, and an upgrade does not require you to rotate the certificate. The kit pins `616.0.0+dev.1` with no URL until the final is cut, so the Director has to hold that dev release before you deploy, the same as for the broker release.
 
 ## Improvements
 
-* The kit deploys RabbitMQ 4.2 with Erlang 27 from cf-rabbitmq 615.0.0. The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under bpm, and the kit sets `features.use_dns_addresses` to `false` because RabbitMQ node names come from instance IP addresses.
+* The kit deploys RabbitMQ 4.2 with Erlang 27 from cf-rabbitmq 616.0.0. The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under bpm, and the kit sets `features.use_dns_addresses` to `false` because RabbitMQ node names come from instance IP addresses.
 
 * The kit has two test errands. The `smoke-tests` job is colocated on the `rmq-server` instance group and runs after every deploy. A separate `acceptance-tests` errand exercises AMQP, management, cluster, HAProxy, and plugin checks. The new `smoke-tests` and `acceptance-tests` addons run them, and the `mqtt`, `stomp`, and `prometheus` features add their plugins to the acceptance-tests plugin checks.
 
@@ -40,7 +40,7 @@ The cf-rabbitmq release pin will move to a new final that verifies the managemen
 
 * The broker's default operator policy is off, and the new `operator_policy_*` parameters set one.
 
-* With `provided-mgmt-cert`, the kit removes the colocated `smoke-tests` job, because it verifies the management certificate against `127.0.0.1`, which a certificate from a public or corporate CA does not carry.
+* With `provided-mgmt-cert`, the kit removes the colocated `smoke-tests` job, because it verifies the management certificate by the name `rabbitmq-mgmt`, which a certificate from a public or corporate CA does not carry.
 
 * The `mqtt` feature sets the cluster's default queue type to classic, so QoS 1 subscribes from clean-session clients work. The plugin declares an exclusive queue for those sessions without a queue type, and an exclusive queue cannot be a quorum queue. The feature keeps sessions with a non-zero expiry on quorum queues through `mqtt.durable_queue_type`. Queues declared without a type over any protocol are classic and unreplicated while the feature is on, and the [mqtt section of the manual](../MANUAL.md#mqtt) explains the trade-off.
 
@@ -52,6 +52,6 @@ The cf-rabbitmq release pin will move to a new final that verifies the managemen
 
 * `no-rmq-tls` did not turn off the broker's `rabbitmq.ssl` property because of a misspelled path. It does now. With `no-rmq-tls` and management TLS on, the kit removes the colocated smoke-tests job, because that job has a single TLS switch for both listeners.
 
-* The acceptance-tests errand failed with `curl: option --cacert: is badly used here` because the kit gave it no CA. The kit now sets the AMQP and management TLS flags and CAs for it, and `no-rmq-tls` and `no-mgmt-tls` switch the matching flag off. The job still connects to node addresses that the management certificate does not name, and its HAProxy checks use plain HTTP, so some of its management and HAProxy checks need a change in the cf-rabbitmq release before they can pass against a TLS-only listener.
+* The acceptance-tests errand failed with `curl: option --cacert: is badly used here` because the kit gave it no CA. The kit now sets the AMQP and management TLS flags and CAs for it, and `no-rmq-tls` and `no-mgmt-tls` switch the matching flag off. With cf-rabbitmq 616.0.0 the errand reaches the management API through the name `rabbitmq-mgmt`, which the management certificate carries, and its HAProxy checks use HTTPS when management TLS is on, so its management and HAProxy checks pass against a TLS-only listener.
 
 * The post-deploy hook no longer calls the base class `perform`, which raised an error after every successful deploy. The hooks also resolve the Genesis library fallback correctly.
