@@ -19,5 +19,8 @@ params:
   rmq_instances:            1
   cf_skip_ssl_validation:   true
   cf_deployment_env:        rsat-bc-genesis-ci
+  # The broker feature reads the secret of this UAA client from the provided
+  # secret cf/admin-client:secret, so the CI vault needs that secret.
+  cf_admin_client:          admin
   noop_leaf_change_counter: 5
   check_queue_sync:         false

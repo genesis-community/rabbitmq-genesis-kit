@@ -1,5 +1,5 @@
 repos:
 - name: cf-rabbitmq-multitenant-broker
-  repo: https://github.com/pivotal-cf/cf-rabbitmq-multitenant-broker-release
+  repo: https://github.com/cloudfoundry-community/cf-rabbitmq-multitenant-broker-release
 - name: cf-rabbitmq-smoke-tests
   repo: https://github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release
