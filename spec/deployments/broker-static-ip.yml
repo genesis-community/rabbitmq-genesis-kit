@@ -16,4 +16,3 @@ params:
   proxy_static_ip: 10.99.0.20
   broker_static_ip: 10.99.0.21
   cf_admin_client:        test-cf-admin-client
-  cf_admin_client_secret: test-cf-admin-secret

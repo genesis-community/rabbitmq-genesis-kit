@@ -16,4 +16,3 @@ params:
   operator_policy_definition: '{"dead-letter-exchange":"dlx"}'
   operator_policy_priority:   60
   cf_admin_client:        test-cf-admin-client
-  cf_admin_client_secret: test-cf-admin-secret

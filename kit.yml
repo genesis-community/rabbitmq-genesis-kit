@@ -66,6 +66,12 @@ certificates:
         names:     ["rabbitmq-metrics-emitter","${params.broker_domain}"]
 
 provided:
+  broker:
+    cf/admin-client:
+      keys:
+        secret:
+          prompt: "Secret of the UAA admin client the broker smoke tests log in with"
+
   provided-rmq-cert:
     rabbitmq/certs/server:
       keys:

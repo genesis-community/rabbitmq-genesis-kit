@@ -16,4 +16,3 @@ params:
   nats_client_cert: test-nats-client-cert
   nats_client_key: test-nats-client-key
   cf_admin_client:        test-cf-admin-client
-  cf_admin_client_secret: test-cf-admin-secret

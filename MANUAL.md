@@ -153,7 +153,7 @@ Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Fo
 
 The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. Until the fork's first final release is cut, the kit pins the dev release `0+dev.1`, which must already be on the Director. The comment in `manifests/releases/cf-rabbitmq-multitenant-broker.yml` shows where the final's URL and sha1 go.
 
-The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-linux` job from cf-cli 2.10.0. That release logs in to Cloud Foundry with a UAA client, so the broker feature needs the two `cf_admin_client` parameters below.
+The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-linux` job from cf-cli 2.10.0. That release logs in to Cloud Foundry with a UAA client, so the broker feature needs the `cf_admin_client` parameter and its provided secret, both described below.
 
 ##### Parameters
 
@@ -166,12 +166,17 @@ The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-li
 | `broker_vm_type` | The VM type for the broker VM. | `small` |
 | `broker_name` | The name of the broker as registered with Cloud Foundry. | `p-rabbitmq` |
 | `service_name` | The name of the service exposed in the CF marketplace. | `p-rabbitmq` |
-| `cf_admin_client` | **REQUIRED** - A UAA client for the smoke tests to log in to Cloud Foundry. It needs the `client_credentials` grant and the `cloud_controller.admin` authority. | *(No default)* |
-| `cf_admin_client_secret` | **REQUIRED** - The secret of that client. Set it with a vault reference rather than a literal. | *(No default)* |
+| `cf_admin_client` | **REQUIRED** - The name of a UAA client for the smoke tests to log in to Cloud Foundry. It needs the `client_credentials` grant and the `cloud_controller.admin` authority. The client's secret is a provided secret, described below. | *(No default)* |
 | `operator_policy_enabled` | Whether the broker sets an operator policy on the vhosts it creates. | `false` |
 | `operator_policy_name` | The name of that policy. | `operator_set_policy` |
 | `operator_policy_definition` | The policy definition as a JSON string. It must be valid on RabbitMQ 4.x, so `ha-mode` keys are rejected. | `{}` |
 | `operator_policy_priority` | The priority of that policy. | `50` |
+
+The secret of the `cf_admin_client` UAA client is not a parameter, so it never appears in the environment file. The `broker` feature declares it as a provided secret, and you populate it at this path:
+
+* `secret/<your/env>/rabbitmq/cf/admin-client:secret`
+
+`genesis <env> add-secrets` prompts for the value, and `genesis <env> check-secrets` reports it missing until it exists.
 
 ##### Example Configuration
 
@@ -186,7 +191,6 @@ params:
   broker_name: rabbitmq-service
   service_name: rabbitmq
   cf_admin_client: rabbitmq-smoke-tests
-  cf_admin_client_secret: (( vault "secret/cf/uaa/clients/rabbitmq-smoke-tests:secret" ))
   # Optional. Off by default.
   operator_policy_enabled: true
   operator_policy_definition: '{"dead-letter-exchange":"dlx"}'

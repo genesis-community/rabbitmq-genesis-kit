@@ -10,6 +10,8 @@ secret/prometheus/no/mgmt/tls/rabbitmq/broker/certs/server:
     certificate: <!{meta.vault}/broker/certs/server:certificate!>
     combined: <!{meta.vault}/broker/certs/server:combined!>
     key: <!{meta.vault}/broker/certs/server:key!>
+secret/prometheus/no/mgmt/tls/rabbitmq/cf/admin-client:
+    secret: <!{meta.vault}/cf/admin-client:secret!>
 secret/prometheus/no/mgmt/tls/rabbitmq/rabbitmq/admin/broker:
     password: <!{meta.vault}/rabbitmq/admin/broker:password!>
 secret/prometheus/no/mgmt/tls/rabbitmq/rabbitmq/admin/management:

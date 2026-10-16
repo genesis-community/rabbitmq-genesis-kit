@@ -24,4 +24,3 @@ params:
   mgmt_domain: test-mgmt-domain
   check_queue_sync: true
   cf_admin_client:        test-cf-admin-client
-  cf_admin_client_secret: test-cf-admin-secret

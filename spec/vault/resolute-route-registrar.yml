@@ -10,6 +10,8 @@ secret/resolute/route/registrar/rabbitmq/broker/certs/server:
   certificate: <!{meta.vault}/broker/certs/server:certificate!>
   combined: <!{meta.vault}/broker/certs/server:combined!>
   key: <!{meta.vault}/broker/certs/server:key!>
+secret/resolute/route/registrar/rabbitmq/cf/admin-client:
+  secret: <!{meta.vault}/cf/admin-client:secret!>
 secret/resolute/route/registrar/rabbitmq/mgmt/certs/ca:
   certificate: <!{meta.vault}/mgmt/certs/ca:certificate!>
   combined: <!{meta.vault}/mgmt/certs/ca:combined!>

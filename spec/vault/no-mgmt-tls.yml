@@ -10,6 +10,8 @@ secret/no/mgmt/tls/rabbitmq/broker/certs/server:
     certificate: <!{meta.vault}/broker/certs/server:certificate!>
     combined: <!{meta.vault}/broker/certs/server:combined!>
     key: <!{meta.vault}/broker/certs/server:key!>
+secret/no/mgmt/tls/rabbitmq/cf/admin-client:
+    secret: <!{meta.vault}/cf/admin-client:secret!>
 secret/no/mgmt/tls/rabbitmq/loggregator-agent/certs/ca:
     certificate: <!{meta.vault}/loggregator-agent/certs/ca:certificate!>
     combined: <!{meta.vault}/loggregator-agent/certs/ca:combined!>

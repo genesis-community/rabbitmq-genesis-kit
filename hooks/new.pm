@@ -36,6 +36,16 @@ sub perform {
       \$broker_domain);
   }
 
+  # Prompt for the UAA client the broker smoke tests log in with.  Its secret
+  # is a provided secret that add-secrets prompts for.
+  my $cf_admin_client;
+  if ($use_broker) {
+    prompt_for('cf_admin_client', 'line',
+      'What is the name of the UAA admin client the broker smoke tests log in with (e.g. rabbitmq-smoke-tests)?  '.
+      'It needs the client_credentials grant and the cloud_controller.admin authority.',
+      \$cf_admin_client);
+  }
+
   # Prompt for RabbitMQ domain
   my $rmq_domain;
   prompt_for('rmq_domain', 'line',
@@ -65,6 +75,7 @@ sub perform {
 
   if ($use_broker) {
     print $fh "  broker_domain: $broker_domain\n";
+    print $fh "  cf_admin_client: $cf_admin_client\n";
   }
 
   close $fh;

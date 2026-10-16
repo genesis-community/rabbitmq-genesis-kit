@@ -10,6 +10,8 @@ secret/base/allparams/rabbitmq/broker/certs/server:
   certificate: <!{meta.vault}/broker/certs/server:certificate!>
   combined: <!{meta.vault}/broker/certs/server:combined!>
   key: <!{meta.vault}/broker/certs/server:key!>
+secret/base/allparams/rabbitmq/cf/admin-client:
+  secret: <!{meta.vault}/cf/admin-client:secret!>
 secret/base/allparams/rabbitmq/mgmt/certs/ca:
   certificate: <!{meta.vault}/mgmt/certs/ca:certificate!>
   combined: <!{meta.vault}/mgmt/certs/ca:combined!>

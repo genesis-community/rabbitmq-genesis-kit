@@ -15,4 +15,3 @@ params:
   broker_network: ocfp-lab-test-ocf.rabbitmq.net-rabbitmq
   proxy_static_ip: 10.99.0.16-10.99.0.20
   cf_admin_client:        test-cf-admin-client
-  cf_admin_client_secret: test-cf-admin-secret

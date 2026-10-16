@@ -183,7 +183,7 @@ instance_groups:
           name: test-service-name
       cf:
         admin_client: test-cf-admin-client
-        admin_client_secret: test-cf-admin-secret
+        admin_client_secret: <!{meta.vault}/cf/admin-client:secret!>
         admin_password: test_password
         admin_username: test_username
         api_url: https://api.sys.test.cf.domain

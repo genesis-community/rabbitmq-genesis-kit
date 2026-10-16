@@ -10,6 +10,8 @@ secret/nats/tls/rabbitmq/broker/certs/server:
   certificate: <!{meta.vault}/broker/certs/server:certificate!>
   combined: <!{meta.vault}/broker/certs/server:combined!>
   key: <!{meta.vault}/broker/certs/server:key!>
+secret/nats/tls/rabbitmq/cf/admin-client:
+  secret: <!{meta.vault}/cf/admin-client:secret!>
 secret/nats/tls/rabbitmq/mgmt/certs/ca:
   certificate: <!{meta.vault}/mgmt/certs/ca:certificate!>
   combined: <!{meta.vault}/mgmt/certs/ca:combined!>

@@ -77,8 +77,15 @@ The broker feature requires the following parameters:
 
 ```yaml
 params:
-  # Required broker parameter
+  # Required broker parameters
   broker_domain: rabbitmq-broker.example.com
+  cf_admin_client: rabbitmq-smoke-tests
+```
+
+The `cf_admin_client` parameter names the UAA client that the broker smoke tests use to log in to Cloud Foundry. The client needs the `client_credentials` grant and the `cloud_controller.admin` authority. Its secret is not a parameter. The broker feature declares it as a provided secret, so `genesis <env> add-secrets` prompts for it and stores it in Vault at `secret/<your/env>/rabbitmq/cf/admin-client:secret`. To set it without the prompt, write it yourself.
+
+```
+safe set secret/<your/env>/rabbitmq/cf/admin-client secret=<client secret>
 ```
 
 ### Optional Parameters
@@ -97,10 +104,6 @@ params:
   operator_policy_name: operator_set_policy
   operator_policy_definition: "{}"
   operator_policy_priority: 50
-
-  # Required: the UAA client the smoke tests use
-  cf_admin_client: rabbitmq-smoke-tests
-  cf_admin_client_secret: (( vault "secret/cf/uaa/clients/rabbitmq-smoke-tests:secret" ))
 ```
 
 ## Registering the Broker with Cloud Foundry

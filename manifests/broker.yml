@@ -32,9 +32,9 @@ params:
   operator_policy_priority: 50
   # The UAA client the smoke-tests job uses to log in to Cloud Foundry.  The
   # client needs the client_credentials grant and the cloud_controller.admin
-  # authority.
+  # authority.  Its secret is not a parameter.  It is a provided secret at
+  # cf/admin-client:secret in the environment's vault path.
   cf_admin_client: (( param "Please specify a UAA admin client for the broker smoke tests" ))
-  cf_admin_client_secret: (( param "Please specify the secret of the UAA admin client for the broker smoke tests" ))
   # Verification is off because we don't currently have a way to
   # automagically sign the certificate for the bosh dns that the servers
   # will be dynamically assigned.
@@ -126,7 +126,7 @@ instance_groups:
       cf:
         domain:  (( grab meta.cf.system_domain ))
         admin_client:        (( grab params.cf_admin_client ))
-        admin_client_secret: (( grab params.cf_admin_client_secret ))
+        admin_client_secret: (( vault meta.vault "/cf/admin-client:secret" ))
       smoke_tests:
         org: system
 
