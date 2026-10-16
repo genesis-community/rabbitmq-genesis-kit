@@ -120,11 +120,12 @@ sub perform {
       manifests/addons/prometheus.yml
     ));
 
-    if (!$self->want_feature("no-prometheus-tls")) {
-      $self->add_files(qw(
-        manifests/addons/prometheus-tls.yml
-      ));
-    }
+    # The rabbitmq-server job opens the plugin's own TLS listener on port
+    # 15691 whenever management TLS is on, using the management certificate,
+    # so the kit adds nothing for TLS.  A haproxy sidecar bound to the same
+    # port makes the node crash at boot with eaddrinuse.  The no-prometheus-tls
+    # feature is still accepted, but the job has no property that closes the
+    # listener, so it changes nothing.
   }
 
   # RabbitMQ TLS
@@ -256,8 +257,8 @@ sub _process_resolute {
     # not compile on resolute.
     $self->add_files('manifests/releases/bpm-resolute.yml');
     # The haproxy package in releases before 16.3.0+3.2.12 bundles a socat
-    # that does not compile on resolute, and the broker and prometheus TLS
-    # addons run the haproxy job.
+    # that does not compile on resolute, and the broker TLS addon runs the
+    # haproxy job.
     $self->add_files('manifests/releases/haproxy-resolute.yml');
   } elsif ($self->env->lookup('params.stemcell_os', 'ubuntu-jammy') eq 'ubuntu-resolute') {
     bail(

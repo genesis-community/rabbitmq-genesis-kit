@@ -388,7 +388,7 @@ features:
 
 #### `prometheus`
 
-Enables the RabbitMQ Prometheus plugin and metrics scraping endpoint on port 15691. This TLS endpoint serves the same certificate as the RabbitMQ cluster.
+Enables the RabbitMQ Prometheus plugin. The plugin serves metrics over plain HTTP on port 15692 and, while management TLS is on, over HTTPS on port 15691. The `rabbitmq-server` job opens the HTTPS listener itself and presents the management certificate, so a scraper has to trust the management CA (`/mgmt/certs/ca`) and not the RabbitMQ CA. The kit adds no proxy for the TLS port. Under `no-mgmt-tls` the job does not open port 15691 at all, and metrics are available only on port 15692.
 
 ##### Example Configuration
 
@@ -401,7 +401,7 @@ features:
 
 #### `no-prometheus-tls`
 
-Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus listener at port 15692.
+Has no effect. The kit once put a haproxy proxy in front of port 15691 and this feature removed it, but the `rabbitmq-server` job now opens the TLS listener itself whenever management TLS is on and has no property to close it. The feature is still accepted so that existing environment files keep rendering. To serve metrics without TLS, use `no-mgmt-tls`, and note that it also turns off management TLS.
 
 ### Stemcell
 
@@ -409,7 +409,7 @@ Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus liste
 
 Deploys RabbitMQ on the `ubuntu-resolute` stemcell instead of the default `ubuntu-jammy`. The feature is opt-in, and we recommend setting `stemcell_version` to a resolute version such as `"0.184"` alongside it.
 
-The feature sets the stemcell OS to `ubuntu-resolute` and pins the bpm release to 1.4.41. Releases of bpm older than 1.4.41 do not compile on resolute, and bpm runs on both the `rmq-server` and `haproxy` instance groups, so the pin applies every time the feature is on. The pin lives in `manifests/releases/bpm-resolute.yml` and loads after `manifests/releases/bpm.yml`, so the two files have to be bumped together. The feature also pins the haproxy release to 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute and the broker and prometheus TLS addons run the haproxy job. That pin lives in `manifests/releases/haproxy-resolute.yml`, loads after `manifests/releases/haproxy.yml`, and the two haproxy files are bumped together as well.
+The feature sets the stemcell OS to `ubuntu-resolute` and pins the bpm release to 1.4.41. Releases of bpm older than 1.4.41 do not compile on resolute, and bpm runs on both the `rmq-server` and `haproxy` instance groups, so the pin applies every time the feature is on. The pin lives in `manifests/releases/bpm-resolute.yml` and loads after `manifests/releases/bpm.yml`, so the two files have to be bumped together. The feature also pins the haproxy release to 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute and the broker TLS addon runs the haproxy job on the `rmq-broker` instance group. That pin lives in `manifests/releases/haproxy-resolute.yml`, loads after `manifests/releases/haproxy.yml`, and the two haproxy files are bumped together as well.
 
 The kit refuses three situations. It refuses an environment that sets `params.stemcell_os` to anything other than `ubuntu-resolute` while the feature is on, because the feature owns the stemcell OS. It refuses an environment that sets `params.stemcell_os` to `ubuntu-resolute` without the feature, so an environment that relied on that parameter alone needs to enable the feature and drop the parameter. It also refuses `resolute` together with `route-registrar` or `metrics-emitter`, because the routing and metrics emitter releases that those features pin have not been proven on resolute.
 
@@ -482,7 +482,7 @@ By default, the RabbitMQ deployment secures all communication with TLS:
 
 - AMQP communication uses port 5671 with TLS
 - Management UI uses port 15671 with HTTPS
-- If Prometheus is enabled, metrics are exposed over HTTPS on port 15691
+- If Prometheus is enabled, metrics are exposed over HTTPS on port 15691 with the management certificate
 
 For production deployments, it's recommended to:
 
@@ -666,8 +666,8 @@ Key metrics to monitor include:
 #### Prometheus
 
 When the `prometheus` feature is enabled, metrics are available at:
-- `https://<rmq_domain>:15691/metrics` (with TLS)
-- `http://<rmq_domain>:15692/metrics` (without TLS, when `no-prometheus-tls` is enabled)
+- `https://<rmq_domain>:15691/metrics` (with TLS, signed by the management CA)
+- `http://<rmq_domain>:15692/metrics` (always available, and the only endpoint under `no-mgmt-tls`)
 
 Example Prometheus scrape configuration:
 

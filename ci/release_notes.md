@@ -2,7 +2,7 @@
 
 * The kit has a new opt-in `resolute` feature for ubuntu-resolute stemcells. It sets the stemcell OS, uses a bpm release that runs on resolute, and refuses combinations it cannot support, such as `route-registrar` or `metrics-emitter` with `resolute`, a resolute stemcell without the feature, and the feature with a stemcell of another OS.
 
-* The `resolute` feature also pins haproxy-boshrelease 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute.
+* The `resolute` feature also pins haproxy-boshrelease 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute. The broker TLS addon still runs the haproxy job on the broker VM.
 
 * The `proxy_static_ip` and `broker_static_ip` parameters set a literal address for the HAProxy and broker VMs. They exist for Genesis 3 named cloud configs, where network names are dotted and the `static_ips` operator cannot resolve them.
 
@@ -13,6 +13,8 @@
 * The broker's default operator policy is off. Its old `ha-mode` definition is invalid on RabbitMQ 4.x. The new `operator_policy_enabled`, `operator_policy_name`, `operator_policy_definition`, and `operator_policy_priority` parameters set a policy for anyone who wants one. They replace `ha_sync_mode`, which only fed the old definition.
 
 ## Bug fixes
+
+* The `prometheus` feature no longer crashes RabbitMQ at boot when management TLS is on. The `rabbitmq-server` job opens its own TLS listener on port 15691 with the management certificate, and the kit's haproxy sidecar bound the same port, so the node died with `could_not_start_listener ... eaddrinuse`. The kit now drops the sidecar and the plugin serves port 15691 itself. Scrapers must trust the management CA instead of the RabbitMQ CA, and under `no-mgmt-tls` only the plain port 15692 is served. `no-prometheus-tls` is still accepted but has no effect.
 
 * The colocated cf-rabbitmq smoke-tests job now points at the management TLS listener and its CA. The management server certificate now also covers `localhost` and `127.0.0.1`.
 
