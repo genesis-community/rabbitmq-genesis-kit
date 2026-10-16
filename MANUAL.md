@@ -149,7 +149,7 @@ params:
 
 Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Foundry to utilize the RabbitMQ cluster. The broker server listens on TCP port 4566 for HTTPS traffic.
 
-**Status on RabbitMQ 4.x**: The `broker` feature remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below). Deploying with `broker` on RabbitMQ 4.x still triggers a warning; proceed only if you understand this risk. Validation against quorum queues is planned follow-up work.
+**Status on RabbitMQ 4.x**: The `broker` feature is deployable on RabbitMQ 4.x, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below), and it prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
 
 The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. Until the fork's first final release is cut, the kit pins the dev release `0+dev.1`, which must already be on the Director. The comment in `manifests/releases/cf-rabbitmq-multitenant-broker.yml` shows where the final's URL and sha1 go.
 
@@ -162,7 +162,7 @@ The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-li
 | `broker_domain` | **REQUIRED** - The domain for the RabbitMQ CF Broker. Used to populate SANs on the certificate. | *(No default)* |
 | `broker_username` | The username that the service broker will accept for authentication. | `broker` |
 | `broker_network` | The network for the RabbitMQ Multitenant Broker. Must be reachable by CF Cloud Controller or GoRouters if using route-registrar. | `rabbitmq` |
-| `broker_static_ip` | A literal static IPv4 address for the broker VM. Use it with a Genesis 3 named cloud config, where network names are dotted. The address is also added as an IP subject alternative name on the RabbitMQ server certificate and the management server certificate, so clients that connect to HAProxy by IP can verify the certificate. See [Literal Static IPs](#literal-static-ips). | *(Unset, the second static IP of `broker_network`)* |
+| `broker_static_ip` | A literal static IPv4 address for the broker VM. Use it with a Genesis 3 named cloud config, where network names are dotted. The broker certificate takes its names from `broker_domain`, so this address does not become a certificate name. When Cloud Controller reaches the broker by address, set `broker_domain` to that address as well. See [Literal Static IPs](#literal-static-ips). | *(Unset, the second static IP of `broker_network`)* |
 | `broker_vm_type` | The VM type for the broker VM. | `small` |
 | `broker_name` | The name of the broker as registered with Cloud Foundry. | `p-rabbitmq` |
 | `service_name` | The name of the service exposed in the CF marketplace. | `p-rabbitmq` |
@@ -394,7 +394,7 @@ features:
 
 #### `prometheus`
 
-Enables the RabbitMQ Prometheus plugin. The plugin serves metrics over plain HTTP on port 15692 and, while management TLS is on, over HTTPS on port 15691. The `rabbitmq-server` job opens the HTTPS listener itself and presents the management certificate, so a scraper has to trust the management CA (`/mgmt/certs/ca`) and not the RabbitMQ CA. The kit adds no proxy for the TLS port. Under `no-mgmt-tls` the job does not open port 15691 at all, and metrics are available only on port 15692.
+Enables the RabbitMQ Prometheus plugin. The plugin serves metrics over plain HTTP on port 15692 and, while management TLS is on, over HTTPS on port 15691. The `rabbitmq-server` job opens the HTTPS listener itself and presents the management certificate, so a scraper has to trust the management CA (`/mgmt/certs/ca`) and not the RabbitMQ CA. The kit adds no proxy for the TLS port, and HAProxy does not forward ports 15691 or 15692, so metrics are served only by each node. Scrape every node address as its own target. The node addresses are not names in the management certificate, so the scraper has to verify the certificate against the name `rabbitmq-mgmt` by setting `server_name: rabbitmq-mgmt` in its TLS configuration. Under `no-mgmt-tls` the job does not open port 15691 at all, and metrics are available only on port 15692.
 
 ##### Example Configuration
 
@@ -407,19 +407,19 @@ features:
 
 #### `no-prometheus-tls`
 
-Has no effect. The kit once put a haproxy proxy in front of port 15691 and this feature removed it, but the `rabbitmq-server` job now opens the TLS listener itself whenever management TLS is on and has no property to close it. The feature is still accepted so that existing environment files keep rendering. To serve metrics without TLS, use `no-mgmt-tls`, and note that it also turns off management TLS.
+Has no effect. The kit once put a haproxy proxy in front of port 15691 and this feature removed it, but the `rabbitmq-server` job now opens the TLS listener itself whenever management TLS is on and has no property to close it. The feature is still accepted so that existing environment files keep rendering, and the kit prints a notice when it is set. To serve metrics without TLS, use `no-mgmt-tls`, and note that it also turns off management TLS.
 
 ### Stemcell
 
 #### `resolute`
 
-Deploys RabbitMQ on the `ubuntu-resolute` stemcell instead of the default `ubuntu-jammy`. The feature is opt-in, and we recommend setting `stemcell_version` to a resolute version such as `"0.184"` alongside it.
+Deploys RabbitMQ on the `ubuntu-resolute` stemcell instead of the default `ubuntu-jammy`. The feature is opt-in. Set `stemcell_version` to a resolute version such as `"0.184"` alongside it.
 
-The feature sets the stemcell OS to `ubuntu-resolute` and pins the bpm release to 1.4.41. Releases of bpm older than 1.4.41 do not compile on resolute, and bpm runs on both the `rmq-server` and `haproxy` instance groups, so the pin applies every time the feature is on. The pin lives in `manifests/releases/bpm-resolute.yml` and loads after `manifests/releases/bpm.yml`, so the two files have to be bumped together. The feature also pins the haproxy release to 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute and the broker TLS addon runs the haproxy job on the `rmq-broker` instance group. That pin lives in `manifests/releases/haproxy-resolute.yml`, loads after `manifests/releases/haproxy.yml`, and the two haproxy files are bumped together as well.
+The feature sets the stemcell OS to `ubuntu-resolute` and pins the bpm release to 1.4.41. Releases of bpm older than 1.4.41 do not compile on resolute, and bpm runs on the `rmq-server`, `haproxy`, and `rmq-broker` instance groups, so the pin applies every time the feature is on. The pin lives in `manifests/releases/bpm-resolute.yml` and loads after `manifests/releases/bpm.yml`, so the two files have to be bumped together. The feature also pins the haproxy release to 16.13.0+3.2.25, because the socat bundled in earlier haproxy releases does not compile on resolute and the broker TLS addon runs the haproxy job on the `rmq-broker` instance group. That pin lives in `manifests/releases/haproxy-resolute.yml`, loads after `manifests/releases/haproxy.yml`, and the two haproxy files are bumped together as well.
 
 The kit refuses three situations. It refuses an environment that sets `params.stemcell_os` to anything other than `ubuntu-resolute` while the feature is on, because the feature owns the stemcell OS. It refuses an environment that sets `params.stemcell_os` to `ubuntu-resolute` without the feature, so an environment that relied on that parameter alone needs to enable the feature and drop the parameter. It also refuses `resolute` together with `route-registrar` or `metrics-emitter`, because the routing and metrics emitter releases that those features pin have not been proven on resolute.
 
-The `broker` feature is not yet supported on resolute. The kit does not refuse the combination, but the broker release still calls `chpst`, which resolute does not ship, so the broker job will not start there until we pin a release that no longer needs it.
+The `broker` feature runs on resolute. The community fork of the broker release replaces the `chpst` call, which resolute does not ship, with `setpriv`. A live test deployed the broker on resolute, registered it with Cloud Foundry, and bound an app to a service instance.
 
 ```yaml
 # Deploy on ubuntu-resolute
@@ -453,7 +453,7 @@ params:
 | `metrics-emitter` | Most features | `resolute` | `broker` |
 | `resolute` | Most features | `route-registrar`, `metrics-emitter` | - |
 
-`broker` is deployable on the 4.x-based release, but it is not yet validated against quorum queues, the RabbitMQ 4.x default queue type. Its default operator policy is off.
+`broker` is deployable on the 4.x-based release. Its default operator policy is off, and it has not been validated against heavy quorum queue workloads.
 
 ## Available Addons
 
@@ -578,7 +578,7 @@ This kit deploys RabbitMQ 4.2 (paired with Erlang 27) via the `cf-rabbitmq` rele
 
 - Classic queue mirroring is removed. Quorum queues are the default queue type; migrate any classic mirrored queues to quorum queues before or during the upgrade.
 - `check_queue_sync` now waits for quorum queue sync only, not mirrored-queue sync.
-- The `broker` feature is not yet validated against RabbitMQ 4.x. The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off.
+- The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off. The `ha_sync_mode` parameter only fed that policy, so the kit now ignores it and prints a notice when it is set. Use the `operator_policy_*` parameters instead.
 - Feature flags gate cluster-wide behavior changes; all nodes must run compatible versions before enabling new feature flags.
 - Streams, added in RabbitMQ 3.9, and the feature flags system remain available.
 
@@ -672,20 +672,26 @@ Key metrics to monitor include:
 
 #### Prometheus
 
-When the `prometheus` feature is enabled, metrics are available at:
-- `https://<rmq_domain>:15691/metrics` (with TLS, signed by the management CA)
-- `http://<rmq_domain>:15692/metrics` (always available, and the only endpoint under `no-mgmt-tls`)
+When the `prometheus` feature is enabled, every RabbitMQ node serves metrics at:
+- `https://<node-ip>:15691/metrics` (with TLS, signed by the management CA)
+- `http://<node-ip>:15692/metrics` (always available, and the only endpoint under `no-mgmt-tls`)
 
-Example Prometheus scrape configuration:
+HAProxy does not forward these ports, so `<rmq_domain>` does not serve them. The node addresses are not names in the management certificate, so a TLS scrape verifies the certificate against the name `rabbitmq-mgmt`.
+
+Example Prometheus scrape configuration, with one target per node:
 
 ```yaml
 scrape_configs:
   - job_name: 'rabbitmq'
     scheme: https
     tls_config:
-      insecure_skip_verify: true  # Replace with proper CA configuration in production
+      ca_file: /etc/prometheus/rabbitmq-mgmt-ca.pem  # the /mgmt/certs/ca certificate
+      server_name: rabbitmq-mgmt
     static_configs:
-      - targets: ['rabbitmq.example.com:15691']
+      - targets:
+        - '10.0.0.11:15691'
+        - '10.0.0.12:15691'
+        - '10.0.0.13:15691'
 ```
 
 #### Grafana Dashboards
