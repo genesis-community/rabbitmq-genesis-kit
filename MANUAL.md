@@ -106,7 +106,7 @@ The deployment includes these key components:
 
 By default the kit asks BOSH for the first static IP in the proxy network for HAProxy, and the second static IP in the broker network for the broker. That lookup breaks on a Genesis 3 named cloud config, because those cloud configs give networks dotted names such as `ocfp-lab-example-ocf.rabbitmq.net-rabbitmq`, and the lookup splits the name at the dots and then fails to find the network.
 
-In that situation, set `params.proxy_static_ip` to give HAProxy a literal address, and set `params.broker_static_ip` to do the same for the broker when the `broker` feature is on. Each parameter takes a single IPv4 address, because HAProxy and the broker each run one instance, and the kit stops with an error if the value is a list or anything other than a dotted IPv4 address. The address you choose must come from the static range of the network that the instance group uses, and the two addresses must differ from each other. When you leave a parameter unset, the manifest is the same as it was before the parameter existed.
+In that situation, set `params.proxy_static_ip` to give HAProxy a literal address, and set `params.broker_static_ip` to do the same for the broker when the `broker` feature is on. Each parameter takes a single IPv4 address, because HAProxy and the broker each run one instance, and the kit stops with an error if the value is a list or anything other than a dotted IPv4 address. The address you choose must come from the static range of the network that the instance group uses, and the two addresses must differ from each other. The kit stops with an error if both are set to the same address while the `broker` feature is on, and it also stops if `params.proxy_static_ip` is set together with `external-rmq-lb`, because that feature removes the HAProxy VM and the address would have nothing to apply to. When you leave a parameter unset, the manifest is the same as it was before the parameter existed.
 
 Because HAProxy fronts both the AMQPS and management listeners, `params.proxy_static_ip` also becomes an IP subject alternative name on the RabbitMQ server certificate (`rabbitmq/certs/server`) and the management server certificate (`mgmt/certs/server`). A client that connects to HAProxy by that IP can then verify the certificate hostname. When the parameter is unset, both certificates carry the same names as before. Genesis keeps the subject of an existing certificate when it rotates, so an environment that already has these certificates needs them regenerated after you set the parameter:
 
@@ -333,7 +333,7 @@ Requires you to provide your own certificates for the Service Broker instead of 
 
 #### `external-rmq-lb`
 
-Removes the HAProxy VM and exposes the RabbitMQ nodes directly through a load balancer using a vm_extension defined in your cloud config.
+Removes the HAProxy VM and exposes the RabbitMQ nodes directly through a load balancer using a vm_extension defined in your cloud config. Because there is no HAProxy VM, do not set `proxy_static_ip` with this feature. The kit stops with an error if you do.
 
 ##### Important Ports
 

@@ -230,5 +230,27 @@ var _ = Describe("RabbitMQ Kit", func() {
 				GenesisManifest:   ContainSubstring("single IPv4"),
 			},
 		})
+		Test(Environment{
+			Name:        "external-rmq-lb-proxy-static-ip",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("has nothing to apply to"),
+				GenesisCheck:      ContainSubstring("has nothing to apply to"),
+				GenesisManifest:   ContainSubstring("has nothing to apply to"),
+			},
+		})
+		Test(Environment{
+			Name:        "static-ip-conflict",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("different"),
+				GenesisCheck:      ContainSubstring("different"),
+				GenesisManifest:   ContainSubstring("different"),
+			},
+		})
 	})
 })

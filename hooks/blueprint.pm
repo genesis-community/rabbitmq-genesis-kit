@@ -217,6 +217,7 @@ sub _process_static_ips {
     broker_static_ip => 'manifests/broker-static-ip.yml',
   );
 
+  my %ips;
   foreach my $param (qw(proxy_static_ip broker_static_ip)) {
     my $ip = $self->env->lookup("params.$param", undef);
     next unless defined $ip;
@@ -228,6 +229,34 @@ sub _process_static_ips {
       "10.0.0.16, because that instance group runs one instance.  Found #R{%s}.",
       $param, (ref($ip) ? 'a non-scalar value' : $ip)
     ) unless $valid;
+
+    $ips{$param} = $ip;
+  }
+
+  # The external load balancer feature removes the haproxy instance group.  The
+  # proxy fragment would merge a new haproxy group back in that holds only a
+  # name and a network, which BOSH rejects, so refuse the combination.
+  bail(
+    "The #c{external-rmq-lb} feature removes the HAProxy instance group, so " .
+    "#c{params.proxy_static_ip} (#R{%s}) has nothing to apply to.  " .
+    "Remove #c{params.proxy_static_ip} or the #c{external-rmq-lb} feature.",
+    $ips{proxy_static_ip}
+  ) if defined($ips{proxy_static_ip}) && $self->want_feature('external-rmq-lb');
+
+  # The two instance groups would claim the same address, and BOSH only finds
+  # the conflict late in the deploy.  The broker address is only applied when
+  # the broker feature is on, so it only conflicts then.
+  bail(
+    "The #c{params.proxy_static_ip} and #c{params.broker_static_ip} " .
+    "parameters are both #R{%s}.  The HAProxy VM and the broker VM need " .
+    "different addresses.",
+    $ips{proxy_static_ip}
+  ) if defined($ips{proxy_static_ip}) && defined($ips{broker_static_ip})
+    && $ips{proxy_static_ip} eq $ips{broker_static_ip}
+    && $self->want_feature('broker');
+
+  foreach my $param (qw(proxy_static_ip broker_static_ip)) {
+    next unless defined $ips{$param};
 
     # The broker group only exists with the broker feature, so the broker
     # address is validated but only applied when the feature is on.
