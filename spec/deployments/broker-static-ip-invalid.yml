@@ -1,0 +1,17 @@
+---
+kit:
+  name: dev
+  features:
+    - broker
+genesis:
+  env:       broker-static-ip-invalid
+
+params:
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium
+  server_network: ocfp-lab-test-ocf.rabbitmq.net-rabbitmq
+  proxy_network:  ocfp-lab-test-ocf.rabbitmq.net-rabbitmq
+  broker_domain:  test-broker-domain
+  broker_network: ocfp-lab-test-ocf.rabbitmq.net-rabbitmq
+  broker_static_ip: 10.99.0
+  cf_admin_client: test-cf-admin-client

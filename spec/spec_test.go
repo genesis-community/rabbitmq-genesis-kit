@@ -208,6 +208,23 @@ var _ = Describe("RabbitMQ Kit", func() {
 			},
 		})
 		Test(Environment{
+			Name:        "resolute-broker",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "resolute-metrics-emitter",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("cannot be combined with"),
+				GenesisCheck:      ContainSubstring("cannot be combined with"),
+				GenesisManifest:   ContainSubstring("cannot be combined with"),
+			},
+		})
+		Test(Environment{
 			Name:        "resolute-route-registrar",
 			CloudConfig: "aws",
 			CPI:         "aws",
@@ -251,6 +268,39 @@ var _ = Describe("RabbitMQ Kit", func() {
 				GenesisAddSecrets: ContainSubstring("single IPv4"),
 				GenesisCheck:      ContainSubstring("single IPv4"),
 				GenesisManifest:   ContainSubstring("single IPv4"),
+			},
+		})
+		Test(Environment{
+			Name:        "proxy-static-ip-list",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("IPv4"),
+				GenesisCheck:      ContainSubstring("IPv4"),
+				GenesisManifest:   ContainSubstring("IPv4"),
+			},
+		})
+		Test(Environment{
+			Name:        "proxy-static-ip-octet",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("IPv4"),
+				GenesisCheck:      ContainSubstring("IPv4"),
+				GenesisManifest:   ContainSubstring("IPv4"),
+			},
+		})
+		Test(Environment{
+			Name:        "broker-static-ip-invalid",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("IPv4"),
+				GenesisCheck:      ContainSubstring("IPv4"),
+				GenesisManifest:   ContainSubstring("IPv4"),
 			},
 		})
 		Test(Environment{

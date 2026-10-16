@@ -1,0 +1,17 @@
+---
+kit:
+  name: dev
+  features:
+    - resolute
+    - broker
+    - metrics-emitter
+
+genesis:
+  env:       resolute-metrics-emitter
+
+params:
+  stemcell_version: "0.184"
+  rmq_domain:       test-rmq-domain
+  broker_domain:    test-broker-domain
+  server_vm_type:   medium
+  cf_admin_client:  test-cf-admin-client
