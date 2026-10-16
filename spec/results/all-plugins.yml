@@ -30,12 +30,15 @@ instance_groups:
         cluster_name: all-plugins
         cluster_partition_handling: pause_minority
         cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+        default_queue_type: classic
         erlang_major_version: 27
         management_tls:
           cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           cert: <!{meta.vault}/mgmt/certs/server:certificate!>
           enabled: true
           key: <!{meta.vault}/mgmt/certs/server:key!>
+        override_config: |
+          mqtt.durable_queue_type = quorum
         plugins:
         - rabbitmq_management
         - rabbitmq_mqtt

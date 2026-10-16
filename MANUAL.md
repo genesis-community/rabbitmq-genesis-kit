@@ -368,6 +368,10 @@ features:
 
 Enables the RabbitMQ MQTT plugin for MQTT protocol support.
 
+The feature also changes the default queue type of the whole cluster to classic. When an MQTT client connects with a clean session, the plugin declares an exclusive queue for it and does not name a queue type, so RabbitMQ falls back to the node-wide default. The release defaults to quorum queues, and a quorum queue cannot be exclusive, so a QoS 1 subscribe from a clean-session client fails. RabbitMQ 4.2 through 4.3 has no setting that avoids this for clean sessions, and the plugin ignores the default queue type of the vhost. With the `mqtt` feature on, the kit sets `rabbitmq-server.default_queue_type` to `classic` on the `rabbitmq-server` job.
+
+The trade-off is that any queue declared without a type, over any protocol, is now a classic queue, and classic queues are not replicated in RabbitMQ 4.x. Clients can still ask for a quorum queue by setting `x-queue-type` explicitly, and a vhost with its own default queue type keeps that default for AMQP 0-9-1 declarations. Existing queues keep the type they were created with. To keep durable MQTT sessions replicated, the feature also sets `mqtt.durable_queue_type = quorum` through `rabbitmq-server.override_config`, so a QoS 1 session with a non-zero session expiry (or `clean_session=false` in MQTT 3.1.1) still gets a quorum queue. If you set `rabbitmq-server.override_config` yourself, your value replaces the one the feature sets, so include that line in it. A client that connects with a non-zero session expiry avoids the clean-session failure without any help from the setting.
+
 ##### Example Configuration
 
 ```yaml

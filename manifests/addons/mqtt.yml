@@ -8,6 +8,19 @@
 - type: replace
   path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ports/-
   value: 8883
+# The MQTT plugin declares the queue for a clean session as exclusive and sets
+# no x-queue-type, so the node-wide default queue type applies, and quorum
+# queues cannot be exclusive.  A QoS 1 subscribe with a clean session then
+# fails.  The plugin does not read the vhost default, so the node default has
+# to be classic.  Sessions with a non-zero expiry still get replicated queues
+# through mqtt.durable_queue_type.
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/default_queue_type?
+  value: classic
+- type: replace
+  path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/override_config?
+  value: |
+    mqtt.durable_queue_type = quorum
 # The acceptance-tests errand runs its plugin checks only for plugins listed
 # in its enabled_plugins property.
 - type: replace

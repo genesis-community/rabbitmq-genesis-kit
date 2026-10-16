@@ -42,6 +42,8 @@ The cf-rabbitmq release pin will move to a new final that verifies the managemen
 
 * With `provided-mgmt-cert`, the kit removes the colocated `smoke-tests` job, because it verifies the management certificate against `127.0.0.1`, which a certificate from a public or corporate CA does not carry.
 
+* The `mqtt` feature sets the cluster's default queue type to classic, so QoS 1 subscribes from clean-session clients work. The plugin declares an exclusive queue for those sessions without a queue type, and an exclusive queue cannot be a quorum queue. The feature keeps sessions with a non-zero expiry on quorum queues through `mqtt.durable_queue_type`. Queues declared without a type over any protocol are classic and unreplicated while the feature is on, and the [mqtt section of the manual](../MANUAL.md#mqtt) explains the trade-off.
+
 ## Bug fixes
 
 * The `prometheus` feature no longer crashes RabbitMQ at boot when management TLS is on. The kit's haproxy sidecar bound the same port 15691 that the `rabbitmq-server` job opens itself, so the node died with `could_not_start_listener ... eaddrinuse`. The kit now drops the sidecar.
