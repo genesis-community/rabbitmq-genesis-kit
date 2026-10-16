@@ -136,6 +136,12 @@ sub perform {
     if ($self->want_feature("provided-rmq-cert")) {
       bail("Cannot have no-rmq-tls and provided-rmq-cert features");
     }
+
+    if (!$self->want_feature("no-mgmt-tls")) {
+      $self->add_files(qw(
+        manifests/addons/no-rmq-tls-smoke-tests.yml
+      ));
+    }
   }
 
   # Management TLS

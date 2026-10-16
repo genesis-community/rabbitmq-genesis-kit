@@ -1,0 +1,9 @@
+---
+# The colocated smoke-tests job has one tls.enabled switch that moves both
+# the AMQP listener check (5672 to 5671) and the management API (http to
+# https).  With AMQP TLS off and management TLS on, no setting of that switch
+# is correct, so the job is removed.  With both TLS listeners off, the
+# no-mgmt-tls addon strips the job's properties and the job runs on its plain
+# defaults.
+- type: remove
+  path: /instance_groups/name=rmq-server/jobs/name=smoke-tests
