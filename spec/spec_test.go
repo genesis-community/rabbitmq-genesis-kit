@@ -24,6 +24,14 @@ var _ = Describe("RabbitMQ Kit", func() {
 			// Focus:       true,
 		})
 		Test(Environment{
+			Name:        "base-certs",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("7 added/0 skipped/0 errors"),
+			},
+		})
+		Test(Environment{
 			Name:        "base-allparams",
 			CloudConfig: "aws",
 			CPI:         "aws",
@@ -174,6 +182,15 @@ var _ = Describe("RabbitMQ Kit", func() {
 			CloudConfig: "aws-dotted-network",
 			CPI:         "aws",
 			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "proxy-static-ip-certs",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("7 added/0 skipped/0 errors"),
+			},
 		})
 		Test(Environment{
 			Name:        "broker-static-ip",
