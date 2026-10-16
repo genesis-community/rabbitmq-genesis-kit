@@ -26,7 +26,7 @@ sub perform {
   if ($self->deploy_successful) {
     info(
       "\n\t#M{$ENV{GENESIS_ENVIRONMENT}} RabbitMQ deployed!\n".
-      "\ntFor details about the deployment, run\n".
+      "\nFor details about the deployment, run:\n".
       "\t#G{$ENV{GENESIS_CALL_ENV} info}\n".
       "\nTo open the RabbitMQ Management UI:\n".
       "\t#G{$ENV{GENESIS_CALL_ENV} do -- open}\n".
@@ -44,9 +44,6 @@ sub perform {
       );
     }
   }
-
-  # Call parent class methods if needed
-  $self->SUPER::perform() if $self->can('SUPER::perform');
 
   # Mark the hook as completed successfully
   return $self->done();
