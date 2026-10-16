@@ -1,0 +1,12 @@
+# bpm for ubuntu-resolute.  Loaded by the resolute feature after
+# manifests/releases/bpm.yml, because bpm releases older than 1.4.41 do not
+# compile on resolute and bpm runs on every instance group.  Bump this version
+# together with manifests/releases/bpm.yml, because the pipeline updates only
+# that file and the two would drift apart.
+- type: replace
+  path: /releases?/name=bpm?
+  value:
+    name: bpm
+    version: 1.4.41
+    url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.41
+    sha1: sha256:7b445508d63d2171d892ba33f836087e1e519b9782f44c5fa5290323616ca8e6

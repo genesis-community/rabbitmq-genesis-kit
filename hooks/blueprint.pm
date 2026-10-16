@@ -26,7 +26,7 @@ sub perform {
     broker metrics-emitter no-rmq-tls no-mgmt-tls no-broker-tls
     external-rmq-lb route-registrar nats-tls stomp mqtt
     provided-rmq-cert provided-mgmt-cert provided-broker-cert
-    prometheus no-prometheus-tls
+    prometheus no-prometheus-tls resolute
     +rmq-tls +mgmt-tls +broker-tls
   )]);
 
@@ -178,7 +178,50 @@ sub perform {
     }
   }
 
+  $self->_process_resolute;
+
   return $self->done();
 }
+
+# _process_resolute - Opt-in ubuntu-resolute stemcell support {{{
+# Called after every other fragment is added so that it overrides the
+# stemcell os default (ubuntu-jammy) and the bpm release pin.
+sub _process_resolute {
+  my ($self) = @_;
+
+  if ($self->want_feature('resolute')) {
+    my $stemcell_os = $self->env->lookup('params.stemcell_os', 'ubuntu-resolute');
+    bail(
+      "The #c{resolute} feature sets the stemcell os to ubuntu-resolute, but " .
+      "the environment sets #c{params.stemcell_os} to #R{%s}.  " .
+      "Remove that parameter.", $stemcell_os
+    ) if $stemcell_os ne 'ubuntu-resolute';
+
+    # The pinned routing and metrics emitter releases have not been proven on
+    # resolute, so refuse them rather than render a deployment that may fail.
+    my @unproven = grep { $self->want_feature($_) } qw(route-registrar metrics-emitter);
+    bail(
+      "The #c{resolute} feature cannot be combined with the #R{%s} %s, " .
+      "because the releases pinned for %s have not been proven on " .
+      "ubuntu-resolute.  Remove %s or the #c{resolute} feature.",
+      join(', ', @unproven),
+      (@unproven == 1 ? 'feature' : 'features'),
+      (@unproven == 1 ? 'it' : 'them'),
+      (@unproven == 1 ? 'it' : 'them')
+    ) if @unproven;
+
+    $self->add_files('manifests/resolute.yml');
+    # bpm runs on every instance group, and bpm releases older than 1.4.41 do
+    # not compile on resolute.
+    $self->add_files('manifests/releases/bpm-resolute.yml');
+  } elsif ($self->env->lookup('params.stemcell_os', 'ubuntu-jammy') eq 'ubuntu-resolute') {
+    bail(
+      "The environment sets #c{params.stemcell_os} to ubuntu-resolute " .
+      "without the #c{resolute} feature.  Enable the feature and remove " .
+      "that parameter."
+    );
+  }
+}
+# }}}
 
 1;
