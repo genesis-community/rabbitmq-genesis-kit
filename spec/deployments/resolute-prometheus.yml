@@ -1,0 +1,15 @@
+---
+kit:
+  name: dev
+  features:
+    - resolute
+    - prometheus
+
+genesis:
+  env:       resolute-prometheus
+
+params:
+  stemcell_version: "0.184"
+  rmq_domain:       test-rmq-domain
+  broker_domain:    test-broker-domain
+  server_vm_type:   medium

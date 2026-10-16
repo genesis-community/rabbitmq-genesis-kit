@@ -1,0 +1,13 @@
+---
+kit:
+  name: dev
+  features:
+    - resolute
+
+genesis:
+  env:       resolute-wrong-stemcell-os
+
+params:
+  stemcell_os:    ubuntu-noble
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium

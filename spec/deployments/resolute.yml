@@ -1,0 +1,13 @@
+---
+kit:
+  name: dev
+  features:
+    - resolute
+
+genesis:
+  env:       resolute
+
+params:
+  stemcell_version: "0.184"
+  rmq_domain:       test-rmq-domain
+  server_vm_type:   medium

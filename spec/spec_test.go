@@ -6,6 +6,7 @@ import (
 
 	. "github.com/genesis-community/testkit/v2/testing"
 	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = BeforeSuite(func() {
@@ -93,5 +94,59 @@ var _ = Describe("RabbitMQ Kit", func() {
 			// Focus:       true,
 		})
 
+	})
+
+	Describe("resolute", func() {
+		Test(Environment{
+			Name:        "resolute",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "resolute-mqtt-stomp",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "resolute-prometheus",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "resolute-wrong-stemcell-os",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("stemcell os to"),
+				GenesisCheck:      ContainSubstring("stemcell os to"),
+				GenesisManifest:   ContainSubstring("stemcell os to"),
+			},
+		})
+		Test(Environment{
+			Name:        "resolute-stemcell-without-feature",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("Enable the feature and remove that parameter"),
+				GenesisCheck:      ContainSubstring("Enable the feature and remove that parameter"),
+				GenesisManifest:   ContainSubstring("Enable the feature and remove that parameter"),
+			},
+		})
+		Test(Environment{
+			Name:        "resolute-route-registrar",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("cannot be combined with"),
+				GenesisCheck:      ContainSubstring("cannot be combined with"),
+				GenesisManifest:   ContainSubstring("cannot be combined with"),
+			},
+		})
 	})
 })
