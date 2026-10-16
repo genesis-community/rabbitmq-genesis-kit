@@ -1,0 +1,16 @@
+secret/provided/mgmt/cert/no/rmq/tls/rabbitmq/mgmt/certs/ca:
+  certificate: <!{meta.vault}/mgmt/certs/ca:certificate!>
+  combined: <!{meta.vault}/mgmt/certs/ca:combined!>
+  crl: <!{meta.vault}/mgmt/certs/ca:crl!>
+  key: <!{meta.vault}/mgmt/certs/ca:key!>
+  serial: <!{meta.vault}/mgmt/certs/ca:serial!>
+secret/provided/mgmt/cert/no/rmq/tls/rabbitmq/mgmt/certs/server:
+  certificate: <!{meta.vault}/mgmt/certs/server:certificate!>
+  combined: <!{meta.vault}/mgmt/certs/server:combined!>
+  key: <!{meta.vault}/mgmt/certs/server:key!>
+secret/provided/mgmt/cert/no/rmq/tls/rabbitmq/rabbitmq/admin/broker:
+  password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+secret/provided/mgmt/cert/no/rmq/tls/rabbitmq/rabbitmq/admin/management:
+  password: <!{meta.vault}/rabbitmq/admin/management:password!>
+secret/provided/mgmt/cert/no/rmq/tls/rabbitmq/rabbitmq/erlang-cookie:
+  cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>

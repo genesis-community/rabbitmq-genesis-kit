@@ -129,6 +129,7 @@ sub perform {
   }
 
   # RabbitMQ TLS
+  my $smoke_tests_removed = 0;
   if ($self->want_feature("no-rmq-tls")) {
     $self->add_files(qw(
       manifests/addons/no-rmq-tls.yml
@@ -142,7 +143,18 @@ sub perform {
       $self->add_files(qw(
         manifests/addons/no-rmq-tls-smoke-tests.yml
       ));
+      $smoke_tests_removed = 1;
     }
+  }
+
+  # A provided management certificate cannot carry the 127.0.0.1 address that
+  # the colocated smoke-tests job connects to, so the job is removed.  Both
+  # addons remove the same job, and removing it twice is an error, so the
+  # second one is skipped when the no-rmq-tls addon has already done it.
+  if ($self->want_feature("provided-mgmt-cert") && !$smoke_tests_removed) {
+    $self->add_files(qw(
+      manifests/addons/provided-mgmt-cert-smoke-tests.yml
+    ));
   }
 
   # Management TLS

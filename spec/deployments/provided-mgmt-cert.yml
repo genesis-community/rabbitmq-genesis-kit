@@ -1,0 +1,12 @@
+---
+kit:
+  name: dev
+  features:
+    - provided-mgmt-cert
+
+genesis:
+  env:       provided-mgmt-cert
+
+params:
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium

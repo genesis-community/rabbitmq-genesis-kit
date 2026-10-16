@@ -316,6 +316,8 @@ Requires you to provide your own certificates for the Management API instead of 
 * `secret/<your/env>/rabbitmq/mgmt/certs/server:key`
 * `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate`
 
+The colocated `smoke-tests` job runs after every deploy and connects to the management API at `127.0.0.1`, so it verifies the management certificate against the loopback address. A certificate from a public or corporate CA almost never carries a loopback IP name, so with this feature the kit removes the colocated `smoke-tests` job rather than let every deploy end in a failed post-deploy step. The `broker` smoke tests errand is unaffected, because it reaches Cloud Foundry and the broker and does not use the management certificate.
+
 #### `provided-broker-cert`
 
 Requires you to provide your own certificates for the Service Broker instead of generating them. You must populate:

@@ -128,6 +128,21 @@ var _ = Describe("RabbitMQ Kit", func() {
 
 	})
 
+	Describe("provided certificates", func() {
+		Test(Environment{
+			Name:        "provided-mgmt-cert",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "provided-mgmt-cert-no-rmq-tls",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+	})
+
 	Describe("resolute", func() {
 		Test(Environment{
 			Name:        "resolute",

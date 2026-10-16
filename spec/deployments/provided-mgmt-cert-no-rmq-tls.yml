@@ -1,0 +1,13 @@
+---
+kit:
+  name: dev
+  features:
+    - provided-mgmt-cert
+    - no-rmq-tls
+
+genesis:
+  env:       provided-mgmt-cert-no-rmq-tls
+
+params:
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium
