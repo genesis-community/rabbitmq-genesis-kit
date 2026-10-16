@@ -29,6 +29,8 @@ The **RabbitMQ Genesis Kit** deploys a RabbitMQ cluster and, optionally, the CF 
   - [Monitoring](#monitoring)
     - [`prometheus`](#prometheus)
     - [`no-prometheus-tls`](#no-prometheus-tls)
+  - [Stemcell](#stemcell)
+    - [`resolute`](#resolute)
 - [Feature Compatibility Matrix](#feature-compatibility-matrix)
 - [Available Addons](#available-addons)
 - [Security Considerations](#security-considerations)
@@ -361,13 +363,36 @@ features:
 
 Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus listener at port 15692.
 
+### Stemcell
+
+#### `resolute`
+
+Deploys RabbitMQ on the `ubuntu-resolute` stemcell instead of the default `ubuntu-jammy`. The feature is opt-in, and we recommend setting `stemcell_version` to a resolute version such as `"0.184"` alongside it.
+
+The feature sets the stemcell OS to `ubuntu-resolute` and pins the bpm release to 1.4.41. Releases of bpm older than 1.4.41 do not compile on resolute, and bpm runs on both the `rmq-server` and `haproxy` instance groups, so the pin applies every time the feature is on. The pin lives in `manifests/releases/bpm-resolute.yml` and loads after `manifests/releases/bpm.yml`, so the two files have to be bumped together.
+
+The kit refuses three situations. It refuses an environment that sets `params.stemcell_os` to anything other than `ubuntu-resolute` while the feature is on, because the feature owns the stemcell OS. It refuses an environment that sets `params.stemcell_os` to `ubuntu-resolute` without the feature, so an environment that relied on that parameter alone needs to enable the feature and drop the parameter. It also refuses `resolute` together with `route-registrar` or `metrics-emitter`, because the routing and metrics emitter releases that those features pin have not been proven on resolute.
+
+The `broker` feature is not yet supported on resolute. The kit does not refuse the combination, but the broker release still calls `chpst`, which resolute does not ship, so the broker job will not start there until we pin a release that no longer needs it.
+
+```yaml
+# Deploy on ubuntu-resolute
+---
+kit:
+  features:
+    - resolute
+
+params:
+  stemcell_version: "0.184"
+```
+
 ## Feature Compatibility Matrix
 
 | Feature | Compatible With | Conflicts With | Depends On |
 |---------|-----------------|----------------|------------|
 | `broker` | All except noted conflicts | - | - |
 | `no-broker-tls` | Most features | `provided-broker-cert` | `broker` |
-| `route-registrar` | Most features | - | `broker` |
+| `route-registrar` | Most features | `resolute` | `broker` |
 | `nats-tls` | Most features | - | `route-registrar` |
 | `no-rmq-tls` | Most features | `provided-rmq-cert` | - |
 | `no-mgmt-tls` | Most features | `provided-mgmt-cert` | - |
@@ -379,7 +404,8 @@ Disables the TLS frontend at port 15691, and leaves the non-TLS Prometheus liste
 | `stomp` | All | - | - |
 | `prometheus` | All | `no-prometheus-tls` | - |
 | `no-prometheus-tls` | All | `prometheus` | - |
-| `metrics-emitter` | Most features | - | `broker` |
+| `metrics-emitter` | Most features | `resolute` | `broker` |
+| `resolute` | Most features | `route-registrar`, `metrics-emitter` | - |
 
 `broker` is deployable on the 4.x-based release, but its `ha_sync_mode` policies are not yet validated against quorum queues, the RabbitMQ 4.x default queue type.
 
