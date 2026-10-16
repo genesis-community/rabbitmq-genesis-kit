@@ -170,8 +170,8 @@ sub perform {
     }
   }
 
-  # A provided management certificate cannot carry the 127.0.0.1 address that
-  # the colocated smoke-tests job connects to, so the job is removed.  Both
+  # A provided management certificate cannot carry the rabbitmq-mgmt name that
+  # the colocated smoke-tests job verifies, so the job is removed.  Both
   # addons remove the same job, and removing it twice is an error, so the
   # second one is skipped when the no-rmq-tls addon has already done it.
   if ($self->want_feature("provided-mgmt-cert") && !$smoke_tests_removed) {

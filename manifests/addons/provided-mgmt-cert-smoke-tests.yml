@@ -1,9 +1,8 @@
 ---
-# The colocated smoke-tests job runs after every deploy and connects to the
-# management API at https://127.0.0.1, so it verifies the management
-# certificate against the loopback address.  A certificate supplied by the
-# operator normally comes from a public or corporate CA, and those CAs refuse
-# to issue a loopback IP name, so the job would fail every deploy.  The job is
-# removed here.
+# The colocated smoke-tests job runs after every deploy and verifies the
+# management certificate by the name rabbitmq-mgmt.  A certificate supplied by
+# the operator normally comes from a public or corporate CA, and those CAs
+# refuse to issue that internal name, so the job would fail every deploy.  The
+# job is removed here.
 - type: remove
   path: /instance_groups/name=rmq-server/jobs/name=smoke-tests
