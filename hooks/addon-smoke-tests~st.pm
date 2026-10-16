@@ -50,7 +50,10 @@ sub perform {
 
   $env->notify("Running RabbitMQ smoke tests...");
 
-  my ($out, $rc, $err) = run({ interactive => 1 }, 'bosh run-errand smoke-tests');
+  # The colocated cf-rabbitmq smoke-tests post-deploy job on rmq-server has the
+  # same job name, so a bare 'bosh run-errand smoke-tests' also targets it.
+  # Restrict the errand to the broker instance group.
+  my ($out, $rc, $err) = run({ interactive => 1 }, 'bosh run-errand smoke-tests --instance rmq-broker');
 
   if ($rc != 0) {
     $env->notify(error => "Smoke tests failed: $err");

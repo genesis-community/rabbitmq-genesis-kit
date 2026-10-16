@@ -87,7 +87,7 @@ genesis deploy prod-rabbitmq
 ## Common Maintenance Operations
 
 - **Register Broker with CF**: `genesis do prod-rabbitmq register-broker`
-- **Run Smoke Tests**: `genesis do prod-rabbitmq smoke-tests`
+- **Run Smoke Tests** (broker deployments only): `genesis do prod-rabbitmq smoke-tests`
 - **Run Acceptance Tests**: `genesis do prod-rabbitmq acceptance-tests`
 - **Deregister Broker**: `genesis do prod-rabbitmq deregister-broker`
 

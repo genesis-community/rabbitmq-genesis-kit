@@ -52,7 +52,7 @@ The standard RabbitMQ deployment architecture consists of:
 2. **HAProxy Layer**: A proxying layer to provide load balancing across the cluster nodes (unless using external load balancing).
 3. **Service Broker** (optional): When integrating with Cloud Foundry, a service broker that manages RabbitMQ service instances.
 4. **Process Supervision**: The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under `bpm` (BOSH Process Manager). A `bpm` job is colocated on the `rmq-server` and `haproxy` instance groups to supervise them.
-5. **Test Errands**: A `smoke-tests` job is colocated on the `rmq-server` instance group, and a separate `acceptance-tests` errand instance group exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed cluster.
+5. **Test Errands**: A `smoke-tests` job is colocated on the `rmq-server` instance group and runs after every deploy, and a separate `acceptance-tests` errand instance group exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed cluster. The plugin checks run for the `mqtt`, `stomp`, and `prometheus` plugins when those features are on. With the `broker` feature, the `rmq-broker` instance group also carries its own `smoke-tests` errand job.
 
 The kit sets `features.use_dns_addresses: false` and this is not user-configurable. RabbitMQ derives its node name from the instance IP address and ships a static `erl_inetrc`; bosh-dns hostnames don't resolve for those node names and break cluster formation, so the kit keeps IP-based addressing.
 
@@ -461,7 +461,7 @@ params:
 |-------|-------------|
 | `register-broker` | Register this broker with the Cloud Foundry in this environment. |
 | `deregister-broker` | Deregister this broker from the Cloud Foundry in this environment. |
-| `smoke-tests` | Run the smoke test errand for this deployment. This errand will not pass unless you have route registrar enabled. |
+| `smoke-tests` | Run the broker's smoke test errand. It only exists when the `broker` feature is on, and the addon runs it with `--instance rmq-broker`, because the colocated smoke-tests job on `rmq-server` shares the errand's name and would otherwise be matched too. The errand will not pass unless you have route registrar enabled. Without the broker, use `acceptance-tests`. |
 | `acceptance-tests` | Run the acceptance test errand for this deployment. Exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed RabbitMQ cluster. |
 
 ### Example Addon Usage
@@ -470,7 +470,7 @@ params:
 # Register the broker with CF
 genesis do my-env -- register-broker
 
-# Run smoke tests
+# Run the broker smoke tests (broker feature only)
 genesis do my-env -- smoke-tests
 
 # Run acceptance tests
@@ -564,8 +564,9 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
    genesis deploy my-env
    ```
 
-6. **Verify Functionality**: Run smoke tests after upgrading:
+6. **Verify Functionality**: Run the acceptance tests after upgrading, and the broker smoke tests too if the `broker` feature is on:
    ```bash
+   genesis do my-env -- acceptance-tests
    genesis do my-env -- smoke-tests
    ```
 

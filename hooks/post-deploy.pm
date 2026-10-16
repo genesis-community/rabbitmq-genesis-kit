@@ -29,10 +29,22 @@ sub perform {
       "\nFor details about the deployment, run:\n".
       "\t#G{$ENV{GENESIS_CALL_ENV} info}\n".
       "\nTo open the RabbitMQ Management UI:\n".
-      "\t#G{$ENV{GENESIS_CALL_ENV} do -- open}\n".
-      "\nTo run smoke tests:\n".
-      "\t#G{$ENV{GENESIS_CALL_ENV} do -- smoke-tests}\n"
+      "\t#G{$ENV{GENESIS_CALL_ENV} do -- open}\n"
     );
+
+    # The smoke-tests addon needs the broker's errand.  Without the broker,
+    # point at the acceptance tests instead.
+    if ($self->env->has_feature('broker')) {
+      info(
+        "\nTo run smoke tests:\n".
+        "\t#G{$ENV{GENESIS_CALL_ENV} do -- smoke-tests}\n"
+      );
+    } else {
+      info(
+        "\nTo run acceptance tests:\n".
+        "\t#G{$ENV{GENESIS_CALL_ENV} do -- acceptance-tests}\n"
+      );
+    }
 
     # If broker feature is enabled
     if ($self->env->has_feature('broker')) {
