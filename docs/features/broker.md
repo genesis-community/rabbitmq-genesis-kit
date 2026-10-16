@@ -2,7 +2,7 @@
 
 The RabbitMQ Genesis Kit includes support for deploying the Cloud Foundry RabbitMQ Multitenant Service Broker, which allows Cloud Foundry applications to use RabbitMQ as a managed service.
 
-**Status on RabbitMQ 4.x**: The broker remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk.
+**Status on RabbitMQ 4.x**: The broker remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off by default. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk.
 
 ## Overview
 
@@ -93,7 +93,14 @@ params:
   broker_vm_type: small
   broker_name: p-rabbitmq
   service_name: p-rabbitmq
-  ha_sync_mode: manual
+  operator_policy_enabled: false
+  operator_policy_name: operator_set_policy
+  operator_policy_definition: "{}"
+  operator_policy_priority: 50
+
+  # Required: the UAA client the smoke tests use
+  cf_admin_client: rabbitmq-smoke-tests
+  cf_admin_client_secret: (( vault "secret/cf/uaa/clients/rabbitmq-smoke-tests:secret" ))
 ```
 
 ## Registering the Broker with Cloud Foundry
@@ -253,17 +260,12 @@ sudo vim /var/vcap/jobs/rabbitmq-broker/config/service_catalog.yml
 sudo monit restart rabbitmq-broker
 ```
 
-### High Availability Settings
+### Operator Policy
 
-**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default. The settings below are not yet validated against RabbitMQ 4.x.
-
-The `ha_sync_mode` parameter controls how queues are synchronized between nodes:
+RabbitMQ 4.x removed classic queue mirroring, so the broker no longer sets an `ha-mode` policy. To have it set an operator policy on the vhosts it creates, enable one and give a definition that RabbitMQ 4.x accepts.
 
 ```yaml
 params:
-  ha_sync_mode: automatic  # Instead of the default 'manual'
+  operator_policy_enabled: true
+  operator_policy_definition: '{"dead-letter-exchange":"dlx"}'
 ```
-
-Settings:
-- `manual` - Queues must be manually synchronized (default, safer for performance)
-- `automatic` - Queues synchronize automatically when new mirrors are added (safer for data integrity)

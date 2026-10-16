@@ -141,7 +141,11 @@ params:
 
 Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Foundry to utilize the RabbitMQ cluster. The broker server listens on TCP port 4566 for HTTPS traffic.
 
-**Status on RabbitMQ 4.x**: The `broker` feature remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk. Validation against quorum queues is planned follow-up work.
+**Status on RabbitMQ 4.x**: The `broker` feature remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below). Deploying with `broker` on RabbitMQ 4.x still triggers a warning; proceed only if you understand this risk. Validation against quorum queues is planned follow-up work.
+
+The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. Until the fork's first final release is cut, the kit pins the dev release `0+dev.1`, which must already be on the Director. The comment in `manifests/releases/cf-rabbitmq-multitenant-broker.yml` shows where the final's URL and sha1 go.
+
+The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-linux` job from cf-cli 2.10.0. That release logs in to Cloud Foundry with a UAA client, so the broker feature needs the two `cf_admin_client` parameters below.
 
 ##### Parameters
 
@@ -154,7 +158,12 @@ Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Fo
 | `broker_vm_type` | The VM type for the broker VM. | `small` |
 | `broker_name` | The name of the broker as registered with Cloud Foundry. | `p-rabbitmq` |
 | `service_name` | The name of the service exposed in the CF marketplace. | `p-rabbitmq` |
-| `ha_sync_mode` | The ha-sync-mode for vhosts created by this broker. | `manual` |
+| `cf_admin_client` | **REQUIRED** - A UAA client for the smoke tests to log in to Cloud Foundry. It needs the `client_credentials` grant and the `cloud_controller.admin` authority. | *(No default)* |
+| `cf_admin_client_secret` | **REQUIRED** - The secret of that client. Set it with a vault reference rather than a literal. | *(No default)* |
+| `operator_policy_enabled` | Whether the broker sets an operator policy on the vhosts it creates. | `false` |
+| `operator_policy_name` | The name of that policy. | `operator_set_policy` |
+| `operator_policy_definition` | The policy definition as a JSON string. It must be valid on RabbitMQ 4.x, so `ha-mode` keys are rejected. | `{}` |
+| `operator_policy_priority` | The priority of that policy. | `50` |
 
 ##### Example Configuration
 
@@ -168,7 +177,11 @@ params:
   broker_domain: rabbitmq-broker.example.com
   broker_name: rabbitmq-service
   service_name: rabbitmq
-  ha_sync_mode: automatic
+  cf_admin_client: rabbitmq-smoke-tests
+  cf_admin_client_secret: (( vault "secret/cf/uaa/clients/rabbitmq-smoke-tests:secret" ))
+  # Optional. Off by default.
+  operator_policy_enabled: true
+  operator_policy_definition: '{"dead-letter-exchange":"dlx"}'
 ```
 
 #### `no-broker-tls`
@@ -273,9 +286,11 @@ params:
 
 Disables TLS communications to the RabbitMQ cluster and between RabbitMQ nodes.
 
+The colocated `smoke-tests` job has a single TLS switch that moves both its AMQP listener check (port 5672 or 5671) and its management API check (HTTP or HTTPS). With `no-rmq-tls` and management TLS both in play, no setting of that switch is correct, so the kit removes the colocated `smoke-tests` job unless `no-mgmt-tls` is also enabled. The `acceptance-tests` errand follows both settings separately.
+
 #### `no-mgmt-tls`
 
-Disables the TLS listener for the Management API on port 15671, and will instead listen for plaintext HTTP traffic on port 15672.
+Disables the TLS listener for the Management API on port 15671, and will instead listen for plaintext HTTP traffic on port 15672. The broker management domain, the metrics emitter endpoint, and the exodus management URL all follow that port and scheme.
 
 #### `provided-rmq-cert`
 
@@ -424,7 +439,7 @@ params:
 | `metrics-emitter` | Most features | `resolute` | `broker` |
 | `resolute` | Most features | `route-registrar`, `metrics-emitter` | - |
 
-`broker` is deployable on the 4.x-based release, but its `ha_sync_mode` policies are not yet validated against quorum queues, the RabbitMQ 4.x default queue type.
+`broker` is deployable on the 4.x-based release, but it is not yet validated against quorum queues, the RabbitMQ 4.x default queue type. Its default operator policy is off.
 
 ## Available Addons
 
@@ -506,14 +521,9 @@ Proper sizing of your RabbitMQ deployment is critical for performance:
 
 ### Queue Mirroring
 
-**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default. The broker's mirrored-queue policies described below are not yet validated against RabbitMQ 4.x.
+**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default.
 
-When using the broker, the `ha_sync_mode` parameter controls queue mirroring behavior:
-
-- `manual`: Queues must be manually synchronized (default)
-- `automatic`: Queues synchronize automatically when new mirrors are added
-
-For production workloads with critical data, consider setting `ha_sync_mode: automatic`.
+The broker no longer sets a mirroring policy by default. To have it set an operator policy on the vhosts it creates, set `operator_policy_enabled: true` and give `operator_policy_definition` a JSON definition that RabbitMQ 4.x accepts, such as `{"dead-letter-exchange":"dlx"}`.
 
 ### Queue Synchronization During Upgrades
 
@@ -553,7 +563,7 @@ This kit deploys RabbitMQ 4.2 (paired with Erlang 27) via the `cf-rabbitmq` rele
 
 - Classic queue mirroring is removed. Quorum queues are the default queue type; migrate any classic mirrored queues to quorum queues before or during the upgrade.
 - `check_queue_sync` now waits for quorum queue sync only, not mirrored-queue sync.
-- The `broker` feature is not yet validated against RabbitMQ 4.x. Its `ha_sync_mode` policies target classic mirrored queues, so they are invalid on this release.
+- The `broker` feature is not yet validated against RabbitMQ 4.x. The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off.
 - Feature flags gate cluster-wide behavior changes; all nodes must run compatible versions before enabling new feature flags.
 - Streams, added in RabbitMQ 3.9, and the feature flags system remain available.
 
