@@ -7,6 +7,7 @@ The **RabbitMQ Genesis Kit** deploys a RabbitMQ cluster and, optionally, the CF 
 - [Overview](#overview)
 - [Deployment Architecture](#deployment-architecture)
 - [Base Parameters](#base-parameters)
+  - [Literal Static IPs](#literal-static-ips)
 - [Features](#features)
   - [Broker Integration](#broker-integration)
     - [`broker`](#broker)
@@ -94,11 +95,26 @@ The deployment includes these key components:
 | `server_network` | The network that the RabbitMQ server VMs will be deployed in. | `rabbitmq` |
 | `proxy_network` | The network that HAProxy will be deployed in. Must be accessible to RabbitMQ users and the broker's network (if deploying with broker). | `rabbitmq` |
 | `server_vm_type` | The VM type for RabbitMQ server VMs. | `rabbitmq` |
+| `proxy_static_ip` | A literal static IPv4 address for the HAProxy VM. Use it with a Genesis 3 named cloud config, where network names are dotted. See [Literal Static IPs](#literal-static-ips). | *(Unset, the first static IP of `proxy_network`)* |
 | `proxy_vm_type` | The VM type for the HAProxy VM. | `small` |
 | `server_disk_type` | The disk type for RabbitMQ server nodes. Used for cluster configuration, queue config, and durable queue data. | `rabbitmq` |
 | `stemcell_os` | The OS of the stemcell to use. | `ubuntu-jammy` |
 | `stemcell_version` | The version of the stemcell to use. | `latest` |
 | `check_queue_sync` | If true, pre-stop script will wait until quorum queues are synced before shutting down. RabbitMQ 4.x removed classic queue mirroring, so this check now applies to quorum queue sync only. | `false` |
+
+### Literal Static IPs
+
+By default the kit asks BOSH for the first static IP in the proxy network for HAProxy, and the second static IP in the broker network for the broker. That lookup breaks on a Genesis 3 named cloud config, because those cloud configs give networks dotted names such as `ocfp-lab-example-ocf.rabbitmq.net-rabbitmq`, and the lookup splits the name at the dots and then fails to find the network.
+
+In that situation, set `params.proxy_static_ip` to give HAProxy a literal address, and set `params.broker_static_ip` to do the same for the broker when the `broker` feature is on. Each parameter takes a single IPv4 address, because HAProxy and the broker each run one instance, and the kit stops with an error if the value is a list or anything other than a dotted IPv4 address. The address you choose must come from the static range of the network that the instance group uses, and the two addresses must differ from each other. When you leave a parameter unset, the manifest is the same as it was before the parameter existed.
+
+```yaml
+params:
+  proxy_network:    ocfp-lab-example-ocf.rabbitmq.net-rabbitmq
+  proxy_static_ip:  10.99.0.20
+  broker_network:   ocfp-lab-example-ocf.rabbitmq.net-rabbitmq
+  broker_static_ip: 10.99.0.21
+```
 
 ### Example Configuration
 
@@ -134,6 +150,7 @@ Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Fo
 | `broker_domain` | **REQUIRED** - The domain for the RabbitMQ CF Broker. Used to populate SANs on the certificate. | *(No default)* |
 | `broker_username` | The username that the service broker will accept for authentication. | `broker` |
 | `broker_network` | The network for the RabbitMQ Multitenant Broker. Must be reachable by CF Cloud Controller or GoRouters if using route-registrar. | `rabbitmq` |
+| `broker_static_ip` | A literal static IPv4 address for the broker VM. Use it with a Genesis 3 named cloud config, where network names are dotted. See [Literal Static IPs](#literal-static-ips). | *(Unset, the second static IP of `broker_network`)* |
 | `broker_vm_type` | The VM type for the broker VM. | `small` |
 | `broker_name` | The name of the broker as registered with Cloud Foundry. | `p-rabbitmq` |
 | `service_name` | The name of the service exposed in the CF marketplace. | `p-rabbitmq` |
