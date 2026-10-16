@@ -149,4 +149,30 @@ var _ = Describe("RabbitMQ Kit", func() {
 			},
 		})
 	})
+
+	Describe("static IPs", func() {
+		Test(Environment{
+			Name:        "proxy-static-ip",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "broker-static-ip",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "static-ip-invalid",
+			CloudConfig: "aws-dotted-network",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisAddSecrets: ContainSubstring("single IPv4"),
+				GenesisCheck:      ContainSubstring("single IPv4"),
+				GenesisManifest:   ContainSubstring("single IPv4"),
+			},
+		})
+	})
 })
