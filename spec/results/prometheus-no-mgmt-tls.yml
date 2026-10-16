@@ -88,9 +88,12 @@ instance_groups:
   - name: acceptance-tests
     properties:
       acceptance-tests:
+        enabled_plugins:
+        - rabbitmq_prometheus
         management_tls:
           cacert: unused
           enabled: false
+        rabbitmq_mgmt_port: 15672
         tls:
           cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
           enabled: true

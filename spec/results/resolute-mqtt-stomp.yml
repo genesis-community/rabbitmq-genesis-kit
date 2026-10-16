@@ -99,9 +99,13 @@ instance_groups:
   - name: acceptance-tests
     properties:
       acceptance-tests:
+        enabled_plugins:
+        - rabbitmq_mqtt
+        - rabbitmq_stomp
         management_tls:
           cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           enabled: true
+        rabbitmq_mgmt_port: 15671
         tls:
           cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
           enabled: true

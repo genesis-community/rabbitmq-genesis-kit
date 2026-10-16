@@ -11,3 +11,8 @@
 - type: replace
   path: /instance_groups/name=rmq-server/jobs/name=rabbitmq-server/properties/rabbitmq-server/ports/-
   value: 15674
+# The acceptance-tests errand runs its plugin checks only for plugins listed
+# in its enabled_plugins property.
+- type: replace
+  path: /instance_groups/name=acceptance-tests/jobs/name=acceptance-tests/properties/acceptance-tests/enabled_plugins?/-
+  value: rabbitmq_stomp

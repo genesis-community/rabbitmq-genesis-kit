@@ -8,3 +8,12 @@ instance_groups:
         - (( append ))
         - rabbitmq_prometheus
         cluster_name: (( grab genesis.env ))
+- name: acceptance-tests
+  jobs:
+  - name: acceptance-tests
+    properties:
+      acceptance-tests:
+        # The errand runs its plugin checks only for plugins listed here.
+        enabled_plugins:
+        - (( append ))
+        - rabbitmq_prometheus

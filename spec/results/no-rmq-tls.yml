@@ -84,6 +84,7 @@ instance_groups:
         management_tls:
           cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           enabled: true
+        rabbitmq_mgmt_port: 15671
         tls:
           enabled: false
     release: cf-rabbitmq

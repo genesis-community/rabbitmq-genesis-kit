@@ -116,9 +116,12 @@ instance_groups:
     # every check with "option --cacert: is badly used here".  Give it both
     # CAs.  The no-rmq-tls and no-mgmt-tls addons replace the matching block
     # with one that turns the listener off, because they drop the meta keys
-    # it grabs.
+    # it grabs.  The job's management port defaults to the plain HTTP port
+    # 15672, so it follows the same port as the smoke-tests job, which is the
+    # TLS port while management TLS is on.
     properties:
       acceptance-tests:
+        rabbitmq_mgmt_port: (( grab meta.mgmt_port ))
         tls:
           enabled: true
           cacert: (( grab meta.rabbitmq_tls.cacert ))

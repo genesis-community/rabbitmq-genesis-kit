@@ -120,6 +120,12 @@ var _ = Describe("RabbitMQ Kit", func() {
 			// Focus:       true,
 		})
 		Test(Environment{
+			Name:        "all-plugins",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
 			Name:        "prometheus-no-mgmt-tls",
 			CloudConfig: "aws",
 			CPI:         "aws",

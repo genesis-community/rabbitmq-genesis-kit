@@ -1,0 +1,14 @@
+---
+kit:
+  name: dev
+  features:
+    - mqtt
+    - stomp
+    - prometheus
+
+genesis:
+  env:       all-plugins
+
+params:
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium
