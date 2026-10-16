@@ -38,6 +38,24 @@ var _ = Describe("RabbitMQ Kit", func() {
 			// Focus:       true,
 		})
 		Test(Environment{
+			Name:        "broker-policy",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "no-rmq-tls",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
+			Name:        "no-mgmt-tls",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+		})
+		Test(Environment{
 			Name:        "metrics-emitter",
 			CloudConfig: "aws",
 			CPI:         "aws",

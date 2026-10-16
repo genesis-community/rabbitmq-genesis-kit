@@ -1,0 +1,19 @@
+---
+kit:
+  name: dev
+  features:
+    - broker
+
+genesis:
+  env:       broker-policy
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  operator_policy_enabled:    true
+  operator_policy_name:       test-policy
+  operator_policy_definition: '{"dead-letter-exchange":"dlx"}'
+  operator_policy_priority:   60
+  cf_admin_client:        test-cf-admin-client
+  cf_admin_client_secret: test-cf-admin-secret

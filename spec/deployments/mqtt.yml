@@ -11,3 +11,5 @@ params:
   rmq_domain:     test-rmq-domain
   broker_domain:  test-broker-domain
   server_vm_type: medium
+  cf_admin_client:        test-cf-admin-client
+  cf_admin_client_secret: test-cf-admin-secret

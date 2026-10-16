@@ -17,6 +17,11 @@ params:
   broker_name: test-broker
   service_name: test-service-name
   broker_username: test-broker-user
-  ha_sync_mode: test-manual
+  operator_policy_enabled:    true
+  operator_policy_name:       test-policy
+  operator_policy_definition: test-definition
+  operator_policy_priority:   60
   mgmt_domain: test-mgmt-domain
   check_queue_sync: true
+  cf_admin_client:        test-cf-admin-client
+  cf_admin_client_secret: test-cf-admin-secret

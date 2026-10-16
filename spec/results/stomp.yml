@@ -63,7 +63,7 @@ instance_groups:
       smoke-tests:
         rabbitmq_mgmt_port: 15671
         tls:
-          cacert: "<!{meta.vault}/mgmt/certs/ca:certificate!>"
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           enabled: true
     release: cf-rabbitmq
   - name: bpm
@@ -94,6 +94,14 @@ instance_groups:
   instances: 1
   jobs:
   - name: acceptance-tests
+    properties:
+      acceptance-tests:
+        management_tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          enabled: true
+        tls:
+          cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+          enabled: true
     release: cf-rabbitmq
   lifecycle: errand
   name: acceptance-tests

@@ -59,7 +59,7 @@ instance_groups:
       smoke-tests:
         rabbitmq_mgmt_port: 15671
         tls:
-          cacert: "<!{meta.vault}/mgmt/certs/ca:certificate!>"
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
           enabled: true
     release: cf-rabbitmq
   - name: bpm
@@ -77,6 +77,14 @@ instance_groups:
   instances: 1
   jobs:
   - name: acceptance-tests
+    properties:
+      acceptance-tests:
+        management_tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          enabled: true
+        tls:
+          cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+          enabled: true
     release: cf-rabbitmq
   lifecycle: errand
   name: acceptance-tests
@@ -107,8 +115,8 @@ instance_groups:
             enabled: true
             skip_verify: true
           operator_set_policy:
-            enabled: true
-            policy_definition: '{"ha-mode":"exactly","ha-params": 2,"ha-sync-mode":"manual"}'
+            enabled: false
+            policy_definition: '{}'
             policy_name: operator_set_policy
             policy_priority: 50
           ssl: true
@@ -122,7 +130,7 @@ instance_groups:
     release: cf-rabbitmq-multitenant-broker
   - name: bpm
     release: bpm
-  - name: cf-cli-7-linux
+  - name: cf-cli-8-linux
     release: cf-cli
   - name: broker-registrar
     properties:
@@ -157,6 +165,8 @@ instance_groups:
         service:
           name: p-rabbitmq
       cf:
+        admin_client: test-cf-admin-client
+        admin_client_secret: test-cf-admin-secret
         admin_password: test_password
         admin_username: test_username
         api_url: https://api.sys.test.cf.domain
@@ -235,17 +245,15 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
   version: 13.4.0+2.8.5
 - name: cf-rabbitmq-multitenant-broker
-  sha1: 3f91bd4e44cef1b4d13ae077a2e4269694a0d81a
-  url: https://s3.amazonaws.com/cf-rabbitmq-multitenant-broker-genesis-releases/cf-rabbitmq-multitenant-broker-107.0.0.tgz
-  version: 107.0.0
+  version: 0+dev.1
 - name: cf-rabbitmq-smoke-tests
-  sha1: 1a0ff77c30f1b39b6121bb10008d0979db8bb08c
-  url: https://bosh.io/d/github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release?v=166.0.0
-  version: 166.0.0
+  sha1: 42c3b5316032d9b48e6edfc463a8f2da4d1a2928
+  url: https://github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release/releases/download/v278.0.0/cf-rabbitmq-smoke-tests-278.0.0.tgz
+  version: 278.0.0
 - name: cf-cli
-  sha1: c0aeacde21976b8710b7010976acf3c056d7a81d
-  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.60.0
-  version: 1.60.0
+  sha1: 3e4aa280995ca2f689da2e088333a8f2c714a35e
+  url: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=2.10.0
+  version: 2.10.0
 stemcells:
 - alias: default
   os: ubuntu-jammy
