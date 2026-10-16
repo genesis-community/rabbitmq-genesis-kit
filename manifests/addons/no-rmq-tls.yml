@@ -11,3 +11,7 @@
 
 - type: remove
   path: /meta/rabbitmq_tls
+
+- type: replace
+  path: /instance_groups/name=acceptance-tests/jobs/name=acceptance-tests/properties/acceptance-tests/tls
+  value: {enabled: false}

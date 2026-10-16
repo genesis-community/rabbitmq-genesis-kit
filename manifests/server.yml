@@ -111,6 +111,20 @@ instance_groups:
   jobs:
   - name: acceptance-tests
     release: cf-rabbitmq
+    # The job reads a CA path for curl whenever its management TLS flag is a
+    # non-empty string, and the flag is always one, so an empty CA breaks
+    # every check with "option --cacert: is badly used here".  Give it both
+    # CAs.  The no-rmq-tls and no-mgmt-tls addons replace the matching block
+    # with one that turns the listener off, because they drop the meta keys
+    # it grabs.
+    properties:
+      acceptance-tests:
+        tls:
+          enabled: true
+          cacert: (( grab meta.rabbitmq_tls.cacert ))
+        management_tls:
+          enabled: true
+          cacert: (( grab meta.mgmt_tls.cacert ))
   vm_type: (( grab params.acceptance_tests_vm_type || "small" ))
   stemcell: default
   networks:
