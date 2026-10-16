@@ -128,6 +128,29 @@ var _ = Describe("RabbitMQ Kit", func() {
 
 	})
 
+	Describe("ignored settings", func() {
+		Test(Environment{
+			Name:        "ha-sync-mode",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisCheck:    ContainSubstring("ignored"),
+				GenesisManifest: ContainSubstring("ignored"),
+			},
+		})
+		Test(Environment{
+			Name:        "no-prometheus-tls",
+			CloudConfig: "aws",
+			CPI:         "aws",
+			Exodus:      "cf",
+			OutputMatchers: OutputMatchers{
+				GenesisCheck:    ContainSubstring("effect"),
+				GenesisManifest: ContainSubstring("effect"),
+			},
+		})
+	})
+
 	Describe("provided certificates", func() {
 		Test(Environment{
 			Name:        "provided-mgmt-cert",

@@ -30,6 +30,18 @@ sub perform {
     +rmq-tls +mgmt-tls +broker-tls
   )]);
 
+  # The old ha-mode policy was the only consumer of ha_sync_mode.
+  if (defined($self->env->lookup('params.ha_sync_mode', undef))) {
+    $self->env->notify(warning =>
+      "The #c{params.ha_sync_mode} parameter is ignored.  It only fed the ".
+      "ha-mode policy that RabbitMQ 4.x cannot use, and the kit no longer ".
+      "sets that policy.  Remove it.  To set an operator policy on the ".
+      "broker's vhosts, use #c{params.operator_policy_enabled}, ".
+      "#c{params.operator_policy_name}, #c{params.operator_policy_definition}, ".
+      "and #c{params.operator_policy_priority}."
+    );
+  }
+
   # Base manifests
   $self->add_files(qw(
     manifests/base.yml
@@ -42,10 +54,11 @@ sub perform {
   # Broker feature
   if ($self->want_feature("broker")) {
     $self->env->notify(warning =>
-      "The 'broker' feature (CF multitenant service broker) is not yet ".
-      "validated against RabbitMQ 4.x. Classic queue mirroring was removed ".
-      "in RabbitMQ 4.x, so the broker's ha-mode policies are invalid on ".
-      "this release. Proceed only if you understand this risk."
+      "RabbitMQ 4.x removed classic queue mirroring, so the broker's default ".
+      "operator policy, which set ha-mode, is turned off.  To have the broker ".
+      "set a policy on the vhosts it creates, set #c{params.operator_policy_enabled} ".
+      "and give #c{params.operator_policy_definition} a JSON definition that ".
+      "RabbitMQ 4.x accepts, such as {\"dead-letter-exchange\":\"dlx\"}."
     );
 
     $self->add_files(qw(
@@ -126,6 +139,16 @@ sub perform {
     # port makes the node crash at boot with eaddrinuse.  The no-prometheus-tls
     # feature is still accepted, but the job has no property that closes the
     # listener, so it changes nothing.
+  }
+
+  if ($self->want_feature("no-prometheus-tls")) {
+    $self->env->notify(warning =>
+      "The #c{no-prometheus-tls} feature has no effect.  The rabbitmq-server ".
+      "job opens the Prometheus TLS listener on port 15691 with the management ".
+      "certificate whenever management TLS is on, and it has no property to ".
+      "close that listener.  To serve metrics without TLS, scrape plain HTTP ".
+      "port 15692, or use #c{no-mgmt-tls}, which also turns off management TLS."
+    );
   }
 
   # RabbitMQ TLS

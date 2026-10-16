@@ -1,0 +1,134 @@
+exodus:
+  bosh: no-prometheus-tls
+  features: prometheus,no-prometheus-tls
+  iaas: null
+  is_director: false
+  management_password: <!{meta.vault}/rabbitmq/admin/management:password!>
+  management_url: https://test-rmq-domain:15671
+  management_username: management
+  scale: null
+  services: null
+  use_create_env: false
+features:
+  use_dns_addresses: false
+instance_groups:
+- azs:
+  - z1
+  instances: 3
+  jobs:
+  - name: rabbitmq-server
+    properties:
+      rabbitmq-server:
+        administrators:
+          broker:
+            password: <!{meta.vault}/rabbitmq/admin/broker:password!>
+            username: broker
+          management:
+            password: <!{meta.vault}/rabbitmq/admin/management:password!>
+            username: management
+        check_queue_sync: false
+        cluster_name: no-prometheus-tls
+        cluster_partition_handling: pause_minority
+        cookie: <!{meta.vault}/rabbitmq/erlang-cookie:cookie!>
+        erlang_major_version: 27
+        management_tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          cert: <!{meta.vault}/mgmt/certs/server:certificate!>
+          enabled: true
+          key: <!{meta.vault}/mgmt/certs/server:key!>
+        plugins:
+        - rabbitmq_management
+        - rabbitmq_prometheus
+        ports:
+        - 5672
+        - 5671
+        - 15671
+        - 15672
+        ssl:
+          cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+          cert: <!{meta.vault}/rabbitmq/certs/server:certificate!>
+          enabled: true
+          fail_if_no_peer_cert: false
+          key: <!{meta.vault}/rabbitmq/certs/server:key!>
+          verification_depth: 5
+          verify: false
+          versions:
+          - tlsv1.2
+        version: "4.2"
+    release: cf-rabbitmq
+  - name: smoke-tests
+    properties:
+      smoke-tests:
+        rabbitmq_mgmt_port: 15671
+        tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          enabled: true
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  name: rmq-server
+  networks:
+  - name: rabbitmq
+  persistent_disk_type: rabbitmq
+  stemcell: default
+  vm_type: medium
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+  - name: bpm
+    release: bpm
+  name: haproxy
+  networks:
+  - name: rabbitmq
+    static_ips:
+    - 10.99.0.16
+  stemcell: default
+  vm_type: small
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: acceptance-tests
+    properties:
+      acceptance-tests:
+        management_tls:
+          cacert: <!{meta.vault}/mgmt/certs/ca:certificate!>
+          enabled: true
+        tls:
+          cacert: <!{meta.vault}/rabbitmq/certs/ca:certificate!>
+          enabled: true
+    release: cf-rabbitmq
+  lifecycle: errand
+  name: acceptance-tests
+  networks:
+  - name: rabbitmq
+  stemcell: default
+  vm_type: small
+name: no-prometheus-tls-rabbitmq
+releases:
+- name: cf-rabbitmq
+  sha1: cb62013f5c460ad1f30063090e993e95829ea5a3
+  url: https://github.com/cloudfoundry-community/cf-rabbitmq-release/releases/download/v615.0.0/cf-rabbitmq-615.0.0.tgz
+  version: 615.0.0
+- name: bpm
+  sha1: 6ccc8c07c05f5d4301df7e052772813533688955
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23
+  version: 1.1.23
+- name: haproxy
+  sha1: 2d6892b6a86ac7dc47674f03ef2f09aa1bec28e4
+  url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
+  version: 13.4.0+2.8.5
+stemcells:
+- alias: default
+  os: ubuntu-jammy
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 5000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 5000-600000

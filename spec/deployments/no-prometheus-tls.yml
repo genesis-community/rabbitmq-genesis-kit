@@ -1,0 +1,13 @@
+---
+kit:
+  name: dev
+  features:
+    - prometheus
+    - no-prometheus-tls
+
+genesis:
+  env:       no-prometheus-tls
+
+params:
+  rmq_domain:     test-rmq-domain
+  server_vm_type: medium

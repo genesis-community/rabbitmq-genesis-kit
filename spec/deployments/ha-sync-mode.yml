@@ -1,0 +1,15 @@
+---
+kit:
+  name: dev
+  features:
+    - broker
+
+genesis:
+  env:       ha-sync-mode
+
+params:
+  rmq_domain:     test-rmq-domain
+  broker_domain:  test-broker-domain
+  server_vm_type: medium
+  cf_admin_client: test-cf-admin-client
+  ha_sync_mode:   automatic
