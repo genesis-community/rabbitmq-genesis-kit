@@ -178,10 +178,45 @@ sub perform {
     }
   }
 
+  $self->_process_static_ips;
   $self->_process_resolute;
 
   return $self->done();
 }
+
+# _process_static_ips - Literal static IPs for haproxy and the broker {{{
+# The haproxy and broker networks use the static_ips operator by default, which
+# cannot resolve the dotted network names of a Genesis 3 named cloud config.
+# Setting params.proxy_static_ip or params.broker_static_ip swaps the operator
+# for a literal address.  Each of those instance groups runs one instance, so
+# each parameter takes a single IPv4 address, not a list.
+sub _process_static_ips {
+  my ($self) = @_;
+
+  my %fragments = (
+    proxy_static_ip  => 'manifests/proxy-static-ip.yml',
+    broker_static_ip => 'manifests/broker-static-ip.yml',
+  );
+
+  foreach my $param (qw(proxy_static_ip broker_static_ip)) {
+    my $ip = $self->env->lookup("params.$param", undef);
+    next unless defined $ip;
+
+    my $valid = !ref($ip) && $ip =~ /^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$/
+      && !grep { $_ > 255 } ($1, $2, $3, $4);
+    bail(
+      "The #c{params.%s} parameter must be a single IPv4 address, such as " .
+      "10.0.0.16, because that instance group runs one instance.  Found #R{%s}.",
+      $param, (ref($ip) ? 'a non-scalar value' : $ip)
+    ) unless $valid;
+
+    # The broker group only exists with the broker feature, so the broker
+    # address is validated but only applied when the feature is on.
+    next if $param eq 'broker_static_ip' && !$self->want_feature('broker');
+    $self->add_files($fragments{$param});
+  }
+}
+# }}}
 
 # _process_resolute - Opt-in ubuntu-resolute stemcell support {{{
 # Called after every other fragment is added so that it overrides the

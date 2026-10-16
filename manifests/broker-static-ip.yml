@@ -1,0 +1,9 @@
+---
+# Added by the blueprint hook when params.broker_static_ip is set.  It replaces
+# the (( static_ips 1 )) operator on the broker network with a literal IP.
+instance_groups:
+- name: rmq-broker
+  networks:
+  - name: (( grab params.broker_network || "rabbitmq" ))
+    static_ips:
+    - (( grab params.broker_static_ip ))

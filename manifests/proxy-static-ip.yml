@@ -1,0 +1,9 @@
+---
+# Added by the blueprint hook when params.proxy_static_ip is set.  It replaces
+# the (( static_ips 0 )) operator on the haproxy network with a literal IP.
+instance_groups:
+- name: haproxy
+  networks:
+  - name: (( grab params.proxy_network || "rabbitmq" ))
+    static_ips:
+    - (( grab params.proxy_static_ip ))
