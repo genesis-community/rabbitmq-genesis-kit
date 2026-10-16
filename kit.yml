@@ -1,5 +1,5 @@
 name:    rabbitmq
-version: 0.1.0
+version: 0.2.0
 author:  Thomas Mitchell <tmitchell@starkandwayne.com>, Kevin Rutten <krutten@fivetwenty.io>
 docs:    https://github.com/cloudfoundry-community/cf-rabbitmq-release
 code:    https://github.com/genesis-community/rabbitmq-genesis-kit
