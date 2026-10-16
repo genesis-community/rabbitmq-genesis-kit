@@ -54,7 +54,7 @@ certificates:
         names:     ["RMQManagementAPICA"]
       server:
         valid_for: 1y
-        names:     ["rabbitmq-mgmt","${params.mgmt_domain}"]
+        names:     ["rabbitmq-mgmt","${params.mgmt_domain}","localhost","127.0.0.1"]
 
   metrics-emitter:
     loggregator-agent/certs:

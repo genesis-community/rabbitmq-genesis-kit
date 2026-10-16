@@ -62,6 +62,12 @@ instance_groups:
         version: "4.2"
     release: cf-rabbitmq
   - name: smoke-tests
+    properties:
+      smoke-tests:
+        rabbitmq_mgmt_port: 15671
+        tls:
+          cacert: "<!{meta.vault}/mgmt/certs/ca:certificate!>"
+          enabled: true
     release: cf-rabbitmq
   - name: bpm
     release: bpm

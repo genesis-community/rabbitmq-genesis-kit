@@ -72,6 +72,15 @@ instance_groups:
           key:    (( grab meta.mgmt_tls.key ))
   - name: smoke-tests
     release: cf-rabbitmq
+    # The job probes the colocated management API and defaults to plain HTTP on
+    # 15672, which is not served while management_tls is enabled.  Point it at
+    # the TLS listener and give it the CA that signed the management cert.
+    properties:
+      smoke-tests:
+        rabbitmq_mgmt_port: (( grab meta.mgmt_port ))
+        tls:
+          enabled: true
+          cacert: (( grab meta.mgmt_tls.cacert ))
   - name: bpm
     release: bpm
 
