@@ -101,30 +101,14 @@ The kit sets `features.use_dns_addresses: false`, and you cannot change it. Rabb
 
 The deployment includes these key components:
 
-```
-                      ┌─────────────┐
-                      │   External  │
-                      │   Clients   │
-                      └──────┬──────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────┐
-│                   HAProxy                       │ (Optional with external-rmq-lb)
-└──────────┬───────────────┬──────────────┬───────┘
-           │               │              │
-           ▼               ▼              ▼
-┌─────────────────┐ ┌────────────────┐ ┌────────────────┐
-│ RabbitMQ Node 1 │ │ RabbitMQ Node 2│ │ RabbitMQ Node N│
-└─────────────────┘ └────────────────┘ └────────────────┘
-           ▲                                   ▲
-           │                                   │
-           └───────────────────────────────────┘
-                Quorum Queue Replication
-                  Clustered Management
-
-      ┌───────────────┐  (Optional)
-      │ Service Broker│ ◄─────► Cloud Foundry
-      └───────────────┘
+```mermaid
+flowchart TD
+  C["External clients"] --> H["HAProxy (optional with external-rmq-lb)"]
+  H --> N1["RabbitMQ node 1"]
+  H --> N2["RabbitMQ node 2"]
+  H --> NN["RabbitMQ node N"]
+  N1 <-. "quorum queue replication and clustered management" .-> NN
+  SB["Service broker (optional)"] <--> CF["Cloud Foundry"]
 ```
 
 ## Base Parameters
@@ -622,11 +606,15 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
    Before upgrading, check the release notes for breaking changes or migration requirements.
 
 2. **Backup**
-   Always take a backup of your RabbitMQ deployment before upgrading:
+   Always take a backup of the definitions in your RabbitMQ cluster before upgrading. The kit has no addon for this, so we open a shell on the first server node and fetch them from the management API, using the operator credentials the job already holds in `/var/vcap/jobs/rabbitmq-server/etc/users` and the management CA in `/var/vcap/jobs/rabbitmq-server/etc/management-cacert.pem`. The `--resolve` option lets curl verify the certificate against the name `rabbitmq-mgmt` while it connects to the node itself. The backup holds users and their password hashes, so protect it as you would a credential store.
    ```bash
-   # Create a snapshot of your RabbitMQ deployment
-   genesis do my-env -- export > rabbitmq-backup.yml
+   genesis my-env bosh ssh rmq-server/0
+   sudo bash -c 'umask 077; . /var/vcap/jobs/rabbitmq-server/etc/users; curl -sS --cacert /var/vcap/jobs/rabbitmq-server/etc/management-cacert.pem --resolve rabbitmq-mgmt:15671:127.0.0.1 -K <(printf "user = \"%s:%s\"\n" "$RMQ_OPERATOR_USERNAME" "$RMQ_OPERATOR_PASSWORD") -o /tmp/rabbitmq-definitions.json https://rabbitmq-mgmt:15671/api/definitions; chown "$SUDO_USER" /tmp/rabbitmq-definitions.json'
+   exit
+   genesis my-env bosh scp rmq-server/0:/tmp/rabbitmq-definitions.json ./rabbitmq-definitions.json
+   genesis my-env bosh ssh rmq-server/0 -c "sudo rm /tmp/rabbitmq-definitions.json"
    ```
+   The definitions do not include messages.
 
 3. **Incremental Upgrades**
    For major version upgrades, consider upgrading incrementally through intermediate versions rather than jumping multiple major versions. This kit cannot be one of those intermediate hops for a cluster older than RabbitMQ 3.13, because it deploys only 4.2, so it refuses to deploy over such a cluster. See [Upgrading to RabbitMQ 4.x](#upgrading-to-rabbitmq-4x).
@@ -700,7 +688,7 @@ This path applies to every environment deployed with kit v0.5.2 or earlier, and 
 
 Broker 107 put an operator policy named `operator_set_policy` with an `ha-mode` definition on the vhost of every service instance. RabbitMQ 4.x drops classic mirroring, so a cluster that carries those policies cannot be upgraded cleanly, and an export of their definitions would carry them into the new cluster. Clear them while the cluster is still on RabbitMQ 3.x.
 
-List the vhosts with `rabbitmqctl list_vhosts`. For each service instance vhost, show the policies with `rabbitmqctl list_operator_policies -p <vhost>`, and clear the broker's policy with `rabbitmqctl clear_operator_policy -p <vhost> operator_set_policy`. To do every vhost in one pass, run this on a cluster node. A vhost with no such policy prints an error that you can ignore.
+List the vhosts with `rabbitmqctl list_vhosts`. For each service instance vhost, show the policies with `rabbitmqctl list_operator_policies -p <vhost>`, and clear the broker's policy with `rabbitmqctl clear_operator_policy -p <vhost> operator_set_policy`. To do every vhost in one pass, run this on a cluster node, after you have opened a shell there with `genesis my-env bosh ssh <instance>` and run `sudo -u vcap -H bash`, then `set -a; . /var/vcap/jobs/rabbitmq-server/bin/env`. On a cluster this kit did not deploy, use that deployment's own instance names. A vhost with no such policy prints an error that you can ignore.
 
 ```bash
 rabbitmqctl -q list_vhosts name | while read -r vhost; do
@@ -730,7 +718,7 @@ The node starts but fails to join the cluster.
 
 3. Check logs for specific errors:
    ```bash
-   genesis do my-env -- logs rabbitmq-server
+   genesis my-env bosh ssh rmq-server/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log"
    ```
 
 #### High Memory Usage
@@ -743,7 +731,7 @@ A RabbitMQ instance uses excessive memory and triggers alarms.
 
 1. Check for large queues or messages:
    ```bash
-   genesis do my-env -- ssh rabbitmq/0 -c "rabbitmqctl list_queues name messages memory"
+   genesis my-env bosh ssh rmq-server/0 -c "sudo -u vcap -H bash -c 'set -a; . /var/vcap/jobs/rabbitmq-server/bin/env; rabbitmqctl list_queues name messages memory'"
    ```
 
 2. Consider increasing memory limits or implementing a message TTL
@@ -762,35 +750,48 @@ The `register-broker` addon fails with authentication or connection errors.
 
 2. Check broker logs:
    ```bash
-   genesis do my-env -- logs rabbitmq-broker
+   genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"
    ```
 
 3. Ensure route registration is working if using that feature
 
 ### Diagnostic Commands
 
+The kit has no addon for running commands on its VMs, so we use the Genesis `bosh` command, which runs the BOSH CLI against the environment's deployment without needing the director or deployment name. The server instance group is `rmq-server` and the broker instance group is `rmq-broker`. The server job puts `rabbitmqctl` and `rabbitmq-diagnostics` under `/var/vcap/packages/rabbitmq-server/bin`, and its `bin/env` script adds that directory and the Erlang directory to `PATH`. The node's Erlang cookie belongs to the `vcap` user, so the examples run the tools as `vcap` after sourcing `bin/env`.
+
 #### Check Cluster Status
 
 ```bash
-genesis do my-env -- ssh rabbitmq/0 -c "rabbitmqctl cluster_status"
+genesis my-env bosh ssh rmq-server/0 -c "sudo -u vcap -H bash -c 'set -a; . /var/vcap/jobs/rabbitmq-server/bin/env; rabbitmqctl cluster_status'"
 ```
 
 #### List Queues and Their Status
 
 ```bash
-genesis do my-env -- ssh rabbitmq/0 -c "rabbitmqctl list_queues name messages consumers memory state"
+genesis my-env bosh ssh rmq-server/0 -c "sudo -u vcap -H bash -c 'set -a; . /var/vcap/jobs/rabbitmq-server/bin/env; rabbitmqctl list_queues name messages consumers memory state'"
 ```
 
-#### Check Broker Status 
+#### Check Broker Status
+
+The broker job runs under monit, so we check the process there first.
 
 ```bash
-genesis do my-env -- ssh rabbitmq-broker/0 -c "curl -k https://localhost:4566/v2/catalog"
+genesis my-env bosh ssh rmq-broker/0 -c "sudo monit summary"
+```
+
+The broker itself listens on plain HTTP at `127.0.0.1:4567`, and with TLS on, HAProxy on the broker VM terminates TLS on port 4566 and forwards to it. Calling the loopback port from the VM therefore needs no `-k` or CA file. We open an interactive session and read the password from a prompt, so it never appears on a command line or in the process list.
+
+```bash
+genesis my-env bosh ssh rmq-broker/0
+read -rsp 'Broker password: ' BROKER_PASSWORD; echo
+curl -sS -K <(printf 'user = "broker:%s"\n' "$BROKER_PASSWORD") http://localhost:4567/v2/catalog
+unset BROKER_PASSWORD
 ```
 
 #### View Recent Logs
 
 ```bash
-genesis do my-env -- logs rabbitmq-server --recent
+genesis my-env bosh ssh rmq-server/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log"
 ```
 
 ## Monitoring and Metrics

@@ -47,37 +47,13 @@ The broker interacts with the following:
 - Applications
   The broker delivers bindings and credentials to them.
 
-```
-┌────────────────────┐         ┌────────────────────┐
-│  Cloud Foundry     │         │   RabbitMQ Cluster │
-│  ┌──────────────┐  │         │  ┌──────────────┐  │
-│  │Cloud         │  │         │  │  RabbitMQ    │  │
-│  │Controller    │◄─┼─────────┼─►│  Management  │  │
-│  └──────────────┘  │         │  │  API         │  │
-│         ▲          │         │  └──────────────┘  │
-└─────────┼──────────┘         └────────────────────┘
-          │                                ▲
-          │                                │
-          ▼                                │
-┌────────────────────┐                     │
-│   Service Broker   │                     │
-│  ┌──────────────┐  │                     │
-│  │ CF RabbitMQ  │  │                     │
-│  │ Multitenant  ├──┼─────────────────────┘
-│  │ Broker       │  │
-│  └──────────────┘  │
-│         ▲          │
-└─────────┼──────────┘
-          │
-          ▼
-┌────────────────────┐
-│   CF Application   │
-│  ┌──────────────┐  │
-│  │ Application  │  │
-│  │ Using AMQP   │  │
-│  │ Client       │  │
-│  └──────────────┘  │
-└────────────────────┘
+```mermaid
+flowchart TD
+  CC["Cloud Controller"] <--> SB["CF RabbitMQ multitenant broker"]
+  SB --> MGMT["RabbitMQ management API"]
+  CC <--> APP["CF application using an AMQP client"]
+  APP --> RMQ["RabbitMQ cluster"]
+  MGMT --- RMQ
 ```
 
 ## Enabling the Broker
@@ -163,23 +139,7 @@ cf env my-app
 
 ## Service Plans
 
-The broker provides service plans that define resource limits and policies. The default plans include:
-
-1. **standard**
-   A basic plan with default settings
-
-   - Single vhost
-
-   - Default user permissions
-
-   - No specific resource limits
-
-2. **ha**
-   A high availability plan
-
-   - Single vhost with HA enabled
-
-   - Default user permissions
+The broker offers one service plan, named `standard`, whose ID is fixed in the kit's broker manifest. Each service instance on that plan gets its own vhost on the shared cluster, and each binding gets its own user with permissions on that vhost. The plan sets no resource limits, and it applies an operator policy only when `operator_policy_enabled` is on.
 
 ## Known Limitations
 
@@ -254,7 +214,7 @@ kit:
 
    - Verify the CF credentials and permissions.
 
-   - Check the broker logs with `genesis do my-env -- logs rabbitmq-broker`.
+   - Check the broker logs on the broker VM, in `/var/vcap/sys/log/rabbitmq-service-broker`, with `genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"`.
 
 2. **Service Creation Fails**
 
@@ -276,40 +236,33 @@ kit:
 
 ```bash
 # Check broker status
-genesis do my-env -- ssh rabbitmq-broker/0 -c "monit summary"
-
-# Test broker API locally
-genesis do my-env -- ssh rabbitmq-broker/0 -c "curl -k https://localhost:4566/v2/catalog -u broker:password"
+genesis my-env bosh ssh rmq-broker/0 -c "sudo monit summary"
 
 # Check broker logs
-genesis do my-env -- logs rabbitmq-broker
+genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"
 
-# Test connection to RabbitMQ
-genesis do my-env -- ssh rabbitmq-broker/0 -c "curl -k https://rabbitmq.example.com:15671/api/overview -u admin:password"
+# Test the broker API locally. The broker listens on plain HTTP at 127.0.0.1:4567,
+# so the call needs no CA file. The password comes from a prompt.
+genesis my-env bosh ssh rmq-broker/0
+read -rsp 'Broker password: ' BROKER_PASSWORD; echo
+curl -sS -K <(printf 'user = "broker:%s"\n' "$BROKER_PASSWORD") http://localhost:4567/v2/catalog
+unset BROKER_PASSWORD
+```
+
+To test the connection to RabbitMQ from the broker VM, we need the management CA. The server VMs hold it at `/var/vcap/jobs/rabbitmq-server/etc/management-cacert.pem`, and the broker VM does not, so we save the certificate from Vault at `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate` to a file on the broker VM, then call the management API through the HAProxy address with that file. The management certificate carries the name `rabbitmq-mgmt`, so `--resolve` lets curl verify that name while it connects to the address. The credentials come from a prompt, as above.
+
+```bash
+read -rp 'Management user: ' MGMT_USER
+read -rsp 'Management password: ' MGMT_PASSWORD; echo
+curl -sS --cacert ./mgmt-ca.pem --resolve rabbitmq-mgmt:15671:<haproxy-address> -K <(printf 'user = "%s:%s"\n' "$MGMT_USER" "$MGMT_PASSWORD") https://rabbitmq-mgmt:15671/api/overview
+unset MGMT_USER MGMT_PASSWORD
 ```
 
 ## Advanced Configuration
 
 ### Custom Service Plans
 
-To customize service plans:
-
-1. SSH into the broker VM.
-
-2. Edit the service configuration files.
-
-3. Restart the broker services.
-
-```bash
-# SSH to broker
-genesis do my-env -- ssh rabbitmq-broker/0
-
-# Edit config
-sudo vim /var/vcap/jobs/rabbitmq-broker/config/service_catalog.yml
-
-# Restart broker
-sudo monit restart rabbitmq-broker
-```
+The broker release builds its catalog in code, with the single `standard` plan, so the kit cannot add or change plans. To offer different plans, we would need a change to the broker release itself.
 
 ### Operator Policy
 

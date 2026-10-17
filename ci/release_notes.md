@@ -2,7 +2,7 @@ This is a major release. It moves the kit from cf-rabbitmq 483.0.0 with RabbitMQ
 
 ## Breaking changes and upgrade steps
 
-A deployment on kit v0.5.2 runs cf-rabbitmq 483.0.0 with RabbitMQ 3.8, and RabbitMQ cannot move from 3.8 to 4.2 in place. The cf-rabbitmq 616.0.0 release carries only RabbitMQ 3.13 and 4.2, and the upgrade to 4.2 itself has to start from a cluster that already runs 3.13 with every feature flag enabled. A v0.5.2 environment therefore cannot be upgraded to this kit by deploying over it. The kit checks for this before every deploy, and the first step below describes the path that works.
+A deployment on kit v0.5.2 runs cf-rabbitmq 483.0.0 with RabbitMQ 3.8, and RabbitMQ cannot move from 3.8 to 4.2 in place. The cf-rabbitmq 616.0.0 release carries only RabbitMQ 3.13 and 4.2, and the upgrade to 4.2 itself has to start from a cluster that already runs 3.13 with every feature flag enabled. A v0.5.2 environment therefore cannot be upgraded to this kit by deploying over it. The kit checks for this before every deploy. The first step below explains that check, and the second describes the path that works.
 
 Work through these steps in order when you move an existing environment to this kit.
 
