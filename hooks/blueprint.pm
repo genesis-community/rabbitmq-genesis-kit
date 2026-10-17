@@ -58,7 +58,11 @@ sub perform {
       "operator policy, which set ha-mode, is turned off.  To have the broker ".
       "set a policy on the vhosts it creates, set #c{params.operator_policy_enabled} ".
       "and give #c{params.operator_policy_definition} a JSON definition that ".
-      "RabbitMQ 4.x accepts, such as {\"dead-letter-exchange\":\"dlx\"}."
+      "RabbitMQ 4.x accepts, such as {\"dead-letter-exchange\":\"dlx\"}.  ".
+      "Service instances that broker 107 created already carry an ha-mode ".
+      "operator policy on their vhosts.  Clear those policies while the ".
+      "cluster is still on RabbitMQ 3.x, as the upgrade steps in the MANUAL ".
+      "describe."
     );
 
     $self->add_files(qw(
@@ -151,8 +155,18 @@ sub perform {
     );
   }
 
+  # A provided management certificate carries params.mgmt_domain and not the
+  # internal name rabbitmq-mgmt, so the errand and the colocated smoke-tests
+  # job are told to verify against params.mgmt_domain.  This has to come before
+  # the no-rmq-tls addon, which can remove the smoke-tests job, because a
+  # merge that follows the removal would create the job again without a release.
+  if ($self->want_feature("provided-mgmt-cert")) {
+    $self->add_files(qw(
+      manifests/addons/provided-mgmt-cert.yml
+    ));
+  }
+
   # RabbitMQ TLS
-  my $smoke_tests_removed = 0;
   if ($self->want_feature("no-rmq-tls")) {
     $self->add_files(qw(
       manifests/addons/no-rmq-tls.yml
@@ -166,18 +180,7 @@ sub perform {
       $self->add_files(qw(
         manifests/addons/no-rmq-tls-smoke-tests.yml
       ));
-      $smoke_tests_removed = 1;
     }
-  }
-
-  # A provided management certificate cannot carry the rabbitmq-mgmt name that
-  # the colocated smoke-tests job verifies, so the job is removed.  Both
-  # addons remove the same job, and removing it twice is an error, so the
-  # second one is skipped when the no-rmq-tls addon has already done it.
-  if ($self->want_feature("provided-mgmt-cert") && !$smoke_tests_removed) {
-    $self->add_files(qw(
-      manifests/addons/provided-mgmt-cert-smoke-tests.yml
-    ));
   }
 
   # Management TLS

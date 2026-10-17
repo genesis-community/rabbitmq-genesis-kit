@@ -100,6 +100,7 @@ The deployment includes these key components:
 | `server_disk_type` | The disk type for RabbitMQ server nodes. Used for cluster configuration, queue config, and durable queue data. | `rabbitmq` |
 | `stemcell_os` | The OS of the stemcell to use. | `ubuntu-jammy` |
 | `stemcell_version` | The version of the stemcell to use. | `latest` |
+| `skip_rabbitmq_upgrade_check` | When `true`, the kit skips the pre-deploy check that stops a deploy over a deployed cluster older than RabbitMQ 3.13. See [Moving a cluster older than RabbitMQ 3.13 to a new 4.2 cluster](#moving-a-cluster-older-than-rabbitmq-313-to-a-new-42-cluster). It accepts `true`, `false`, `yes`, `no`, `on`, `off`, `1`, and `0`, and the kit stops with an error on any other value. | `false` |
 | `check_queue_sync` | If true, pre-stop script will wait until quorum queues are synced before shutting down. RabbitMQ 4.x removed classic queue mirroring, so this check now applies to quorum queue sync only. | `false` |
 
 ### Literal Static IPs
@@ -151,7 +152,7 @@ Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Fo
 
 **Status on RabbitMQ 4.x**: The `broker` feature is deployable on RabbitMQ 4.x, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below), and it prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
 
-The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. Until the fork's first final release is cut, the kit pins the dev release `0+dev.4`, which must already be on the Director. The comment in `manifests/releases/cf-rabbitmq-multitenant-broker.yml` shows where the final's URL and sha1 go.
+The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. Until the fork's first final release is cut, the kit pins the dev release `0+dev.5`, which must already be on the Director. The comment in `manifests/releases/cf-rabbitmq-multitenant-broker.yml` shows where the final's URL and sha1 go.
 
 The broker smoke tests use cf-rabbitmq-smoke-tests 278.0.0 with the `cf-cli-8-linux` job from cf-cli 2.10.0. That release logs in to Cloud Foundry with a UAA client, so the broker feature needs the `cf_admin_client` parameter and its provided secret, both described below.
 
@@ -320,7 +321,7 @@ Requires you to provide your own certificates for the Management API instead of 
 * `secret/<your/env>/rabbitmq/mgmt/certs/server:key`
 * `secret/<your/env>/rabbitmq/mgmt/certs/ca:certificate`
 
-The colocated `smoke-tests` job runs after every deploy and verifies the management certificate by the name `rabbitmq-mgmt`. A certificate from a public or corporate CA almost never carries that internal name, so with this feature the kit removes the colocated `smoke-tests` job rather than let every deploy end in a failed post-deploy step. The `broker` smoke tests errand is unaffected, because it reaches Cloud Foundry and the broker and does not use the management certificate.
+By default the colocated `smoke-tests` job and the `acceptance-tests` errand verify the management certificate by the internal name `rabbitmq-mgmt`, which a certificate from a public or corporate CA almost never carries. With this feature the kit tells both of them to verify against `params.mgmt_domain` instead, so your certificate has to carry the name in `params.mgmt_domain`. Both jobs connect to the node or the HAProxy address and use that name only for verification, so the certificate never needs an IP address. Set `params.mgmt_domain` to a DNS name, made of letters, digits, dots, and hyphens, because the jobs refuse any other value. The colocated `smoke-tests` job stays in the deployment, so every deploy still checks the management API. The `broker` smoke tests errand is unaffected, because it reaches Cloud Foundry and the broker and does not use the management certificate.
 
 #### `provided-broker-cert`
 
@@ -559,7 +560,7 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
    genesis do my-env -- export > rabbitmq-backup.yml
    ```
 
-3. **Incremental Upgrades**: For major version upgrades, consider upgrading incrementally through intermediate versions rather than jumping multiple major versions.
+3. **Incremental Upgrades**: For major version upgrades, consider upgrading incrementally through intermediate versions rather than jumping multiple major versions. This kit cannot be one of those intermediate hops for a cluster older than RabbitMQ 3.13, because it deploys only 4.2, so it refuses to deploy over such a cluster. See [Upgrading to RabbitMQ 4.x](#upgrading-to-rabbitmq-4x).
 
 4. **Testing**: Test the upgrade in a non-production environment first.
 
@@ -580,11 +581,58 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
 
 This kit deploys RabbitMQ 4.2 (paired with Erlang 27) via the `cf-rabbitmq` release. The same release also supports RabbitMQ 3.13 (paired with Erlang 26). Note the following when upgrading a cluster running an earlier RabbitMQ 3.x release:
 
+- RabbitMQ cannot move from 3.8, or from any version older than 3.13, to 4.2 in place. The cluster has to be on 3.13 with every feature flag enabled before 4.2 will start on its data. Kit v0.5.2 runs RabbitMQ 3.8, and this kit cannot carry a cluster through 3.9 to 3.12, so a v0.5.2 environment cannot be upgraded in place. The kit refuses to deploy over such a cluster. See [Moving a cluster older than RabbitMQ 3.13 to a new 4.2 cluster](#moving-a-cluster-older-than-rabbitmq-313-to-a-new-42-cluster).
 - Classic queue mirroring is removed. Quorum queues are the default queue type; migrate any classic mirrored queues to quorum queues before or during the upgrade.
 - `check_queue_sync` now waits for quorum queue sync only, not mirrored-queue sync.
-- The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off. The `ha_sync_mode` parameter only fed that policy, so the kit now ignores it and prints a notice when it is set. Use the `operator_policy_*` parameters instead.
+- The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off. The `ha_sync_mode` parameter only fed that policy, so the kit now ignores it and prints a notice when it is set. Use the `operator_policy_*` parameters instead. The policies that broker 107 already set on your service instances' vhosts have to be cleared by hand, as described in [Clearing the broker's ha-mode operator policies](#clearing-the-brokers-ha-mode-operator-policies).
 - Feature flags gate cluster-wide behavior changes; all nodes must run compatible versions before enabling new feature flags.
 - Streams, added in RabbitMQ 3.9, and the feature flags system remain available.
+- Off resolute, the kit pins bpm 1.4.22 in place of 1.1.23, because 1.1.23 cannot start jobs on noble stemcells. The pin carries a URL and sha1, so the Director fetches the release when it does not hold it. The `resolute` feature keeps its own bpm 1.4.41 pin.
+- The kit no longer asks for `localhost` and `127.0.0.1` on the management certificate. An existing certificate still carries them, so `genesis <env> check-secrets -V` reports `Subject Alt Names (extra: localhost, 127.0.0.1)` as a warning. The warning does not block a deploy. To clear it, run `genesis <env> rotate-secrets mgmt/certs/server`.
+
+##### The pre-deploy version check
+
+Before every deploy, the kit asks the Director for the deployed manifest of the environment and stops when the running `rabbitmq-server` is older than RabbitMQ 3.13. A deployment that does not exist yet passes, because there is nothing to upgrade.
+
+The kit decides in this order. First it reads the `rabbitmq-server.version` property from the deployed manifest, looking at the job, then the instance group, then the top level, and a value such as `3.8` or `3.12` older than 3.13 stops the deploy. When the manifest sets no usable version, the kit falls back to the cf-rabbitmq release, because every release before 614 carries RabbitMQ 3.12 or older and release 614 is the first with 3.13 and 4.2 only. The release version comes from the deployed manifest, and when the manifest says `latest` the kit asks the Director what the deployment holds. If neither source gives a version, the kit stops and tells you it could not decide, rather than guess.
+
+To skip the check, set `params.skip_rabbitmq_upgrade_check` to `true`. Use it only when you have already handled the old cluster some other way, such as an environment whose data you have deliberately discarded, and remove it again after that deploy.
+
+##### Moving a cluster older than RabbitMQ 3.13 to a new 4.2 cluster
+
+This path applies to every environment deployed with kit v0.5.2 or earlier, and to any other cluster running a RabbitMQ older than 3.13. We deploy this kit as a new environment, copy the cluster's definitions across, and move the clients. The old environment keeps running until you retire it, so the move can go client by client. We have not rehearsed this path against a live broker deployment, so try it on a copy first.
+
+1. If you use the `broker` feature, clear the `ha-mode` operator policies on the old cluster first, as described in the next section, so the exported definitions do not carry them.
+
+2. Drain or stop the producers you can, and let consumers empty the queues you care about. The export holds definitions and not messages. If you need the messages, use the shovel plugin to move them to the new cluster.
+
+3. Export the definitions from the old cluster, either with `rabbitmqctl export_definitions <file>` on one of its nodes or by fetching `/api/definitions` from the management API. The export holds users and their password hashes, vhosts, permissions, exchanges, queues, bindings, and policies, so protect the file as you would a credential store.
+
+4. Review the exported file for anything RabbitMQ 4.x does not support. Remove mirroring policies and any `ha-mode` or `ha-params` definition, and check the queue arguments, because queues of a classic mirrored type have no mirrors on 4.x.
+
+5. Create a new environment file for this kit with its own name, vault path, and domain. Set `kit.version` to 1.0.0, run `genesis <env> add-secrets`, and deploy it. Because no deployment of that name exists, the version check passes.
+
+6. Import the definitions into the new cluster, either with `rabbitmqctl import_definitions <file>` on one of its nodes or by posting the file to `/api/definitions`.
+
+7. Move your clients to the new domain, then run the acceptance tests against the new environment. With the `broker` feature, register the new broker with Cloud Foundry and recreate every service key and binding, so they carry the new host and the HTTPS management entry. Apps that already hold bindings keep pointing at the old cluster until you rebind them.
+
+8. When every client has moved, retire the old environment.
+
+##### Clearing the broker's ha-mode operator policies
+
+Broker 107 put an operator policy named `operator_set_policy` with an `ha-mode` definition on the vhost of every service instance. RabbitMQ 4.x drops classic mirroring, so a cluster that carries those policies cannot be upgraded cleanly, and an export of their definitions would carry them into the new cluster. Clear them while the cluster is still on RabbitMQ 3.x.
+
+List the vhosts with `rabbitmqctl list_vhosts`. For each service instance vhost, show the policies with `rabbitmqctl list_operator_policies -p <vhost>`, and clear the broker's policy with `rabbitmqctl clear_operator_policy -p <vhost> operator_set_policy`. To do every vhost in one pass, run this on a cluster node. A vhost with no such policy prints an error that you can ignore.
+
+```bash
+rabbitmqctl -q list_vhosts name | while read -r vhost; do
+  rabbitmqctl clear_operator_policy -p "$vhost" operator_set_policy
+done
+```
+
+##### Recreating service keys and bindings after the upgrade
+
+Keys and bindings that broker 107 created hold a `management` entry that points at HTTP port 15672. After the upgrade, that port serves nothing while management TLS is on. The new broker writes HTTPS port 15671 only into keys and bindings created after the upgrade. Delete and recreate each service key, and unbind and rebind every app that reads the `management` entries, then restage the app. Bindings that only use the AMQP entries keep working and need no change.
 
 ## Troubleshooting
 

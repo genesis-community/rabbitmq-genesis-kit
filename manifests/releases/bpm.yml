@@ -1,7 +1,9 @@
+# bpm 1.1.23 cannot start jobs on noble, and 1.4.22 can.  The resolute feature
+# replaces this pin with bpm 1.4.41.
 - type: replace
   path: /releases?/name=bpm?
   value:
     name: bpm
-    version: 1.1.23
-    url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23
-    sha1: 6ccc8c07c05f5d4301df7e052772813533688955
+    version: 1.4.22
+    url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.22
+    sha1: c7259686575aef4cf5fd4abddf4c04207735845a

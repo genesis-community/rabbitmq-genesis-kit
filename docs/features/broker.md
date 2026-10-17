@@ -2,7 +2,7 @@
 
 The RabbitMQ Genesis Kit includes support for deploying the Cloud Foundry RabbitMQ Multitenant Service Broker, which allows Cloud Foundry applications to use RabbitMQ as a managed service.
 
-**Status on RabbitMQ 4.x**: The broker remains selectable and deployable. It is not yet validated against RabbitMQ 4.x. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off by default. Deploying with `broker` on RabbitMQ 4.x triggers a warning; proceed only if you understand this risk.
+**Status on RabbitMQ 4.x**: The broker is deployable on RabbitMQ 4.x, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off by default and prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
 
 ## Overview
 
@@ -82,10 +82,10 @@ params:
   cf_admin_client: rabbitmq-smoke-tests
 ```
 
-The `cf_admin_client` parameter names the UAA client that the broker smoke tests use to log in to Cloud Foundry. The client needs the `client_credentials` grant and the `cloud_controller.admin` authority. Its secret is not a parameter. The broker feature declares it as a provided secret, so `genesis <env> add-secrets` prompts for it and stores it in Vault at `secret/<your/env>/rabbitmq/cf/admin-client:secret`. To set it without the prompt, write it yourself.
+The `cf_admin_client` parameter names the UAA client that the broker smoke tests use to log in to Cloud Foundry. The client needs the `client_credentials` grant and the `cloud_controller.admin` authority. Its secret is not a parameter. The broker feature declares it as a provided secret, so `genesis <env> add-secrets` prompts for it and stores it in Vault at `secret/<your/env>/rabbitmq/cf/admin-client:secret`. To set it without the Genesis prompt, write it yourself with the command below. Give `safe` the key name and no value, and it asks for the secret twice without echoing it, so the secret stays out of your shell history and the process list.
 
 ```
-safe set secret/<your/env>/rabbitmq/cf/admin-client secret=<client secret>
+safe set secret/<your/env>/rabbitmq/cf/admin-client secret
 ```
 
 ### Optional Parameters
@@ -149,8 +149,15 @@ The broker provides service plans that define resource limits and policies. The 
 
 2. **ha** - High availability plan
    - Single vhost with HA enabled
-   - Mirrored queues across all nodes (not yet validated against RabbitMQ 4.x; see the status note above)
    - Default user permissions
+
+## Known Limitations
+
+Two limitations affect the management entries in service bindings and service keys.
+
+**Management host and certificate**. The `management` entries in a binding name the host that the broker is given for the cluster, which in this kit is the HAProxy address. The management certificate carries the names `rabbitmq-mgmt` and `params.mgmt_domain`, and it carries the HAProxy address only when `params.proxy_static_ip` is set. A client that verifies TLS against the host in the binding therefore fails unless you set `params.proxy_static_ip` and rotate the management certificate with `genesis <env> rotate-secrets --update-subjects -y mgmt/certs/server`, or the client overrides the name it verifies and uses `rabbitmq-mgmt`.
+
+**No management TLS behind route-registrar**. The `no-mgmt-tls` feature makes the broker write `http` URIs for the management API, and it appends the plain management port 15672 to `params.mgmt_domain`. With `route-registrar` on as well, `params.mgmt_domain` is the Cloud Foundry router name, and the router terminates TLS on port 443 and does not serve port 15672. The `http_api_uri` and `http_api_uris` entries in a binding then point at `http://<router name>:15672`, which does not answer. We have not tested the combination of `broker`, `no-mgmt-tls`, and `route-registrar`, and we recommend that you keep management TLS on when you use `route-registrar` with the broker.
 
 ## TLS Configuration
 

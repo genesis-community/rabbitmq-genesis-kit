@@ -1,0 +1,25 @@
+# A management certificate supplied by the operator carries the name in
+# params.mgmt_domain and not the internal name rabbitmq-mgmt that the errand
+# and the colocated smoke-tests job verify by default.  Both jobs connect to
+# the real address with curl --resolve and verify the certificate against the
+# name given here, so the certificate needs params.mgmt_domain and never needs
+# an IP address.
+#
+# This is a merge file and the no-rmq-tls-smoke-tests addon is an ops file that
+# runs after it, so the smoke-tests job can still be removed when AMQP TLS is
+# off and management TLS is on.
+instance_groups:
+- name: rmq-server
+  jobs:
+  - name: smoke-tests
+    properties:
+      smoke-tests:
+        tls:
+          server_name: (( grab params.mgmt_domain ))
+- name: acceptance-tests
+  jobs:
+  - name: acceptance-tests
+    properties:
+      acceptance-tests:
+        management_tls:
+          server_name: (( grab params.mgmt_domain ))

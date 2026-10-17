@@ -233,17 +233,17 @@ instance_groups:
 name: no-rmq-tls-rabbitmq
 releases:
 - name: cf-rabbitmq
-  version: 616.0.0+dev.2
+  version: 616.0.0+dev.3
 - name: bpm
-  sha1: 6ccc8c07c05f5d4301df7e052772813533688955
-  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23
-  version: 1.1.23
+  sha1: c7259686575aef4cf5fd4abddf4c04207735845a
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.22
+  version: 1.4.22
 - name: haproxy
   sha1: 2d6892b6a86ac7dc47674f03ef2f09aa1bec28e4
   url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
   version: 13.4.0+2.8.5
 - name: cf-rabbitmq-multitenant-broker
-  version: 0+dev.4
+  version: 0+dev.5
 - name: cf-rabbitmq-smoke-tests
   sha1: 42c3b5316032d9b48e6edfc463a8f2da4d1a2928
   url: https://github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release/releases/download/v278.0.0/cf-rabbitmq-smoke-tests-278.0.0.tgz

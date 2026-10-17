@@ -1,0 +1,219 @@
+# Cases for the pre-deploy check that refuses to upgrade a deployed RabbitMQ
+# older than 3.13.  Each guard case holds the manifest that BOSH reports for the
+# deployment, the release versions BOSH lists for it, and the expected verdict.
+guard:
+- name: kit v0.5.2 manifest with RabbitMQ 3.8 set explicitly
+  deployed_releases: {cf-rabbitmq: 483.0.0}
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 483.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "3.8"}
+  expect: old
+  reason_includes: sets rabbitmq-server.version to 3.8
+
+- name: release 483 with no version property
+  deployed_releases: {cf-rabbitmq: 483.0.0}
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 483.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+  expect: old
+  reason_includes: releases before 614 carry RabbitMQ 3.12 at most
+
+- name: release 539 with no version property
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 539.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: old
+
+- name: release 613 with no version property
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 613.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: old
+
+- name: release 614 with no version property
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 614.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: ok
+  reason_includes: defaults to RabbitMQ 3.13 or newer
+
+- name: dev release of 616 with no version property
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 616.0.0+dev.3}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: ok
+
+- name: version 4.2 set by the kit
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 616.0.0+dev.3}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "4.2"}
+  expect: ok
+
+- name: version 3.13 on an intermediate hop
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 614.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "3.13"}
+  expect: ok
+
+- name: version 3.12 on a new release still counts as older
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 614.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "3.12"}
+  expect: old
+
+- name: unquoted version 3.10 reads back as 3.1
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 539.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: 3.10}
+  expect: old
+
+- name: version property on the instance group
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 614.0.0}]
+    instance_groups:
+    - name: rmq-server
+      properties:
+        rabbitmq-server: {version: "3.11"}
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: old
+
+- name: version property at the top of the manifest
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 614.0.0}]
+    properties:
+      rabbitmq-server: {version: "4.2"}
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: ok
+
+- name: a version property that is not a version falls back to the release
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 483.0.0}]
+    instance_groups:
+    - name: rmq-server
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: banana}
+  expect: old
+  reason_includes: releases before 614
+
+- name: manifest says latest and BOSH reports 483
+  deployed_releases: {cf-rabbitmq: 483.0.0}
+  manifest:
+    releases: [{name: cf-rabbitmq, version: latest}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: old
+  reason_includes: release 483.0.0
+
+- name: manifest says latest and BOSH reports 616
+  deployed_releases: {cf-rabbitmq: 616.0.0}
+  manifest:
+    releases: [{name: cf-rabbitmq, version: latest}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: ok
+
+- name: manifest says latest and BOSH reports nothing
+  manifest:
+    releases: [{name: cf-rabbitmq, version: latest}]
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: unknown
+  reason_includes: not recorded
+
+- name: no release listed and no version property
+  manifest:
+    instance_groups:
+    - name: rmq-server
+      jobs: [{name: rabbitmq-server, release: cf-rabbitmq}]
+  expect: unknown
+  reason_includes: not recorded
+
+- name: two server groups where one is older
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 616.0.0}]
+    instance_groups:
+    - name: first
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "4.2"}
+    - name: second
+      jobs:
+      - name: rabbitmq-server
+        release: cf-rabbitmq
+        properties:
+          rabbitmq-server: {version: "3.8"}
+  expect: old
+  reason_includes: instance group second
+
+- name: a manifest without a rabbitmq-server job
+  manifest:
+    releases: [{name: cf-rabbitmq, version: 483.0.0}]
+    instance_groups:
+    - name: haproxy
+      jobs: [{name: rabbitmq-haproxy, release: cf-rabbitmq}]
+  expect: none
+
+booleans:
+- {value: true,     expect: "true"}
+- {value: false,    expect: "false"}
+- {value: "true",   expect: "true"}
+- {value: "yes",    expect: "true"}
+- {value: "false",  expect: "false"}
+- {value: "no",     expect: "false"}
+- {value: 0,        expect: "false"}
+- {value: 1,        expect: "true"}
+- {value: "",       expect: "false"}
+- {value: ture,     expect: error}
+- {value: [true],   expect: error}

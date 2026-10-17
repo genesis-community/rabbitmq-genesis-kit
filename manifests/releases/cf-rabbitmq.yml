@@ -8,4 +8,4 @@
   path: /releases?/name=cf-rabbitmq?
   value:
     name: cf-rabbitmq
-    version: 616.0.0+dev.2
+    version: 616.0.0+dev.3

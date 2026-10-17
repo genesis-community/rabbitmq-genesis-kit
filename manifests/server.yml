@@ -74,7 +74,10 @@ instance_groups:
     release: cf-rabbitmq
     # The job probes the colocated management API and defaults to plain HTTP on
     # 15672, which is not served while management_tls is enabled.  Point it at
-    # the TLS listener and give it the CA that signed the management cert.
+    # the TLS listener, which is the port that meta.mgmt_port holds, and give
+    # it the CA that signed the management cert.  The job verifies the
+    # certificate against the name rabbitmq-mgmt, and the provided-mgmt-cert
+    # feature changes that name to params.mgmt_domain.
     properties:
       smoke-tests:
         rabbitmq_mgmt_port: (( grab meta.mgmt_port ))
@@ -111,14 +114,14 @@ instance_groups:
   jobs:
   - name: acceptance-tests
     release: cf-rabbitmq
-    # The job reads a CA path for curl whenever its management TLS flag is a
-    # non-empty string, and the flag is always one, so an empty CA breaks
-    # every check with "option --cacert: is badly used here".  Give it both
-    # CAs.  The no-rmq-tls and no-mgmt-tls addons replace the matching block
-    # with one that turns the listener off, because they drop the meta keys
-    # it grabs.  The job's management port defaults to the plain HTTP port
-    # 15672, so it follows the same port as the smoke-tests job, which is the
-    # TLS port while management TLS is on.
+    # The job verifies each TLS listener against the CA given here.  The
+    # no-rmq-tls and no-mgmt-tls addons replace the matching block with one
+    # that turns the listener off, because they drop the meta keys it grabs.
+    # The job's management port defaults to the plain HTTP port 15672, so it
+    # follows the same port as the smoke-tests job, which is the TLS port
+    # while management TLS is on.  The job verifies the management certificate
+    # against the name rabbitmq-mgmt, and the provided-mgmt-cert feature
+    # changes that name to params.mgmt_domain.
     properties:
       acceptance-tests:
         rabbitmq_mgmt_port: (( grab meta.mgmt_port ))
