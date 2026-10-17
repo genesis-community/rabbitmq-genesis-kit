@@ -718,7 +718,7 @@ The node starts but fails to join the cluster.
 
 3. Check logs for specific errors:
    ```bash
-   genesis my-env bosh ssh rmq-server/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log"
+   genesis my-env bosh ssh rmq-server/0 -c "sudo bash -c 'tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log'"
    ```
 
 #### High Memory Usage
@@ -750,14 +750,14 @@ The `register-broker` addon fails with authentication or connection errors.
 
 2. Check broker logs:
    ```bash
-   genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"
+   genesis my-env bosh ssh rmq-broker/0 -c "sudo bash -c 'tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log'"
    ```
 
 3. Ensure route registration is working if using that feature
 
 ### Diagnostic Commands
 
-The kit has no addon for running commands on its VMs, so we use the Genesis `bosh` command, which runs the BOSH CLI against the environment's deployment without needing the director or deployment name. The server instance group is `rmq-server` and the broker instance group is `rmq-broker`. The server job puts `rabbitmqctl` and `rabbitmq-diagnostics` under `/var/vcap/packages/rabbitmq-server/bin`, and its `bin/env` script adds that directory and the Erlang directory to `PATH`. The node's Erlang cookie belongs to the `vcap` user, so the examples run the tools as `vcap` after sourcing `bin/env`.
+The kit has no addon for running commands on its VMs, so we use the Genesis `bosh` command, which runs the BOSH CLI against the environment's deployment without needing the director or deployment name. The server instance group is `rmq-server` and the broker instance group is `rmq-broker`. The server job puts `rabbitmqctl` and `rabbitmq-diagnostics` under `/var/vcap/packages/rabbitmq-server/bin`, and its `bin/env` script adds that directory and the Erlang directory to `PATH`. The node's Erlang cookie belongs to the `vcap` user, so the examples run the tools as `vcap` after sourcing `bin/env`. The log directories belong to `vcap` and carry no access for other users, so the log examples expand the `*.log` pattern inside `sudo bash -c`. A pattern that the login shell expands would match nothing.
 
 #### Check Cluster Status
 
@@ -791,7 +791,7 @@ unset BROKER_PASSWORD
 #### View Recent Logs
 
 ```bash
-genesis my-env bosh ssh rmq-server/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log"
+genesis my-env bosh ssh rmq-server/0 -c "sudo bash -c 'tail -n 200 /var/vcap/sys/log/rabbitmq-server/*.log'"
 ```
 
 ## Monitoring and Metrics

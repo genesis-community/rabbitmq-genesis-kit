@@ -214,7 +214,7 @@ kit:
 
    - Verify the CF credentials and permissions.
 
-   - Check the broker logs on the broker VM, in `/var/vcap/sys/log/rabbitmq-service-broker`, with `genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"`.
+   - Check the broker logs on the broker VM, in `/var/vcap/sys/log/rabbitmq-service-broker`, with `genesis my-env bosh ssh rmq-broker/0 -c "sudo bash -c 'tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log'"`.
 
 2. **Service Creation Fails**
 
@@ -239,7 +239,7 @@ kit:
 genesis my-env bosh ssh rmq-broker/0 -c "sudo monit summary"
 
 # Check broker logs
-genesis my-env bosh ssh rmq-broker/0 -c "sudo tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log"
+genesis my-env bosh ssh rmq-broker/0 -c "sudo bash -c 'tail -n 200 /var/vcap/sys/log/rabbitmq-service-broker/*.log'"
 
 # Test the broker API locally. The broker listens on plain HTTP at 127.0.0.1:4567,
 # so the call needs no CA file. The password comes from a prompt.
