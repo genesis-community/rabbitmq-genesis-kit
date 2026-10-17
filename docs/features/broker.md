@@ -2,30 +2,50 @@
 
 The RabbitMQ Genesis Kit includes support for deploying the Cloud Foundry RabbitMQ Multitenant Service Broker, which allows Cloud Foundry applications to use RabbitMQ as a managed service.
 
-**Status on RabbitMQ 4.x**: The broker is deployable on RabbitMQ 4.x, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off by default and prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
+On RabbitMQ 4.x, the broker is deployable, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off by default and prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
 
 ## Overview
 
 The service broker provides:
 
-1. **Service Instance Management** - Creating and deleting RabbitMQ vhosts (virtual hosts)
-2. **Service Binding** - Generating credentials and permissions for applications
-3. **Service Plans** - Customizable service tiers with different limits and policies
-4. **Integration with Cloud Foundry** - Marketplace listings and instance dashboard
+1. **Service Instance Management**
+   The broker creates and deletes RabbitMQ vhosts (virtual hosts).
+
+2. **Service Binding**
+   The broker generates credentials and permissions for applications.
+
+3. **Service Plans**
+   Customizable service tiers carry different limits and policies.
+
+4. **Integration with Cloud Foundry**
+   The broker supplies marketplace listings and an instance dashboard.
 
 ## Architecture
 
 When the `broker` feature is enabled, the Genesis Kit deploys:
 
-1. **Broker VM** - Runs the cf-rabbitmq-multitenant-broker service
-2. **Broker Database** - Stores service instance and binding information
-3. **Broker API** - HTTPS endpoint that implements the Open Service Broker API
-4. **Service Dashboard** - Web UI for managing RabbitMQ service instances
+1. **Broker VM**
+   This VM runs the cf-rabbitmq-multitenant-broker service.
 
-The broker interacts with:
-- Cloud Foundry Cloud Controller - For service registration and provisioning requests
-- RabbitMQ Management API - To create vhosts, users, and permissions
-- Applications - For binding and credential delivery
+2. **Broker Database**
+   This database stores service instance and binding information.
+
+3. **Broker API**
+   This HTTPS endpoint implements the Open Service Broker API.
+
+4. **Service Dashboard**
+   This web UI manages RabbitMQ service instances.
+
+The broker interacts with the following:
+
+- Cloud Foundry Cloud Controller
+  The broker handles service registration and provisioning requests from it.
+
+- RabbitMQ Management API
+  The broker uses it to create vhosts, users, and permissions.
+
+- Applications
+  The broker delivers bindings and credentials to them.
 
 ```
 ┌────────────────────┐         ┌────────────────────┐
@@ -115,9 +135,12 @@ After deployment, register the broker with Cloud Foundry using the provided addo
 genesis do my-env -- register-broker
 ```
 
-This command:
+This command does three things.
+
 1. Authenticates with Cloud Foundry
+
 2. Registers the broker using the configured parameters
+
 3. Makes service plans available in the marketplace
 
 ## Using the Service
@@ -142,13 +165,20 @@ cf env my-app
 
 The broker provides service plans that define resource limits and policies. The default plans include:
 
-1. **standard** - Basic plan with default settings
+1. **standard**
+   A basic plan with default settings
+
    - Single vhost
+
    - Default user permissions
+
    - No specific resource limits
 
-2. **ha** - High availability plan
+2. **ha**
+   A high availability plan
+
    - Single vhost with HA enabled
+
    - Default user permissions
 
 ## Known Limitations
@@ -219,19 +249,28 @@ kit:
 ### Common Issues
 
 1. **Broker Registration Fails**
-   - Check connectivity between broker and CF API
-   - Verify CF credentials and permissions
-   - Check broker logs: `genesis do my-env -- logs rabbitmq-broker`
+
+   - Check connectivity between the broker and the CF API.
+
+   - Verify the CF credentials and permissions.
+
+   - Check the broker logs with `genesis do my-env -- logs rabbitmq-broker`.
 
 2. **Service Creation Fails**
-   - Check broker logs for errors
-   - Verify connectivity to RabbitMQ management API
-   - Check RabbitMQ has capacity for new vhosts
+
+   - Check the broker logs for errors.
+
+   - Verify connectivity to the RabbitMQ management API.
+
+   - Check that RabbitMQ has capacity for new vhosts.
 
 3. **Service Binding Fails**
-   - Check broker logs for errors
-   - Verify RabbitMQ user creation permissions
-   - Check that the vhost exists and is healthy
+
+   - Check the broker logs for errors.
+
+   - Verify the RabbitMQ user creation permissions.
+
+   - Check that the vhost exists and is healthy.
 
 ### Diagnostic Commands
 
@@ -255,9 +294,11 @@ genesis do my-env -- ssh rabbitmq-broker/0 -c "curl -k https://rabbitmq.example.
 
 To customize service plans:
 
-1. SSH into the broker VM
-2. Edit the service configuration files
-3. Restart the broker services
+1. SSH into the broker VM.
+
+2. Edit the service configuration files.
+
+3. Restart the broker services.
 
 ```bash
 # SSH to broker

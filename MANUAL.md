@@ -5,56 +5,99 @@ The **RabbitMQ Genesis Kit** deploys a RabbitMQ cluster and, optionally, the CF 
 ## Table of Contents
 
 - [Overview](#overview)
+
 - [Deployment Architecture](#deployment-architecture)
+
 - [Base Parameters](#base-parameters)
+
   - [Literal Static IPs](#literal-static-ips)
+
 - [Features](#features)
+
   - [Broker Integration](#broker-integration)
+
     - [`broker`](#broker)
+
     - [`no-broker-tls`](#no-broker-tls)
+
     - [`metrics-emitter`](#metrics-emitter)
+
   - [Cloud Foundry Integration](#cloud-foundry-integration)
+
     - [`route-registrar`](#route-registrar)
+
     - [`nats-tls`](#nats-tls)
+
   - [TLS Configuration](#tls-configuration)
+
     - [`no-rmq-tls`](#no-rmq-tls)
+
     - [`no-mgmt-tls`](#no-mgmt-tls)
+
     - [`provided-rmq-cert`](#provided-rmq-cert)
+
     - [`provided-mgmt-cert`](#provided-mgmt-cert)
+
     - [`provided-broker-cert`](#provided-broker-cert)
+
   - [Load Balancing](#load-balancing)
+
     - [`external-rmq-lb`](#external-rmq-lb)
+
   - [Protocol Support](#protocol-support)
+
     - [`mqtt`](#mqtt)
+
     - [`stomp`](#stomp)
+
   - [Monitoring](#monitoring)
+
     - [`prometheus`](#prometheus)
+
     - [`no-prometheus-tls`](#no-prometheus-tls)
+
   - [Stemcell](#stemcell)
+
     - [`resolute`](#resolute)
+
 - [Feature Compatibility Matrix](#feature-compatibility-matrix)
+
 - [Available Addons](#available-addons)
+
 - [Security Considerations](#security-considerations)
+
 - [Performance Tuning](#performance-tuning)
+
 - [Upgrading](#upgrading)
+
 - [Troubleshooting](#troubleshooting)
+
 - [Monitoring and Metrics](#monitoring-and-metrics)
 
 ## Overview
 
-The RabbitMQ Genesis Kit provides a production-ready RabbitMQ cluster deployment with optional integration to Cloud Foundry. It leverages the power of BOSH to manage the lifecycle of the RabbitMQ service, including deployment, updates, and recovery from failure scenarios. The kit deploys RabbitMQ 4.2 (paired with Erlang 27) using the `cf-rabbitmq` BOSH release.
+The RabbitMQ Genesis Kit provides a production-ready RabbitMQ cluster deployment with optional integration to Cloud Foundry. It uses BOSH to manage the lifecycle of the RabbitMQ service, including deployment, updates, and recovery from failure scenarios. The kit deploys RabbitMQ 4.2 (paired with Erlang 27) using the `cf-rabbitmq` BOSH release.
 
 ## Deployment Architecture
 
 The standard RabbitMQ deployment architecture consists of:
 
-1. **RabbitMQ Server Nodes**: Multiple RabbitMQ server instances forming a cluster for high availability.
-2. **HAProxy Layer**: A proxying layer to provide load balancing across the cluster nodes (unless using external load balancing).
-3. **Service Broker** (optional): When integrating with Cloud Foundry, a service broker that manages RabbitMQ service instances.
-4. **Process Supervision**: The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under `bpm` (BOSH Process Manager). A `bpm` job is colocated on the `rmq-server` and `haproxy` instance groups to supervise them.
-5. **Test Errands**: A `smoke-tests` job is colocated on the `rmq-server` instance group and runs after every deploy, and a separate `acceptance-tests` errand instance group exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed cluster. The plugin checks run for the `mqtt`, `stomp`, and `prometheus` plugins when those features are on. With the `broker` feature, the `rmq-broker` instance group also carries its own `smoke-tests` errand job.
+1. **RabbitMQ Server Nodes**
+   Multiple RabbitMQ server instances forming a cluster for high availability.
 
-The kit sets `features.use_dns_addresses: false` and this is not user-configurable. RabbitMQ derives its node name from the instance IP address and ships a static `erl_inetrc`; bosh-dns hostnames don't resolve for those node names and break cluster formation, so the kit keeps IP-based addressing.
+2. **HAProxy Layer**
+   A proxying layer provides load balancing across the cluster nodes, unless you use external load balancing.
+
+3. **Service Broker** (optional)
+   When you integrate with Cloud Foundry, a service broker manages the RabbitMQ service instances.
+
+4. **Process Supervision**
+   The `rabbitmq-server` and `rabbitmq-haproxy` jobs run under `bpm` (BOSH Process Manager). A `bpm` job is colocated on the `rmq-server` and `haproxy` instance groups to supervise them.
+
+5. **Test Errands**
+   A `smoke-tests` job is colocated on the `rmq-server` instance group and runs after every deploy, and a separate `acceptance-tests` errand instance group exercises AMQP, management, cluster, HAProxy, and plugin checks against the deployed cluster. The plugin checks run for the `mqtt`, `stomp`, and `prometheus` plugins when those features are on. With the `broker` feature, the `rmq-broker` instance group also carries its own `smoke-tests` errand job.
+
+The kit sets `features.use_dns_addresses: false`, and you cannot change it. RabbitMQ derives its node name from the instance IP address and ships a static `erl_inetrc`. Because bosh-dns hostnames don't resolve for those node names and would break cluster formation, the kit keeps IP-based addressing.
 
 The deployment includes these key components:
 
@@ -97,11 +140,11 @@ The deployment includes these key components:
 | `server_vm_type` | The VM type for RabbitMQ server VMs. | `rabbitmq` |
 | `proxy_static_ip` | A literal static IPv4 address for the HAProxy VM. Use it with a Genesis 3 named cloud config, where network names are dotted. The address is also added as an IP subject alternative name on the RabbitMQ server certificate and the management server certificate, so clients that connect to HAProxy by IP can verify the certificate. See [Literal Static IPs](#literal-static-ips). | *(Unset, the first static IP of `proxy_network`)* |
 | `proxy_vm_type` | The VM type for the HAProxy VM. | `small` |
-| `server_disk_type` | The disk type for RabbitMQ server nodes. Used for cluster configuration, queue config, and durable queue data. | `rabbitmq` |
+| `server_disk_type` | The disk type for RabbitMQ server nodes. RabbitMQ uses it for cluster configuration, queue configuration, and durable queue data. | `rabbitmq` |
 | `stemcell_os` | The OS of the stemcell to use. | `ubuntu-jammy` |
 | `stemcell_version` | The version of the stemcell to use. | `latest` |
 | `skip_rabbitmq_upgrade_check` | When `true`, the kit skips the pre-deploy check that stops a deploy over a deployed cluster older than RabbitMQ 3.13. See [Moving a cluster older than RabbitMQ 3.13 to a new 4.2 cluster](#moving-a-cluster-older-than-rabbitmq-313-to-a-new-42-cluster). It accepts `true`, `false`, `yes`, `no`, `on`, `off`, `1`, and `0`, and the kit stops with an error on any other value. | `false` |
-| `check_queue_sync` | If true, pre-stop script will wait until quorum queues are synced before shutting down. RabbitMQ 4.x removed classic queue mirroring, so this check now applies to quorum queue sync only. | `false` |
+| `check_queue_sync` | If true, the pre-stop script waits until quorum queues are synced before shutting down. RabbitMQ 4.x removed classic queue mirroring, so this check now applies to quorum queue sync only. | `false` |
 
 ### Literal Static IPs
 
@@ -150,7 +193,7 @@ params:
 
 Deploys the cf-rabbitmq-multitenant-broker to allow applications within Cloud Foundry to utilize the RabbitMQ cluster. The broker server listens on TCP port 4566 for HTTPS traffic.
 
-**Status on RabbitMQ 4.x**: The `broker` feature is deployable on RabbitMQ 4.x, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below), and it prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
+On RabbitMQ 4.x, the `broker` feature is deployable, and a live test deployed it, registered it with Cloud Foundry, and bound an app to a service instance. RabbitMQ 4.x removed classic queue mirroring in favor of quorum queues as the default queue type, and the `ha-mode` operator policy the broker used to set by default targets classic mirrored queues, so it is invalid on this release. The kit now turns that policy off by default (see `operator_policy_enabled` below), and it prints a warning that says so each time it builds the manifest. Broader validation against quorum queue workloads is planned follow-up work.
 
 The kit pins the community fork of the broker release, `cloudfoundry-community/cf-rabbitmq-multitenant-broker-release`, on every stemcell. The pivotal-cf v107 release it replaces no longer serves its blobs. The kit pins the fork's first final release, 237.0.0+cfcommunity.1, and the Director downloads it from the GitHub release.
 
@@ -352,7 +395,8 @@ Removes the HAProxy VM and exposes the RabbitMQ nodes directly through a load ba
 
 ##### VM Extensions
 
-* `rmq-loadbalancer` - Applied to each RabbitMQ server node to attach the VMs to the backend pool of a load balancer.
+* `rmq-loadbalancer`
+  The kit applies this extension to each RabbitMQ server node to attach the VMs to the backend pool of a load balancer.
 
 ##### Example Configuration
 
@@ -412,7 +456,7 @@ features:
 
 #### `no-prometheus-tls`
 
-Has no effect. The kit once put a haproxy proxy in front of port 15691 and this feature removed it, but the `rabbitmq-server` job now opens the TLS listener itself whenever management TLS is on and has no property to close it. The feature is still accepted so that existing environment files keep rendering, and the kit prints a notice when it is set. To serve metrics without TLS, use `no-mgmt-tls`, and note that it also turns off management TLS.
+This feature has no effect. The kit once put a haproxy proxy in front of port 15691 and this feature removed it, but the `rabbitmq-server` job now opens the TLS listener itself whenever management TLS is on and has no property to close it. The feature is still accepted so that existing environment files keep rendering, and the kit prints a notice when it is set. To serve metrics without TLS, use `no-mgmt-tls`, and note that it also turns off management TLS.
 
 ### Stemcell
 
@@ -492,29 +536,39 @@ genesis do my-env -- deregister-broker
 By default, the RabbitMQ deployment secures all communication with TLS:
 
 - AMQP communication uses port 5671 with TLS
+
 - Management UI uses port 15671 with HTTPS
+
 - If Prometheus is enabled, metrics are exposed over HTTPS on port 15691 with the management certificate
 
 For production deployments, it's recommended to:
 
-1. **Maintain TLS Security**: Avoid using the `no-rmq-tls`, `no-mgmt-tls`, and `no-broker-tls` features in production environments.
+1. **Maintain TLS Security**
+   Avoid using the `no-rmq-tls`, `no-mgmt-tls`, and `no-broker-tls` features in production environments.
 
-2. **Certificate Management**: Consider using the `provided-*-cert` features to supply your own certificates from a trusted certificate authority, especially for external-facing interfaces.
+2. **Certificate Management**
+   Consider using the `provided-*-cert` features to supply your own certificates from a trusted certificate authority, especially for external-facing interfaces.
 
-3. **Authentication**: The default broker credentials should be changed. Consider implementing additional authentication methods for production use.
+3. **Authentication**
+   Change the default broker credentials, and consider adding other authentication methods for production use.
 
-4. **Network Isolation**: Use network segmentation to restrict access to the RabbitMQ cluster, allowing only necessary communication paths.
+4. **Network Isolation**
+   Use network segmentation to restrict access to the RabbitMQ cluster, allowing only necessary communication paths.
 
 ### User Management
 
 The RabbitMQ deployment creates default users:
 
 - Admin user for management access
+
 - Broker user for service broker access
 
 For production deployments:
+
 1. Rotate credentials regularly
+
 2. Use the principle of least privilege when granting permissions to users
+
 3. Monitor access logs for suspicious activity
 
 ## Performance Tuning
@@ -523,53 +577,70 @@ For production deployments:
 
 Proper sizing of your RabbitMQ deployment is critical for performance:
 
-1. **Node Count**: Increase `rmq_instances` for higher availability and throughput. For most production workloads, at least 3 nodes are recommended.
+1. **Node Count**
+   Increase `rmq_instances` for higher availability and throughput. For most production workloads, at least 3 nodes are recommended.
 
-2. **VM Sizing**: Adjust `server_vm_type` based on expected workload:
+2. **VM Sizing**
+   Adjust `server_vm_type` based on expected workload:
+
    - Memory is typically the most important resource for RabbitMQ
+
    - CPU becomes important with many concurrent connections
+
    - Example sizing:
+
      - Small workloads: 2 CPU, 4GB RAM
+
      - Medium workloads: 4 CPU, 8GB RAM 
+
      - Large workloads: 8+ CPU, 16GB+ RAM
 
-3. **Disk Performance**: Use `server_disk_type` to specify a disk type with:
+3. **Disk Performance**
+   Use `server_disk_type` to specify a disk type with:
+
    - Good throughput for queue operations
+
    - Low latency for message persistence
+
    - Sufficient IOPS for high message rates
 
 ### Queue Mirroring
 
-**Note**: RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default.
+RabbitMQ 4.x removed classic queue mirroring and uses quorum queues by default.
 
 The broker no longer sets a mirroring policy by default. To have it set an operator policy on the vhosts it creates, set `operator_policy_enabled: true` and give `operator_policy_definition` a JSON definition that RabbitMQ 4.x accepts, such as `{"dead-letter-exchange":"dlx"}`.
 
 ### Queue Synchronization During Upgrades
 
-Set `check_queue_sync: true` to ensure queue contents are fully synchronized before node shutdown during upgrades. This prevents potential message loss but may increase upgrade time.
+Set `check_queue_sync: true` to ensure queue contents are fully synchronized before node shutdown during upgrades. This prevents potential message loss, but it may increase upgrade time.
 
 ## Upgrading
 
 ### General Upgrade Process
 
-1. **Review Release Notes**: Before upgrading, check the release notes for breaking changes or migration requirements.
+1. **Review Release Notes**
+   Before upgrading, check the release notes for breaking changes or migration requirements.
 
-2. **Backup**: Always take a backup of your RabbitMQ deployment before upgrading:
+2. **Backup**
+   Always take a backup of your RabbitMQ deployment before upgrading:
    ```bash
    # Create a snapshot of your RabbitMQ deployment
    genesis do my-env -- export > rabbitmq-backup.yml
    ```
 
-3. **Incremental Upgrades**: For major version upgrades, consider upgrading incrementally through intermediate versions rather than jumping multiple major versions. This kit cannot be one of those intermediate hops for a cluster older than RabbitMQ 3.13, because it deploys only 4.2, so it refuses to deploy over such a cluster. See [Upgrading to RabbitMQ 4.x](#upgrading-to-rabbitmq-4x).
+3. **Incremental Upgrades**
+   For major version upgrades, consider upgrading incrementally through intermediate versions rather than jumping multiple major versions. This kit cannot be one of those intermediate hops for a cluster older than RabbitMQ 3.13, because it deploys only 4.2, so it refuses to deploy over such a cluster. See [Upgrading to RabbitMQ 4.x](#upgrading-to-rabbitmq-4x).
 
-4. **Testing**: Test the upgrade in a non-production environment first.
+4. **Testing**
+   Test the upgrade in a non-production environment first.
 
-5. **Perform the Upgrade**:
+5. **Perform the Upgrade**
    ```bash
    genesis deploy my-env
    ```
 
-6. **Verify Functionality**: Run the acceptance tests after upgrading, and the broker smoke tests too if the `broker` feature is on:
+6. **Verify Functionality**
+   Run the acceptance tests after upgrading, and the broker smoke tests too if the `broker` feature is on:
    ```bash
    genesis do my-env -- acceptance-tests
    genesis do my-env -- smoke-tests
@@ -582,12 +653,19 @@ Set `check_queue_sync: true` to ensure queue contents are fully synchronized bef
 This kit deploys RabbitMQ 4.2 (paired with Erlang 27) via the `cf-rabbitmq` release. The same release also supports RabbitMQ 3.13 (paired with Erlang 26). Note the following when upgrading a cluster running an earlier RabbitMQ 3.x release:
 
 - RabbitMQ cannot move from 3.8, or from any version older than 3.13, to 4.2 in place. The cluster has to be on 3.13 with every feature flag enabled before 4.2 will start on its data. Kit v0.5.2 runs RabbitMQ 3.8, and this kit cannot carry a cluster through 3.9 to 3.12, so a v0.5.2 environment cannot be upgraded in place. The kit refuses to deploy over such a cluster. See [Moving a cluster older than RabbitMQ 3.13 to a new 4.2 cluster](#moving-a-cluster-older-than-rabbitmq-313-to-a-new-42-cluster).
-- Classic queue mirroring is removed. Quorum queues are the default queue type; migrate any classic mirrored queues to quorum queues before or during the upgrade.
+
+- Classic queue mirroring is removed, and quorum queues are the default queue type. Migrate any classic mirrored queues to quorum queues before or during the upgrade.
+
 - `check_queue_sync` now waits for quorum queue sync only, not mirrored-queue sync.
+
 - The broker's old default `ha-mode` policy targets classic mirrored queues, so the kit turns it off. The `ha_sync_mode` parameter only fed that policy, so the kit now ignores it and prints a notice when it is set. Use the `operator_policy_*` parameters instead. The policies that broker 107 already set on your service instances' vhosts have to be cleared by hand, as described in [Clearing the broker's ha-mode operator policies](#clearing-the-brokers-ha-mode-operator-policies).
-- Feature flags gate cluster-wide behavior changes; all nodes must run compatible versions before enabling new feature flags.
-- Streams, added in RabbitMQ 3.9, and the feature flags system remain available.
+
+- Feature flags gate cluster-wide behavior changes. All nodes must run compatible versions before you enable new feature flags.
+
+- Streams, which RabbitMQ added in 3.9, and the feature flags system remain available.
+
 - Off resolute, the kit pins bpm 1.4.22 in place of 1.1.23, because 1.1.23 cannot start jobs on noble stemcells. The pin carries a URL and sha1, so the Director fetches the release when it does not hold it. The `resolute` feature keeps its own bpm 1.4.41 pin.
+
 - The kit no longer asks for `localhost` and `127.0.0.1` on the management certificate. An existing certificate still carries them, so `genesis <env> check-secrets -V` reports `Subject Alt Names (extra: localhost, 127.0.0.1)` as a warning. The warning does not block a deploy. To clear it, run `genesis <env> rotate-secrets mgmt/certs/server`.
 
 ##### The pre-deploy version check
@@ -640,11 +718,16 @@ Keys and bindings that broker 107 created hold a `management` entry that points 
 
 #### Node Not Joining Cluster
 
-**Symptoms**: Node starts but fails to join the cluster.
+**Symptoms**
 
-**Resolution**:
+The node starts but fails to join the cluster.
+
+**Resolution**
+
 1. Check network connectivity between nodes
+
 2. Verify Erlang cookie is consistent across nodes
+
 3. Check logs for specific errors:
    ```bash
    genesis do my-env -- logs rabbitmq-server
@@ -652,26 +735,36 @@ Keys and bindings that broker 107 created hold a `management` entry that points 
 
 #### High Memory Usage
 
-**Symptoms**: RabbitMQ instance using excessive memory, triggering alarms.
+**Symptoms**
 
-**Resolution**:
+A RabbitMQ instance uses excessive memory and triggers alarms.
+
+**Resolution**
+
 1. Check for large queues or messages:
    ```bash
    genesis do my-env -- ssh rabbitmq/0 -c "rabbitmqctl list_queues name messages memory"
    ```
+
 2. Consider increasing memory limits or implementing a message TTL
+
 3. Review consumer performance if queues are backing up
 
 #### Service Broker Registration Failures
 
-**Symptoms**: The `register-broker` addon fails with authentication or connection errors.
+**Symptoms**
 
-**Resolution**:
+The `register-broker` addon fails with authentication or connection errors.
+
+**Resolution**
+
 1. Verify Cloud Foundry credentials and connectivity
+
 2. Check broker logs:
    ```bash
    genesis do my-env -- logs rabbitmq-broker
    ```
+
 3. Ensure route registration is working if using that feature
 
 ### Diagnostic Commands
@@ -706,9 +799,14 @@ genesis do my-env -- logs rabbitmq-server --recent
 
 RabbitMQ exposes a wide range of metrics that can be collected through various means:
 
-1. **Management API**: Basic metrics via HTTP/HTTPS
-2. **Prometheus Endpoint**: Comprehensive metrics in Prometheus format
-3. **Metrics Emitter**: For Cloud Foundry integration via Loggregator
+1. **Management API**
+   Basic metrics over HTTP or HTTPS
+
+2. **Prometheus Endpoint**
+   Comprehensive metrics in Prometheus format
+
+3. **Metrics Emitter**
+   Cloud Foundry integration through Loggregator
 
 Key metrics to monitor include:
 
@@ -725,7 +823,9 @@ Key metrics to monitor include:
 #### Prometheus
 
 When the `prometheus` feature is enabled, every RabbitMQ node serves metrics at:
+
 - `https://<node-ip>:15691/metrics` (with TLS, signed by the management CA)
+
 - `http://<node-ip>:15692/metrics` (always available, and the only endpoint under `no-mgmt-tls`)
 
 HAProxy does not forward these ports, so `<rmq_domain>` does not serve them. The node addresses are not names in the management certificate, so a TLS scrape verifies the certificate against the name `rabbitmq-mgmt`.
@@ -749,8 +849,11 @@ scrape_configs:
 #### Grafana Dashboards
 
 Several Grafana dashboards are available for RabbitMQ Prometheus metrics:
+
 - RabbitMQ-Overview
+
 - RabbitMQ-Queues
+
 - RabbitMQ-Erlang
 
 #### Cloud Foundry Integration
@@ -762,9 +865,13 @@ When using the `metrics-emitter` feature, RabbitMQ metrics are sent to the Cloud
 Consider setting up alerts for:
 
 1. Node availability issues
+
 2. Queue depth exceeding thresholds
+
 3. High memory or disk usage
+
 4. Message rate anomalies
+
 5. Connection churn
 
 Example alerting rules for Prometheus:
