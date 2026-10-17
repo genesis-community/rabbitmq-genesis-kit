@@ -318,7 +318,7 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/haproxy-boshrelease?v=13.4.0%2B2.8.5
   version: 13.4.0+2.8.5
 - name: cf-rabbitmq-multitenant-broker
-  version: 0+dev.2
+  version: 0+dev.3
 - name: cf-rabbitmq-smoke-tests
   sha1: 42c3b5316032d9b48e6edfc463a8f2da4d1a2928
   url: https://github.com/pivotal-cf/cf-rabbitmq-smoke-tests-release/releases/download/v278.0.0/cf-rabbitmq-smoke-tests-278.0.0.tgz

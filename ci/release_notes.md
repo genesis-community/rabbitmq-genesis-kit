@@ -12,7 +12,7 @@ Work through these steps in order when you upgrade an existing environment.
 
 4. If you use the `broker` feature, create a UAA client for the broker smoke tests, with the `client_credentials` grant and the `cloud_controller.admin` authority. Set `params.cf_admin_client` to its name, then store its secret in Vault at `secret/<your/env>/rabbitmq/cf/admin-client` under the key `secret`. Running `genesis <env> add-secrets` prompts for the secret. The manifest will not build until the parameter is set, and `check-secrets` reports the secret as missing until it exists.
 
-5. If you use the `broker` feature, make sure the Director already has the broker release that the kit pins. The kit now pins the community fork of the broker release, because the pivotal-cf v107 release no longer serves its blobs. Until the fork's first final release is cut, the pin is a dev release, `0+dev.2`, with no URL, so the Director has to hold it already.
+5. If you use the `broker` feature, make sure the Director already has the broker release that the kit pins. The kit now pins the community fork of the broker release, because the pivotal-cf v107 release no longer serves its blobs. Until the fork's first final release is cut, the pin is a dev release, `0+dev.3`, with no URL, so the Director has to hold it already.
 
 6. Deploy the environment.
 
@@ -53,5 +53,7 @@ The kit pins cf-rabbitmq 616.0.0. Its smoke-tests job and the acceptance-tests e
 * `no-rmq-tls` did not turn off the broker's `rabbitmq.ssl` property because of a misspelled path. It does now. With `no-rmq-tls` and management TLS on, the kit removes the colocated smoke-tests job, because that job has a single TLS switch for both listeners.
 
 * The acceptance-tests errand failed with `curl: option --cacert: is badly used here` because the kit gave it no CA. The kit now sets the AMQP and management TLS flags and CAs for it, and `no-rmq-tls` and `no-mgmt-tls` switch the matching flag off. With cf-rabbitmq 616.0.0 the errand reaches the management API through the name `rabbitmq-mgmt`, which the management certificate carries, and its HAProxy checks use HTTPS when management TLS is on, so its management and HAProxy checks pass against a TLS-only listener.
+
+* Service bindings from the `broker` feature advertised the management API at HTTP port 15672 even when management TLS was on, where nothing listens. With the broker release at `0+dev.3`, the `management` and `management+ssl` entries in a binding point at HTTPS port 15671 with `ssl` true when management TLS is on, and stay at HTTP port 15672 with `no-mgmt-tls`. The `http_api_uri` and `dashboard_url` entries are built from the management domain, so they already used port 15671.
 
 * The post-deploy hook no longer calls the base class `perform`, which raised an error after every successful deploy. The hooks also resolve the Genesis library fallback correctly.

@@ -14,4 +14,4 @@
   path: /releases?/name=cf-rabbitmq-multitenant-broker?
   value:
     name: cf-rabbitmq-multitenant-broker
-    version: 0+dev.2
+    version: 0+dev.3
