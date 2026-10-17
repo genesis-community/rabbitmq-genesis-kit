@@ -115,7 +115,7 @@ instance_groups:
 name: proxy-static-ip-rabbitmq
 releases:
 - name: cf-rabbitmq
-  version: 616.0.0+dev.1
+  version: 616.0.0+dev.2
 - name: bpm
   sha1: 6ccc8c07c05f5d4301df7e052772813533688955
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.23

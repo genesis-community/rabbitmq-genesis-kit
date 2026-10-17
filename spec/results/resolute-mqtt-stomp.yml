@@ -122,7 +122,7 @@ instance_groups:
 name: resolute-mqtt-stomp-rabbitmq
 releases:
 - name: cf-rabbitmq
-  version: 616.0.0+dev.1
+  version: 616.0.0+dev.2
 - name: bpm
   sha1: sha256:7b445508d63d2171d892ba33f836087e1e519b9782f44c5fa5290323616ca8e6
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.41
