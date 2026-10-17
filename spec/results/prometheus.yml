@@ -113,7 +113,9 @@ instance_groups:
 name: prometheus-rabbitmq
 releases:
 - name: cf-rabbitmq
-  version: 616.0.0+dev.3
+  sha1: 1175a2233576517ef1a81d724fa280b32625057f
+  url: https://github.com/cloudfoundry-community/cf-rabbitmq-release/releases/download/v616.0.0/cf-rabbitmq-616.0.0.tgz
+  version: 616.0.0
 - name: bpm
   sha1: c7259686575aef4cf5fd4abddf4c04207735845a
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.22

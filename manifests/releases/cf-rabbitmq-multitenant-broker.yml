@@ -1,17 +1,9 @@
 # The community fork of the broker release, on every stemcell.  It replaces
 # the pivotal-cf v107 pin, whose blobs now return 403.
-#
-# The final release has not been cut yet.  Until it is, this pins the dev
-# release that is already on the Director, so there is no url or sha1.
-#
-# When the final exists, replace the version and add the url and sha1 of its
-# GitHub release asset:
-#
-#   version: 237.0.0+cfcommunity.1
-#   url:     https://github.com/cloudfoundry-community/cf-rabbitmq-multitenant-broker-release/releases/download/v237.0.0%2Bcfcommunity.1/cf-rabbitmq-multitenant-broker-237.0.0+cfcommunity.1.tgz
-#   sha1:    <sha1 of that tarball>
 - type: replace
   path: /releases?/name=cf-rabbitmq-multitenant-broker?
   value:
     name: cf-rabbitmq-multitenant-broker
-    version: 0+dev.5
+    version: 237.0.0+cfcommunity.1
+    url: https://github.com/cloudfoundry-community/cf-rabbitmq-multitenant-broker-release/releases/download/v237.0.0%2Bcfcommunity.1/cf-rabbitmq-multitenant-broker-237.0.0%2Bcfcommunity.1.tgz
+    sha1: 638a436a31432445e667be1dd9603a36bba20f6c
