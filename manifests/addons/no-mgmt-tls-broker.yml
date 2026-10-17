@@ -1,0 +1,6 @@
+---
+# Without management TLS the management domain points straight at the plain
+# HTTP listener, so the broker has to build http_api_uri with the http scheme.
+- type: replace
+  path: /instance_groups/name=rmq-broker/jobs/name=rabbitmq-service-broker/properties/rabbitmq-service-broker/rabbitmq/management_api_scheme?
+  value: http

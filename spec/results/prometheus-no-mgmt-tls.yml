@@ -120,6 +120,7 @@ instance_groups:
             username: broker
           management:
             username: management
+          management_api_scheme: http
           management_domain: test-rmq-domain:15672
           operator_set_policy:
             enabled: false

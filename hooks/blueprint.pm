@@ -186,6 +186,15 @@ sub perform {
       manifests/addons/no-mgmt-tls.yml
     ));
 
+    # The broker builds http_api_uri from its management domain with an https
+    # scheme unless told otherwise, and this deployment's management
+    # listener is plain HTTP.
+    if ($self->want_feature("broker")) {
+      $self->add_files(qw(
+        manifests/addons/no-mgmt-tls-broker.yml
+      ));
+    }
+
     if ($self->want_feature("route-registrar")) {
       $self->add_files(qw(
         manifests/addons/no-mgmt-tls-route-registrar.yml
